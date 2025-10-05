@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { CreatePlayerContext } from "../../player2/index.svelte";
+	import { CreatePlayerContext } from "../../player/index.svelte";
 
 	let { children } = $props();
 	CreatePlayerContext();
