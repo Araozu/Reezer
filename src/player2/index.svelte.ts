@@ -1,5 +1,5 @@
 import { getContext, setContext } from "svelte";
-import { HeadlessMusicPlayer } from "./HeadlessMusicPlayer";
+import { HeadlessMusicPlayer } from "./HeadlessMusicPlayer.svelte";
 
 const playerKey = Symbol("music_player");
 
@@ -9,9 +9,14 @@ export function CreatePlayerContext()
 	setContext(playerKey, player);
 }
 
-export function GetCurrentPlayer()
+export function GetCurrentPlayer(): HeadlessMusicPlayer
 {
-	return getContext<HeadlessMusicPlayer>(playerKey);
-	//
+	const player = getContext<HeadlessMusicPlayer | undefined>(playerKey);
+	if (!player)
+{
+		throw new Error("No music player context found. Ensure that CreatePlayerContext has been called in a parent component.");
+	}
+
+	return player;
 }
 
