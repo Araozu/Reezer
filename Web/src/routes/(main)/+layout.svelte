@@ -2,6 +2,7 @@
 	import MusicPlayer from "../../components/music-player.svelte";
 	import NewMusicPlayer from "../../components/new-music-player.svelte";
 	import { CreatePlayerContext } from "../../player/index.svelte";
+	import Player from "./player.svelte";
 
 	let { children } = $props();
 	CreatePlayerContext();
@@ -15,3 +16,5 @@
 		<NewMusicPlayer />
 	</div>
 </div>
+
+<Player />

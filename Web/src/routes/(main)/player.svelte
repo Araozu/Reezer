@@ -18,6 +18,4 @@
 	});
 </script>
 
-<div>My music player</div>
-
 <audio bind:this={audioRef} bind:paused={player.paused}></audio>
