@@ -33,15 +33,24 @@ public class LibraryInitializationService(
 
         var supportedExtensions = new[] { "*.flac", "*.opus", "*.mp3", "*.m4a", "*.ogg" };
         var audioFiles = supportedExtensions
-            .SelectMany(ext => Directory.GetFiles(libraryInitPath, ext))
+            .SelectMany(ext =>
+                Directory.GetFiles(libraryInitPath, ext, SearchOption.AllDirectories)
+            )
             .ToArray();
 
         logger.LogInformation("Found {AudioFiles} audio files", audioFiles.Length);
 
         foreach (var audioFile in audioFiles)
         {
-            var fileName = Path.GetFileName(audioFile);
-            var songName = Path.GetFileNameWithoutExtension(fileName);
+            var parsedInfo = ParseAudioFilePath(audioFile, libraryInitPath);
+
+            logger.LogInformation(
+                "Parsed: Artist='{Artist}', Album='{Album}', Disc={Disc}, Song='{Song}'",
+                parsedInfo.Artist,
+                parsedInfo.Album,
+                parsedInfo.DiscNumber ?? 0,
+                parsedInfo.SongName
+            );
 
             var existingSong = await dbContext.Songs.FirstOrDefaultAsync(s =>
                 s.RawPath == audioFile
@@ -49,13 +58,72 @@ public class LibraryInitializationService(
 
             if (existingSong is null)
             {
-                var song = Song.CreateFromLibrary(songName, audioFile);
+                var song = Song.CreateFromLibrary(parsedInfo.SongName, audioFile);
                 dbContext.Songs.Add(song);
-                logger.LogInformation("Added song {SongName} to database", songName);
+                logger.LogInformation(
+                    "Added song '{SongName}' to database (from {Artist}/{Album})",
+                    parsedInfo.SongName,
+                    parsedInfo.Artist,
+                    parsedInfo.Album
+                );
             }
         }
 
         await dbContext.SaveChangesAsync();
         logger.LogInformation("Saved changes to database");
+    }
+
+    private ParsedAudioInfo ParseAudioFilePath(string audioFilePath, string libraryInitPath)
+    {
+        var relativePath = Path.GetRelativePath(libraryInitPath, audioFilePath);
+        var pathParts = relativePath.Split(Path.DirectorySeparatorChar);
+
+        var songName = Path.GetFileNameWithoutExtension(audioFilePath);
+        string artist;
+        string album;
+        int? discNumber = null;
+
+        if (pathParts.Length >= 3)
+        {
+            artist = pathParts[0];
+            album = pathParts[1];
+
+            if (pathParts.Length == 4)
+            {
+                var discFolder = pathParts[2];
+                if (
+                    int.TryParse(new string(discFolder.Where(char.IsDigit).ToArray()), out var disc)
+                )
+                {
+                    discNumber = disc;
+                }
+            }
+        }
+        else if (pathParts.Length == 2)
+        {
+            artist = pathParts[0];
+            album = "Unknown Album";
+        }
+        else
+        {
+            artist = "Unknown Artist";
+            album = "Unknown Album";
+        }
+
+        return new ParsedAudioInfo
+        {
+            Artist = artist,
+            Album = album,
+            DiscNumber = discNumber,
+            SongName = songName,
+        };
+    }
+
+    private record ParsedAudioInfo
+    {
+        public required string Artist { get; init; }
+        public required string Album { get; init; }
+        public int? DiscNumber { get; init; }
+        public required string SongName { get; init; }
     }
 }

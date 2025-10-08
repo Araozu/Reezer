@@ -6,7 +6,8 @@ FRAMEWORK ?= net10.0
 VERBOSITY ?= minimal
 
 clean:
-	find Api Application Domain Infrastructure -type d \( -name "obj" -o -name "bin" \) -exec rm -rf {} +
+	find Api Application Domain Infrastructure -type d -name "obj" -delete
+	find Api Application Domain Infrastructure -type d -name "bin" -delete
 
 build:
 	dotnet build Reezer.sln --configuration $(CONFIG) --framework $(FRAMEWORK) --verbosity $(VERBOSITY) $(ARGS)
@@ -25,7 +26,7 @@ ef-update:
 	dotnet ef database update --project Infrastructure --startup-project Api
 
 ef-drop:
-	dotnet ef database drop --project Api
+	dotnet ef database drop  --project Infrastructure --startup-project Api
 
 fmt:
 	dotnet csharpier format .
