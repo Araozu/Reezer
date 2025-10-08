@@ -1,0 +1,6 @@
+.kiro
+.idea
+bin
+obj
+appsettings.Development.json
+
