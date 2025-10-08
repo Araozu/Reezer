@@ -1,6 +1,13 @@
 <script lang="ts">
 	import * as Card from "$lib/components/ui/card/index.js";
-	import { ChevronsRight, ChevronsLeft } from "lucide-svelte";
+	import {
+		ChevronsRight,
+		ChevronsLeft,
+		Play,
+		Pause,
+		SkipForward,
+		SkipBack,
+	} from "lucide-svelte";
 	import { GetCurrentPlayer } from "../../player/index.svelte";
 
 	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
@@ -46,20 +53,46 @@
 		</Card.Header>
 		<Card.Content class={collapsed ? "px-2" : ""}>
 			<img
-				class="shadow rounded-xl"
+				class={[
+					"shadow",
+					collapsed ? "rounded" : "rounded-xl",
+				]}
 				src={coverUrl}
 				alt="Album portrait"
 			/>
-			<div class="py-2">
-				<p class="font-bold font-display text-xl">
-					{song?.name ?? "-"}
-				</p>
-				<p class="font-medium text-foreground/80">
-					<span class="underline">
-						{song?.artist ?? "-"}
-					</span>
-					• {song?.album ?? "-"}
-				</p>
+			{#if !collapsed}
+				<div class="py-2">
+					<p
+						class="font-bold font-display text-xl"
+					>
+						{song?.name ?? "-"}
+					</p>
+					<p
+						class="font-medium text-foreground/80"
+					>
+						<span class="underline">
+							{song?.artist ?? "-"}
+						</span>
+						• {song?.album ?? "-"}
+					</p>
+				</div>
+			{/if}
+			<div class="flex flex-col items-center gap-1 my-8">
+				<button
+					class="hover:bg-zinc-200 rounded-sm cursor-pointer transition-colors"
+				>
+					<SkipBack class="m-2" size={16} />
+				</button>
+				<button
+					class="hover:bg-zinc-200 rounded-full cursor-pointer transition-colors"
+				>
+					<Play class="m-2" size={32} />
+				</button>
+				<button
+					class="hover:bg-zinc-200 rounded-sm cursor-pointer transition-colors"
+				>
+					<SkipForward class="m-2" size={16} />
+				</button>
 			</div>
 		</Card.Content>
 	</Card.Root>

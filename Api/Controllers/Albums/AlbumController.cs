@@ -5,7 +5,7 @@ namespace Reezer.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AlbumController(GetAlbumCoverUseCase getAlbumCoverUseCase) : ControllerBase
+public class AlbumsController(GetAlbumCoverUseCase getAlbumCoverUseCase) : ControllerBase
 {
     [EndpointSummary("Get album cover by album ID")]
     [HttpGet("{albumId}/cover")]
