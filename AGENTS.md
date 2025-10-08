@@ -1,6 +1,6 @@
 # Agent Instructions for Reezer
 
-## Build/Lint/Test Commands
+## Build/Test Commands
 
 ### Frontend (Web/SvelteKit)
 - **Development server**: `cd Web && npm run dev` or `pnpm dev`
@@ -12,7 +12,6 @@
 - **Build solution**: `dotnet build`
 - **Run API**: `cd Api && dotnet run`
 - **Test** (if test projects exist): `dotnet test`
-- **Format C#**: `dotnet csharpier .` (CSharpier installed)
 
 ## Code Style Guidelines
 
@@ -36,6 +35,8 @@
 - **Implicit usings**: Enabled
 - **Formatting**: Use CSharpier for consistent formatting
 - **Naming**: PascalCase for classes/methods/properties, camelCase for local variables
+- **Features**: Always use primary constructor, file namespaces, records for DTOs
+- **EF**: When writing Fluent configuration, NEVER use the Fluent API for things that convention-based entities already cover
 
 ### General
 - **No comments**: Avoid adding comments unless explicitly requested

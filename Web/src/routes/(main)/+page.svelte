@@ -1,6 +1,7 @@
 <script lang="ts">
 	import MyComponent from "./my-component.svelte";
 	import Player from "./player.svelte";
+	import SongsList from "./songs-list.svelte";
 </script>
 
 <h1>Welcome to SvelteKit :D</h1>
@@ -11,3 +12,4 @@
 
 <MyComponent />
 <Player />
+<SongsList />
