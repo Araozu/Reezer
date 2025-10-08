@@ -14,6 +14,17 @@
 
 	let imgUrl = $state({ data: "#" });
 	let showQueue = $state(false);
+	let imgOpacity = $state(0);
+	let currentSong = {
+		name: "",
+		album: "",
+		artist: "",
+		album_id: "",
+		artist_id: "",
+	};
+	let roomName = "";
+	let songBy = "foo";
+
 	function setShowQueue(v: boolean) {
 		showQueue = v;
 	}
@@ -57,6 +68,68 @@
 					size={32}
 				/>
 			</button>
+		</div>
+		<div
+			class="absolute top-0 left-0 w-[30rem] overflow-hidden h-full grid grid-rows-[auto_6rem_2rem]"
+		>
+			<div class="relative min-w-full">
+				<img
+					alt=""
+					class={`rounded w-full inline-block transition-opacity ${imgOpacity}`}
+					src={imgUrl.data}
+					onload={() => {}}
+				/>
+			</div>
+
+			<div
+				class="px-4 transition-colors text-white w-[29rem]"
+			>
+				<p
+					class="font-display font-bold text-3xl mb-2 whitespace-nowrap overflow-hidden text-ellipsis"
+					title="hello"
+				>
+					{currentSong?.name ?? "-"}&nbsp;
+				</p>
+				<p
+					class="opacity-90 my-1 font-semibold whitespace-nowrap overflow-hidden text-ellipsis"
+					title={currentSong?.album ?? ""}
+				>
+					{#if !!currentSong?.album_id && !!currentSong?.album}
+						<a
+							href={`/collab/${roomName}/albums/${currentSong?.album_id}`}
+							class="hover:underline"
+							title={currentSong?.album}
+						>
+							{currentSong?.album}
+						</a>
+					{:else if !currentSong?.album_id || !currentSong?.album}
+						{currentSong?.album ?? "-"}
+					{/if}
+				</p>
+				<p
+					class="text-sm opacity-75 font-medium whitespace-nowrap overflow-hidden text-ellipsis"
+					title={currentSong?.artist ?? ""}
+				>
+					{#if !!currentSong?.artist_id && !!currentSong?.artist}
+						<a
+							href={`/collab/${roomName}/artists/${currentSong?.artist_id}`}
+							class="hover:underline"
+							title={currentSong?.artist}
+						>
+							{currentSong?.artist}
+						</a>&nbsp;
+					{:else if !currentSong?.artist_id || !currentSong?.artist}
+						{currentSong?.artist ??
+							"-"}&nbsp;
+					{:else if !!songBy}
+						<span
+							class="opacity-50 select-none"
+						>
+							· by {songBy}
+						</span>
+					{/if}
+				</p>
+			</div>
 		</div>
 	</div>
 </div>

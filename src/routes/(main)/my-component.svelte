@@ -28,7 +28,7 @@
 		{#if isPlaying}
 			Pause
 		{:else}
-			Play
+			Play! (set song?)
 		{/if}
 	</Button>
 </div>
