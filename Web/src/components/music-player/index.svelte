@@ -7,8 +7,8 @@
 		Pause,
 		SkipForward,
 		SkipBack,
-        Volume1,
-        Volume2,
+		Volume1,
+		Volume2,
 	} from "lucide-svelte";
 	import { GetCurrentPlayer } from "../../player/index.svelte";
 	import { Slider } from "$lib/components/ui/slider/index.js";
@@ -108,20 +108,35 @@
 					<SkipForward class="m-2" size={16} />
 				</button>
 			</div>
-			<div>
+			<div
+				class={[
+					!collapsed &&
+						"grid grid-cols-[1.5rem_auto_2rem] items-center gap-2",
+				]}
+			>
 				{#if !collapsed}
-				<Volume1 />
+					<div class="text-center">
+						<Volume1 />
+					</div>
 				{/if}
-				<Slider
-					type="single"
-					orientation={collapsed ? "vertical" : "horizontal"}
-					bind:value={player.volume}
-					max={100}
-					step={1}
-					onValueChange={(value) => player.SetVolume(value)}
-				/>
+				<div>
+					<Slider
+						type="single"
+						orientation={collapsed
+							? "vertical"
+							: "horizontal"}
+						bind:value={player.volume}
+						max={100}
+						step={1}
+						onValueChange={(
+							value: number,
+						) => player.SetVolume(value)}
+					/>
+				</div>
 				{#if !collapsed}
-				<Volume2 />
+					<div class="text-center">
+						<Volume2 />
+					</div>
 				{/if}
 			</div>
 		</Card.Content>
