@@ -6,7 +6,10 @@ namespace Reezer.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SongsController(GetAllSongsUseCase getAllSongsUseCase) : ControllerBase
+public class SongsController(
+    GetAllSongsUseCase getAllSongsUseCase,
+    StreamSongUseCase streamSongUseCase
+) : ControllerBase
 {
     [EndpointSummary("Get all songs")]
     [HttpGet]
@@ -16,5 +19,13 @@ public class SongsController(GetAllSongsUseCase getAllSongsUseCase) : Controller
     {
         var songs = await getAllSongsUseCase.GetAllSongsAsync(cancellationToken);
         return Ok(songs);
+    }
+
+    [EndpointSummary("Stream a song by ID")]
+    [HttpGet("{songId}/stream")]
+    public async Task<IActionResult> StreamSong(Guid songId, CancellationToken cancellationToken)
+    {
+        var stream = await streamSongUseCase.StreamSongAsync(songId, cancellationToken);
+        return File(stream, "audio/flac", enableRangeProcessing: true);
     }
 }
