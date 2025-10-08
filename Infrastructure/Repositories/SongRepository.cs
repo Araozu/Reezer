@@ -17,7 +17,11 @@ public class SongRepository(ReezerDbContext dbContext, IOptions<StorageOptions> 
         CancellationToken cancellationToken = default
     )
     {
-        return await dbContext.Songs.AsNoTracking().ToListAsync(cancellationToken);
+        return await dbContext
+            .Songs.Include(s => s.Album)
+            .ThenInclude(a => a.Artist)
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<Stream> GetSongStreamAsync(

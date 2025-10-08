@@ -83,7 +83,7 @@ public class LibraryInitializationService(
         logger.LogInformation("Saved changes to database");
     }
 
-    private ParsedAudioInfo ParseAudioFilePath(string audioFilePath, string libraryInitPath)
+    private static ParsedAudioInfo ParseAudioFilePath(string audioFilePath, string libraryInitPath)
     {
         var relativePath = Path.GetRelativePath(libraryInitPath, audioFilePath);
         var pathParts = relativePath.Split(Path.DirectorySeparatorChar);
