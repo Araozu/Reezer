@@ -9,8 +9,8 @@ public partial class Song
     public bool Raw => TranscodedPath is null;
 
     // Navigation properties
-    public Artist Artist { get; private set; }
-    public Guid ArtistId { get; private set; }
+    public Album Album { get; private set; }
+    public Guid AlbumId { get; private set; }
 
     public void SetTranscodedPath(string transcodedPath)
     {

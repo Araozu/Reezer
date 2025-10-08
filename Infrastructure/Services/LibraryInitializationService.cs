@@ -58,14 +58,14 @@ public class LibraryInitializationService(
 
             if (existingSong is null)
             {
-                var song = Song.CreateFromLibrary(parsedInfo.SongName, audioFile);
-                dbContext.Songs.Add(song);
-                logger.LogInformation(
-                    "Added song '{SongName}' to database (from {Artist}/{Album})",
-                    parsedInfo.SongName,
-                    parsedInfo.Artist,
-                    parsedInfo.Album
-                );
+                // var song = Song.CreateFromLibrary(parsedInfo.SongName, audioFile);
+                // dbContext.Songs.Add(song);
+                // logger.LogInformation(
+                //     "Added song '{SongName}' to database (from {Artist}/{Album})",
+                //     parsedInfo.SongName,
+                //     parsedInfo.Artist,
+                //     parsedInfo.Album
+                // );
             }
         }
 

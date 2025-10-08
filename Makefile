@@ -6,8 +6,7 @@ FRAMEWORK ?= net10.0
 VERBOSITY ?= minimal
 
 clean:
-	find Api Application Domain Infrastructure -type d -name "obj" -delete
-	find Api Application Domain Infrastructure -type d -name "bin" -delete
+	find Api Application Domain Infrastructure -type d \( -name "obj" -o -name "bin" \) -exec rm -rf {} +
 
 build:
 	dotnet build Reezer.sln --configuration $(CONFIG) --framework $(FRAMEWORK) --verbosity $(VERBOSITY) $(ARGS)
