@@ -1,4 +1,4 @@
-.PHONY: clean build rebuild run
+.PHONY: clean build rebuild
 
 # Default configuration
 CONFIG ?= Debug
@@ -15,3 +15,16 @@ rebuild: clean build
 
 run:
 	cd Api && dotnet run --configuration $(CONFIG) --framework $(FRAMEWORK) $(ARGS)
+
+ef-add:
+	dotnet ef migrations add "$(NAME)" --project Infrastructure --startup-project Api
+
+ef-update:
+	dotnet ef database update --project Infrastructure --startup-project Api
+
+ef-drop:
+	dotnet ef database drop --project Api
+
+format:
+	dotnet csharpier format .
+

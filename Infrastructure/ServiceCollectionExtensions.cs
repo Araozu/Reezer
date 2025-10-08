@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Reezer.Infrastructure.Data;
 
@@ -8,9 +9,21 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
-        string connectionString
+        IConfiguration configuration
     )
     {
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        if (string.IsNullOrEmpty(connectionString))
+        {
+            throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        }
+
+        // Add PostgreSQL DbContext
+        services.AddDbContext<ReezerDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString);
+        });
+
         services.AddDbContext<ReezerDbContext>(options => options.UseNpgsql(connectionString));
 
         return services;
