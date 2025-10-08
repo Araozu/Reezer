@@ -31,22 +31,25 @@ public class LibraryInitializationService(
             );
         }
 
-        var flacFiles = Directory.GetFiles(libraryInitPath, "*.flac");
-        logger.LogInformation("Found {FlacFiles} flac files", flacFiles.Length);
+        var supportedExtensions = new[] { "*.flac", "*.opus", "*.mp3", "*.m4a", "*.ogg" };
+        var audioFiles = supportedExtensions
+            .SelectMany(ext => Directory.GetFiles(libraryInitPath, ext))
+            .ToArray();
 
-        foreach (var flacFile in flacFiles)
+        logger.LogInformation("Found {AudioFiles} audio files", audioFiles.Length);
+
+        foreach (var audioFile in audioFiles)
         {
-            var fileName = Path.GetFileName(flacFile);
-            var songName = Path.GetFileNameWithoutExtension(fileName); // Remove .flac extension
+            var fileName = Path.GetFileName(audioFile);
+            var songName = Path.GetFileNameWithoutExtension(fileName);
 
-            // Check if song already exists
             var existingSong = await dbContext.Songs.FirstOrDefaultAsync(s =>
-                s.RawPath == flacFile
+                s.RawPath == audioFile
             );
 
             if (existingSong is null)
             {
-                var song = Song.CreateFromLibrary(songName, flacFile);
+                var song = Song.CreateFromLibrary(songName, audioFile);
                 dbContext.Songs.Add(song);
                 logger.LogInformation("Added song {SongName} to database", songName);
             }
