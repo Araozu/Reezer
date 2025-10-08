@@ -22,6 +22,7 @@
 		// Start new playback
 		currentlyPlayingId = songId;
 		audioElement = new Audio(`/api/Songs/${songId}/stream`);
+		audioElement.volume = 0.3;
 
 		audioElement.addEventListener('ended', () => {
 			currentlyPlayingId = null;

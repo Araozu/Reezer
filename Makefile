@@ -27,6 +27,6 @@ ef-update:
 ef-drop:
 	dotnet ef database drop --project Api
 
-format:
+fmt:
 	dotnet csharpier format .
 
