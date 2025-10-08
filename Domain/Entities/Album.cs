@@ -9,6 +9,14 @@ public class Album
     public Artist Artist { get; private set; }
     public Guid ArtistId { get; private set; }
 
+    public static Album Create(string name, Artist artist) =>
+        new()
+        {
+            Name = name,
+            Artist = artist,
+            ArtistId = artist.Id,
+        };
+
     // Private EF constructor
 #pragma warning disable CS8618
     private Album() { }

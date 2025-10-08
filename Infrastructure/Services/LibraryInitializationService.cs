@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Reezer.Application.Services;
+using Reezer.Domain.Entities;
 using Reezer.Domain.Entities.Songs;
 using Reezer.Infrastructure.Data;
 using Reezer.Infrastructure.Options;
@@ -58,14 +59,23 @@ public class LibraryInitializationService(
 
             if (existingSong is null)
             {
-                // var song = Song.CreateFromLibrary(parsedInfo.SongName, audioFile);
-                // dbContext.Songs.Add(song);
-                // logger.LogInformation(
-                //     "Added song '{SongName}' to database (from {Artist}/{Album})",
-                //     parsedInfo.SongName,
-                //     parsedInfo.Artist,
-                //     parsedInfo.Album
-                // );
+                var artist =
+                    await dbContext.Artists.FirstOrDefaultAsync(a => a.Name == parsedInfo.Artist)
+                    ?? Artist.Create(parsedInfo.Artist);
+
+                var album =
+                    await dbContext.Albums.FirstOrDefaultAsync(a =>
+                        a.Name == parsedInfo.Album && a.ArtistId == artist.Id
+                    ) ?? Album.Create(parsedInfo.Album, artist);
+
+                var song = Song.CreateFromLibrary(parsedInfo.SongName, audioFile, album);
+                dbContext.Songs.Add(song);
+                logger.LogInformation(
+                    "Added song '{SongName}' to database (from {Artist}/{Album})",
+                    parsedInfo.SongName,
+                    parsedInfo.Artist,
+                    parsedInfo.Album
+                );
             }
         }
 

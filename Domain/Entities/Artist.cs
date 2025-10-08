@@ -10,6 +10,8 @@ public class Artist
     // Navigation properties
     public ICollection<Song> Songs { get; private set; } = [];
 
+    public static Artist Create(string name) => new() { Name = name };
+
     // Private EF constructor
 #pragma warning disable CS8618
     private Artist() { }
