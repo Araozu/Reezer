@@ -650,6 +650,15 @@
         "resolved": "9.0.0",
         "contentHash": "U9msthvnH2Fsw7xwAvIhNHOdnIjOQTwOc8Vd0oGOsiRcGMGoBFlUD6qtYawRUoQdKH9ysxesZ9juFElt1Jw/7A=="
       },
+      "reezer.application": {
+        "type": "Project",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.0-rc.1.25451.107, )",
+          "Microsoft.Extensions.Hosting": "[10.0.0-rc.1.25451.107, )",
+          "Microsoft.Extensions.Logging.Abstractions": "[10.0.0-rc.1.25451.107, )",
+          "Reezer.Domain": "[1.0.0, )"
+        }
+      },
       "reezer.domain": {
         "type": "Project"
       }

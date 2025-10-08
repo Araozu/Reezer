@@ -22,6 +22,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0-rc.1" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Application\Reezer.Application.csproj" />
     <ProjectReference Include="..\Domain\Reezer.Domain.csproj" />
   </ItemGroup>
 </Project>

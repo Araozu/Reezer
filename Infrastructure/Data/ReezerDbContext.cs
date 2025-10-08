@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Reezer.Domain.Entities;
+using Reezer.Domain.Entities.Songs;
 
 namespace Reezer.Infrastructure.Data;
 

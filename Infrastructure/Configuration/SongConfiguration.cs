@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Reezer.Domain.Entities;
+using Reezer.Domain.Entities.Songs;
 
 namespace Reezer.Infrastructure.Configuration;
 
