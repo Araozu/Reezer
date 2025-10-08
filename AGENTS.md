@@ -1,6 +1,6 @@
 # Agent Instructions for Reezer
 
-## Build/Lint/Test Commands
+## Build/Test Commands
 
 ### Frontend (Web/SvelteKit)
 - **Development server**: `cd Web && npm run dev` or `pnpm dev`
@@ -12,7 +12,6 @@
 - **Build solution**: `dotnet build`
 - **Run API**: `cd Api && dotnet run`
 - **Test** (if test projects exist): `dotnet test`
-- **Format C#**: `dotnet csharpier .` (CSharpier installed)
 
 ## Code Style Guidelines
 
