@@ -10,7 +10,5 @@
 	<div>
 		{@render children()}
 	</div>
-	<div>
-		<MusicPlayer />
-	</div>
+	<MusicPlayer />
 </div>

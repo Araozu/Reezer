@@ -2,7 +2,6 @@
 	import * as Card from "$lib/components/ui/card/index.js";
 	import { ChevronsRight } from "lucide-svelte";
 	import { GetCurrentPlayer } from "../../player/index.svelte";
-	import { Skeleton } from "$lib/components/ui/skeleton/index.js";
 
 	let player = GetCurrentPlayer();
 
@@ -14,7 +13,7 @@
 	let artist = "Solange";
 </script>
 
-<div class="p-1 h-screen">
+<div class="p-1 h-screen sticky top-0">
 	<Card.Root class="h-full border-primary">
 		<Card.Header>
 			<Card.Title

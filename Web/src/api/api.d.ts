@@ -86,6 +86,12 @@ export interface components {
             /** Format: uuid */
             id: string;
             name: string;
+            artist: string;
+            album: string;
+            /** Format: uuid */
+            artistId: string;
+            /** Format: uuid */
+            albumId: string;
         };
     };
     responses: never;

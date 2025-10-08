@@ -1,6 +1,9 @@
+import type { ISong } from "../providers";
+
 export class HeadlessMusicPlayer
 {
 	private audioTag = new Audio("/_.opus");
+	private currentSong = $state<ISong | null>(null);
 
 	constructor()
 	{
@@ -18,10 +21,11 @@ export class HeadlessMusicPlayer
 		console.log("Doing something in the music player");
 	}
 
-	public PlaySong(src: string)
+	public PlaySong(song: ISong)
 	{
+		this.currentSong = song;
 		this.audioTag.pause()
-		this.audioTag.src = src;
+		this.audioTag.src = `/api/Songs/${song.id}/stream`;
 		this.audioTag.play().catch(e => console.error(e));
 	}
 
