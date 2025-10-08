@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Reezer.Application.Repositories;
 using Reezer.Application.Services;
 using Reezer.Infrastructure.Data;
 using Reezer.Infrastructure.Options;
+using Reezer.Infrastructure.Repositories;
 using Reezer.Infrastructure.Services;
 
 namespace Reezer.Infrastructure;
@@ -29,6 +31,9 @@ public static class ServiceCollectionExtensions
 
         // Register options
         services.Configure<StorageOptions>(configuration.GetSection("Storage"));
+
+        // Register repositories
+        services.AddScoped<ISongRepository, SongRepository>();
 
         // Register services
         services.AddScoped<ILibraryInitializationService, LibraryInitializationService>();
