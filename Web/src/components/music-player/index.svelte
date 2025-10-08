@@ -7,15 +7,17 @@
 		Pause,
 		SkipForward,
 		SkipBack,
+        Volume1,
+        Volume2,
 	} from "lucide-svelte";
 	import { GetCurrentPlayer } from "../../player/index.svelte";
 	import { Slider } from "$lib/components/ui/slider/index.js";
-	let value = $state(33);
 
 	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
 	let player = GetCurrentPlayer();
 	let song = $derived(player.currentSong);
+	let isPaused = $derived(player.isPaused);
 	let coverUrl = $derived(
 		song ? `/api/Albums/${song.albumId}/cover` : "/vinyl.jpg",
 	);
@@ -86,31 +88,42 @@
 				]}
 			>
 				<button
-					class="hover:bg-zinc-200 rounded-sm cursor-pointer transition-colors"
+					class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors"
 				>
 					<SkipBack class="m-2" size={16} />
 				</button>
 				<button
-					class="hover:bg-zinc-200 rounded-full cursor-pointer transition-colors"
+					class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-full cursor-pointer transition-colors"
+					onclick={() => player.TogglePlayPause()}
 				>
-					<Play class="m-2" size={32} />
+					{#if isPaused}
+						<Play class="m-2" size={32} />
+					{:else}
+						<Pause class="m-2" size={32} />
+					{/if}
 				</button>
 				<button
-					class="hover:bg-zinc-200 rounded-sm cursor-pointer transition-colors"
+					class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors"
 				>
 					<SkipForward class="m-2" size={16} />
 				</button>
 			</div>
-			{#if !collapsed}
-				<div>
-					<Slider
-						type="single"
-						bind:value
-						max={100}
-						step={1}
-					/>
-				</div>
-			{/if}
+			<div>
+				{#if !collapsed}
+				<Volume1 />
+				{/if}
+				<Slider
+					type="single"
+					orientation={collapsed ? "vertical" : "horizontal"}
+					bind:value={player.volume}
+					max={100}
+					step={1}
+					onValueChange={(value) => player.SetVolume(value)}
+				/>
+				{#if !collapsed}
+				<Volume2 />
+				{/if}
+			</div>
 		</Card.Content>
 	</Card.Root>
 </div>
