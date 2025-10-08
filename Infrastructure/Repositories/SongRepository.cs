@@ -87,4 +87,34 @@ public class SongRepository(ReezerDbContext dbContext, IOptions<StorageOptions> 
             "audio/opus"
         );
     }
+
+    public async Task<(Stream Stream, string ContentType)> GetAlbumCoverStreamAsync(
+        Guid albumId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var album =
+            await dbContext.Albums.FirstOrDefaultAsync(a => a.Id == albumId, cancellationToken)
+            ?? throw new KeyNotFoundException($"Album with ID {albumId} not found.");
+
+        if (string.IsNullOrEmpty(album.CoverPath) || !File.Exists(album.CoverPath))
+        {
+            throw new FileNotFoundException($"Album cover not found for album ID: {albumId}");
+        }
+
+        var extension = Path.GetExtension(album.CoverPath).ToLowerInvariant();
+        var contentType = extension switch
+        {
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".png" => "image/png",
+            ".gif" => "image/gif",
+            ".webp" => "image/webp",
+            _ => "application/octet-stream",
+        };
+
+        return (
+            new FileStream(album.CoverPath, FileMode.Open, FileAccess.Read, FileShare.Read),
+            contentType
+        );
+    }
 }

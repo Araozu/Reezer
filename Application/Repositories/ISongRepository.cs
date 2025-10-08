@@ -10,4 +10,8 @@ public interface ISongRepository
         Guid songId,
         CancellationToken cancellationToken = default
     );
+    Task<(Stream Stream, string ContentType)> GetAlbumCoverStreamAsync(
+        Guid albumId,
+        CancellationToken cancellationToken = default
+    );
 }

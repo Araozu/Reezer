@@ -5,6 +5,9 @@
 
 	let player = GetCurrentPlayer();
 	let song = $derived(player.currentSong);
+	let coverUrl = $derived(
+		song ? `/api/Songs/albums/${song.albumId}/cover` : "/vinyl.jpg",
+	);
 
 	let imgLink =
 		"https://navidrome.araozu.dev/rest/getCoverArt?u=fernando&t=ff0cd713cc6f438348e32123b893c4c6&s=20c44f&f=json&v=1.8.0&c=NavidromeUI&id=al-4BVGFEYgyFyJE6eDPH3QK1&_=2025-08-16T21%3A49%3A22.9279453Z";
@@ -28,7 +31,7 @@
 		<Card.Content>
 			<img
 				class="shadow rounded-xl"
-				src={imgLink}
+				src={coverUrl}
 				alt="Album portrait"
 			/>
 			<div class="py-2">
