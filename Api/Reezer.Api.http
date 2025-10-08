@@ -1,6 +1,0 @@
-@Reezer.Api_HostAddress = http://localhost:5088
-
-GET {{Reezer.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
