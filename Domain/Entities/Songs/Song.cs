@@ -8,6 +8,10 @@ public partial class Song
     public string? RawPath { get; private set; } = null;
     public bool Raw => TranscodedPath is null;
 
+    // Navigation properties
+    public Artist Artist { get; private set; }
+    public Guid ArtistId { get; private set; }
+
     public void SetTranscodedPath(string transcodedPath)
     {
         TranscodedPath = transcodedPath;
