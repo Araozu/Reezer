@@ -1,5 +1,6 @@
 <script lang="ts">
 	import "../app.css";
+	import { ModeWatcher } from "mode-watcher";
 	import favicon from "$lib/assets/favicon.svg";
 	import { browser } from "$app/environment";
 	import {
@@ -27,3 +28,4 @@
 	{@render children()}
 	<SvelteQueryDevtools />
 </QueryClientProvider>
+<ModeWatcher />

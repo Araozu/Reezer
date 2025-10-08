@@ -9,6 +9,8 @@
 		SkipBack,
 	} from "lucide-svelte";
 	import { GetCurrentPlayer } from "../../player/index.svelte";
+	import { Slider } from "$lib/components/ui/slider/index.js";
+	let value = $state(33);
 
 	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
@@ -77,7 +79,12 @@
 					</p>
 				</div>
 			{/if}
-			<div class="flex flex-col items-center gap-1 my-8">
+			<div
+				class={[
+					"flex items-center gap-1 my-8",
+					collapsed && "flex-col",
+				]}
+			>
 				<button
 					class="hover:bg-zinc-200 rounded-sm cursor-pointer transition-colors"
 				>
@@ -94,6 +101,16 @@
 					<SkipForward class="m-2" size={16} />
 				</button>
 			</div>
+			{#if !collapsed}
+				<div>
+					<Slider
+						type="single"
+						bind:value
+						max={100}
+						step={1}
+					/>
+				</div>
+			{/if}
 		</Card.Content>
 	</Card.Root>
 </div>
