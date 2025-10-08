@@ -8,8 +8,7 @@ namespace Reezer.Api.Controllers;
 [Route("api/[controller]")]
 public class SongsController(
     GetAllSongsUseCase getAllSongsUseCase,
-    StreamSongUseCase streamSongUseCase,
-    GetAlbumCoverUseCase getAlbumCoverUseCase
+    StreamSongUseCase streamSongUseCase
 ) : ControllerBase
 {
     [EndpointSummary("Get all songs")]
@@ -28,16 +27,5 @@ public class SongsController(
     {
         var result = await streamSongUseCase.StreamSongAsync(songId, cancellationToken);
         return File(result.Stream, result.ContentType, enableRangeProcessing: true);
-    }
-
-    [EndpointSummary("Get album cover by album ID")]
-    [HttpGet("albums/{albumId}/cover")]
-    public async Task<IActionResult> GetAlbumCover(
-        Guid albumId,
-        CancellationToken cancellationToken
-    )
-    {
-        var result = await getAlbumCoverUseCase.GetAlbumCoverAsync(albumId, cancellationToken);
-        return File(result.Stream, result.ContentType);
     }
 }

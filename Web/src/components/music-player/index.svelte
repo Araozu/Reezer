@@ -6,7 +6,7 @@
 	let player = GetCurrentPlayer();
 	let song = $derived(player.currentSong);
 	let coverUrl = $derived(
-		song ? `/api/Songs/albums/${song.albumId}/cover` : "/vinyl.jpg",
+		song ? `/api/Albums/${song.albumId}/cover` : "/vinyl.jpg",
 	);
 
 	let imgLink =
