@@ -9,5 +9,7 @@ public partial class Song
     public bool Raw => TranscodedPath is null;
 
     // Private EF constructor
+#pragma warning disable CS8618
     private Song() { }
+#pragma warning restore CS8618
 }
