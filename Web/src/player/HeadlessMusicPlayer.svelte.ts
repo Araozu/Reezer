@@ -3,7 +3,7 @@ import type { ISong } from "../providers";
 export class HeadlessMusicPlayer
 {
 	private audioTag = new Audio("/_.opus");
-	private currentSong = $state<ISong | null>(null);
+	public currentSong = $state<ISong | null>(null);
 
 	constructor()
 	{

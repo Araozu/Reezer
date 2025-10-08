@@ -63,18 +63,25 @@ public class LibraryInitializationService(
                     await dbContext.Artists.FirstOrDefaultAsync(a => a.Name == parsedInfo.Artist)
                     ?? Artist.Create(parsedInfo.Artist);
 
+                var albumDirectory = Path.GetDirectoryName(audioFile);
+                var coverPath =
+                    albumDirectory != null ? Path.Combine(albumDirectory, "cover.jpg") : null;
+
+                var albumCoverPath = coverPath != null && File.Exists(coverPath) ? coverPath : null;
+
                 var album =
                     await dbContext.Albums.FirstOrDefaultAsync(a =>
                         a.Name == parsedInfo.Album && a.ArtistId == artist.Id
-                    ) ?? Album.Create(parsedInfo.Album, artist);
+                    ) ?? Album.Create(parsedInfo.Album, artist, albumCoverPath);
 
                 var song = Song.CreateFromLibrary(parsedInfo.SongName, audioFile, album);
                 dbContext.Songs.Add(song);
                 logger.LogInformation(
-                    "Added song '{SongName}' to database (from {Artist}/{Album})",
+                    "Added song '{SongName}' to database (from {Artist}/{Album}){CoverInfo}",
                     parsedInfo.SongName,
                     parsedInfo.Artist,
-                    parsedInfo.Album
+                    parsedInfo.Album,
+                    albumCoverPath != null ? $" with cover: {albumCoverPath}" : ""
                 );
             }
         }

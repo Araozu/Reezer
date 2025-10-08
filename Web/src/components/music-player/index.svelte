@@ -4,13 +4,10 @@
 	import { GetCurrentPlayer } from "../../player/index.svelte";
 
 	let player = GetCurrentPlayer();
+	let song = $derived(player.currentSong);
 
 	let imgLink =
 		"https://navidrome.araozu.dev/rest/getCoverArt?u=fernando&t=ff0cd713cc6f438348e32123b893c4c6&s=20c44f&f=json&v=1.8.0&c=NavidromeUI&id=al-4BVGFEYgyFyJE6eDPH3QK1&_=2025-08-16T21%3A49%3A22.9279453Z";
-
-	let song = "Mad";
-	let album = "A Seat at the Table";
-	let artist = "Solange";
 </script>
 
 <div class="p-1 h-screen sticky top-0">
@@ -36,13 +33,13 @@
 			/>
 			<div class="py-2">
 				<p class="font-bold font-display text-xl">
-					{song}
+					{song?.name ?? "-"}
 				</p>
 				<p class="font-medium text-foreground/80">
 					<span class="underline">
-						{artist}
+						{song?.artist ?? "-"}
 					</span>
-					• {album}
+					• {song?.album ?? "-"}
 				</p>
 			</div>
 		</Card.Content>
