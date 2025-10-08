@@ -21,6 +21,18 @@
         "type": "Transitive",
         "resolved": "2.0.0",
         "contentHash": "GGYLfzV/G/ct80OZ45JxnWP7NvMX1BCugn/lX7TH5o0lcVaviavsLMTxmFV2AybXWjbi3h6FF1vgZiTK6PXndw=="
+      },
+      "reezer.application": {
+        "type": "Project"
+      },
+      "reezer.domain": {
+        "type": "Project"
+      },
+      "reezer.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Reezer.Domain": "[1.0.0, )"
+        }
       }
     }
   }
