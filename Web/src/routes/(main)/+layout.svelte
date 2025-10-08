@@ -4,11 +4,20 @@
 
 	let { children } = $props();
 	CreatePlayerContext();
+
+	let playerCollapsed = $state(true);
 </script>
 
-<div class="grid grid-cols-[auto_30rem]">
+<div
+	class={[
+		"grid",
+		playerCollapsed
+			? "grid-cols-[auto_6rem]"
+			: "grid-cols-[auto_30rem]",
+	]}
+>
 	<div>
 		{@render children()}
 	</div>
-	<MusicPlayer />
+	<MusicPlayer bind:collapsed={playerCollapsed} />
 </div>

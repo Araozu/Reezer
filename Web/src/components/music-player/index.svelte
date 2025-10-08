@@ -1,34 +1,50 @@
 <script lang="ts">
 	import * as Card from "$lib/components/ui/card/index.js";
-	import { ChevronsRight } from "lucide-svelte";
+	import { ChevronsRight, ChevronsLeft } from "lucide-svelte";
 	import { GetCurrentPlayer } from "../../player/index.svelte";
+
+	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
 	let player = GetCurrentPlayer();
 	let song = $derived(player.currentSong);
 	let coverUrl = $derived(
 		song ? `/api/Albums/${song.albumId}/cover` : "/vinyl.jpg",
 	);
-
-	let imgLink =
-		"https://navidrome.araozu.dev/rest/getCoverArt?u=fernando&t=ff0cd713cc6f438348e32123b893c4c6&s=20c44f&f=json&v=1.8.0&c=NavidromeUI&id=al-4BVGFEYgyFyJE6eDPH3QK1&_=2025-08-16T21%3A49%3A22.9279453Z";
 </script>
 
 <div class="p-1 h-screen sticky top-0">
 	<Card.Root class="h-full border-primary">
-		<Card.Header>
+		<Card.Header class={collapsed ? "px-0" : ""}>
 			<Card.Title
-				class="font-display flex justify-between items-center gap-2"
+				class={[
+					"font-display flex items-center gap-2",
+					collapsed
+						? "justify-center"
+						: "justify-between",
+				]}
 			>
-				<span>Now playing</span>
+				{#if !collapsed}
+					<span>Now playing</span>
+				{/if}
 
 				<button
-					class="hover:bg-zinc-200 rounded-sm cursor-pointer transition-colors"
+					class={[
+						"hover:bg-zinc-200 rounded-sm cursor-pointer transition-colors",
+						!collapsed && "mr-2",
+					]}
+					onclick={() => {
+						collapsed = !collapsed;
+					}}
 				>
-					<ChevronsRight />
+					{#if collapsed}
+						<ChevronsLeft />
+					{:else}
+						<ChevronsRight />
+					{/if}
 				</button>
 			</Card.Title>
 		</Card.Header>
-		<Card.Content>
+		<Card.Content class={collapsed ? "px-2" : ""}>
 			<img
 				class="shadow rounded-xl"
 				src={coverUrl}
