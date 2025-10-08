@@ -36,6 +36,8 @@
 - **Implicit usings**: Enabled
 - **Formatting**: Use CSharpier for consistent formatting
 - **Naming**: PascalCase for classes/methods/properties, camelCase for local variables
+- **Features**: Always use primary constructor, file namespaces, records for DTOs
+- **EF**: When writing Fluent configuration, NEVER use the Fluent API for things that convention-based entities already cover
 
 ### General
 - **No comments**: Avoid adding comments unless explicitly requested
