@@ -333,7 +333,10 @@
         "contentHash": "U9msthvnH2Fsw7xwAvIhNHOdnIjOQTwOc8Vd0oGOsiRcGMGoBFlUD6qtYawRUoQdKH9ysxesZ9juFElt1Jw/7A=="
       },
       "reezer.application": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "Reezer.Domain": "[1.0.0, )"
+        }
       },
       "reezer.domain": {
         "type": "Project"

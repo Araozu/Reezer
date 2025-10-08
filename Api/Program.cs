@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+using Reezer.Application;
 using Reezer.Infrastructure;
 using Scalar.AspNetCore;
 
@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplicationServices();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
