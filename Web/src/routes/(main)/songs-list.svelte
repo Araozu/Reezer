@@ -31,25 +31,11 @@
 						<div
 							class="w-8 h-8 flex items-center justify-center"
 						>
-							{#if currentlyPlayingId === song.id && !player.paused}
-								<span
-									class="text-blue-600"
-								>
-									▶️</span
-								>
-							{:else if currentlyPlayingId === song.id && player.paused}
-								<span
-									class="text-blue-400"
-								>
-									⏸️</span
-								>
-							{:else}
-								<span
-									class="text-gray-400"
-								>
-									⏸️</span
-								>
-							{/if}
+							<span
+								class="text-blue-600"
+							>
+								▶️</span
+							>
 						</div>
 						<div>
 							<h3 class="font-medium">

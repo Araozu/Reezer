@@ -5,7 +5,6 @@ export class HeadlessMusicPlayer
 	constructor()
 	{
 		const onclick = () => {
-			console.log("registering the user click?")
 			this.audioTag.play()
 				.catch(e => console.error(e))
 				.finally(() => this.audioTag.pause());
@@ -21,9 +20,9 @@ export class HeadlessMusicPlayer
 
 	public PlaySong(src: string)
 	{
-		this.audioTag.pause();
+		this.audioTag.pause()
 		this.audioTag.src = src;
-		this.audioTag.play();
+		this.audioTag.play().catch(e => console.error(e));
 	}
 
 	public TogglePlayPause()
