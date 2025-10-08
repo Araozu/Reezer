@@ -1,7 +1,6 @@
 <script lang="ts">
 	import MusicPlayer from "../../components/music-player/index.svelte";
 	import { CreatePlayerContext } from "../../player/index.svelte";
-	import Player from "./player.svelte";
 
 	let { children } = $props();
 	CreatePlayerContext();
@@ -15,5 +14,3 @@
 		<MusicPlayer />
 	</div>
 </div>
-
-<Player />
