@@ -14,7 +14,7 @@ build:
 rebuild: clean build
 
 run:
-	cd Api && dotnet run --configuration $(CONFIG) --framework $(FRAMEWORK) $(ARGS)
+	dotnet watch run --project Api --configuration $(CONFIG) --framework $(FRAMEWORK) $(ARGS)
 
 ef-add:
 	dotnet ef migrations add "$(NAME)" --project Infrastructure --startup-project Api

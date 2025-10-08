@@ -3,12 +3,9 @@ using Reezer.Domain.Entities;
 
 namespace Reezer.Infrastructure.Data;
 
-public class ReezerDbContext : DbContext
+public class ReezerDbContext(DbContextOptions<ReezerDbContext> options) : DbContext(options)
 {
     public DbSet<Song> Songs { get; set; }
-
-    public ReezerDbContext(DbContextOptions<ReezerDbContext> options)
-        : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) =>
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ReezerDbContext).Assembly);
