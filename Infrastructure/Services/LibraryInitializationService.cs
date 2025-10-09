@@ -96,6 +96,7 @@ public class LibraryInitializationService(
         var pathParts = relativePath.Split(Path.DirectorySeparatorChar);
 
         var songName = Path.GetFileNameWithoutExtension(audioFilePath);
+        songName = TrimLeadingNumbers(songName);
         string artist;
         string album;
         int? discNumber = null;
@@ -134,6 +135,34 @@ public class LibraryInitializationService(
             DiscNumber = discNumber,
             SongName = songName,
         };
+    }
+
+    private static string TrimLeadingNumbers(string songName)
+    {
+        var trimmed = songName.TrimStart();
+        var index = 0;
+
+        while (index < trimmed.Length && char.IsDigit(trimmed[index]))
+        {
+            index++;
+        }
+
+        if (index > 0 && index < trimmed.Length)
+        {
+            var afterNumbers = trimmed[index..].TrimStart();
+            if (
+                afterNumbers.StartsWith('-')
+                || afterNumbers.StartsWith('.')
+                || afterNumbers.StartsWith('_')
+            )
+            {
+                afterNumbers = afterNumbers[1..].TrimStart();
+            }
+
+            return afterNumbers.Length > 0 ? afterNumbers : songName;
+        }
+
+        return songName;
     }
 
     private record ParsedAudioInfo

@@ -11,7 +11,6 @@
 		Volume2,
 	} from "lucide-svelte";
 	import { GetCurrentPlayer } from "../../player/index.svelte";
-	import { Slider } from "$lib/components/ui/slider/index.js";
 	import VolumeSlider from "./volume-slider.svelte";
 
 	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
@@ -19,8 +18,6 @@
 	let player = GetCurrentPlayer();
 	let song = $derived(player.currentSong);
 	let isPaused = player.isPaused;
-	let volume = player.volume;
-	let sliderVolume = $derived(Math.round($volume * 100));
 
 	let coverUrl = $derived(
 		song ? `/api/Albums/${song.albumId}/cover` : "/vinyl.jpg",
