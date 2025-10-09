@@ -17,7 +17,7 @@
 
 	let player = GetCurrentPlayer();
 	let song = $derived(player.currentSong);
-	let isPaused = $derived(player.isPaused);
+	let isPaused = player.isPaused;
 	let coverUrl = $derived(
 		song ? `/api/Albums/${song.albumId}/cover` : "/vinyl.jpg",
 	);
@@ -96,7 +96,7 @@
 					class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-full cursor-pointer transition-colors"
 					onclick={() => player.TogglePlayPause()}
 				>
-					{#if isPaused}
+					{#if $isPaused}
 						<Play class="m-2" size={32} />
 					{:else}
 						<Pause class="m-2" size={32} />

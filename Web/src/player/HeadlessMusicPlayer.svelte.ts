@@ -1,3 +1,4 @@
+import type { Readable, Writable } from "svelte/store";
 import type { ISong } from "../providers";
 
 export class HeadlessMusicPlayer
@@ -5,10 +6,19 @@ export class HeadlessMusicPlayer
 	private audioTag = new Audio("/_.opus");
 	public currentSong = $state<ISong | null>(null);
 	public volume = $state(33);
-	public isPaused = $derived(true);
 
-	constructor()
+	constructor(
+		public isPaused: Writable<boolean>
+	)
 	{
+		// Initialize audio volume with logarithmic scaling
+		this.audioTag.volume = Math.pow(this.volume / 100, 2);
+	}
+
+	public OverrideTag(el: HTMLAudioElement)
+	{
+		this.audioTag = el;
+
 		const onclick = () => {
 			this.audioTag.play()
 				.catch(e => console.error(e))
@@ -16,18 +26,6 @@ export class HeadlessMusicPlayer
 			document.removeEventListener("click", onclick);
 		};
 		document.addEventListener("click", onclick);
-
-		// Initialize audio volume with logarithmic scaling
-		this.audioTag.volume = Math.pow(this.volume / 100, 2);
-
-		// Initialize pause state
-		this.audioTag.addEventListener("pause", () => this.isPaused = true);
-		this.audioTag.addEventListener("play", () => this.isPaused = false);
-	}
-
-	public DoSomething()
-	{
-		console.log("Doing something in the music player");
 	}
 
 	public PlaySong(song: ISong)

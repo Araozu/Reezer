@@ -1,11 +1,12 @@
 import { getContext, setContext } from "svelte";
 import { HeadlessMusicPlayer } from "./HeadlessMusicPlayer.svelte";
+import type { Readable, Writable } from "svelte/store";
 
 const playerKey = Symbol("music_player");
 
-export function CreatePlayerContext()
+export function CreatePlayerContext(paused: Writable<boolean>)
 {
-	const player = new HeadlessMusicPlayer();
+	const player = new HeadlessMusicPlayer(paused);
 	setContext(playerKey, player);
 }
 
