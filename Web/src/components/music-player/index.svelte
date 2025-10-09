@@ -12,6 +12,7 @@
 	} from "lucide-svelte";
 	import { GetCurrentPlayer } from "../../player/index.svelte";
 	import VolumeSlider from "./volume-slider.svelte";
+	import PositionSlider from "./position-slider.svelte";
 
 	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
@@ -108,6 +109,11 @@
 				>
 					<SkipForward class="m-2" size={16} />
 				</button>
+				{#if !collapsed}
+					<div class="flex-1 ml-4">
+						<PositionSlider />
+					</div>
+				{/if}
 			</div>
 			<div
 				class={[

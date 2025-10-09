@@ -13,6 +13,8 @@
 	// Audio bindings
 	let aPaused = $state(false);
 	let aVolume = $state(0.5);
+	let aCurrentTime = $state(0);
+	let aDuration = $state(0);
 
 	CreatePlayerContext(
 		toStore(
@@ -23,6 +25,11 @@
 			() => aVolume,
 			(v) => (aVolume = v),
 		),
+		toStore(
+			() => aCurrentTime,
+			(v) => (aCurrentTime = v),
+		),
+		toStore(() => aDuration),
 	);
 	let player = GetCurrentPlayer();
 
@@ -54,6 +61,8 @@
 		bind:this={audioTag}
 		bind:volume={aVolume}
 		bind:paused={aPaused}
+		bind:currentTime={aCurrentTime}
+		bind:duration={aDuration}
 	>
 	</audio>
 	<MusicPlayer bind:collapsed={playerCollapsed} />

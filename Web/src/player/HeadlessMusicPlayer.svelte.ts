@@ -1,4 +1,4 @@
-import type { Writable } from "svelte/store";
+import type { Readable, Writable } from "svelte/store";
 import type { ISong } from "../providers";
 
 export class HeadlessMusicPlayer
@@ -9,6 +9,8 @@ export class HeadlessMusicPlayer
 	constructor(
 		public isPaused: Writable<boolean>,
 		public volume: Writable<number>,
+		public currentTime: Writable<number>,
+		public duration: Readable<number>,
 	)
 	{}
 
@@ -50,5 +52,10 @@ export class HeadlessMusicPlayer
 		if (volume < 0 || volume > 1) throw new Error("Attemted to set a invalid volume level: " + volume)
 
 		this.volume.set(volume);
+	}
+
+	public SetCurrentTime(time: number)
+	{
+		this.currentTime.set(time)
 	}
 }
