@@ -12,6 +12,7 @@
 	} from "lucide-svelte";
 	import { GetCurrentPlayer } from "../../player/index.svelte";
 	import { Slider } from "$lib/components/ui/slider/index.js";
+	import VolumeSlider from "./volume-slider.svelte";
 
 	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
@@ -123,21 +124,7 @@
 					</div>
 				{/if}
 				<div>
-					<Slider
-						type="single"
-						orientation={collapsed
-							? "vertical"
-							: "horizontal"}
-						value={Math.round(
-							$volume * 100,
-						)}
-						min={0}
-						max={100}
-						step={1}
-						onValueChange={(
-							value: number,
-						) => player.SetVolume(value)}
-					/>
+					<VolumeSlider {collapsed} />
 				</div>
 				{#if !collapsed}
 					<div class="text-center">

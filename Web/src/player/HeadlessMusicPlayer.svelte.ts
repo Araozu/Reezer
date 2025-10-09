@@ -1,4 +1,4 @@
-import type { Readable, Writable } from "svelte/store";
+import type { Writable } from "svelte/store";
 import type { ISong } from "../providers";
 
 export class HeadlessMusicPlayer
@@ -10,8 +10,7 @@ export class HeadlessMusicPlayer
 		public isPaused: Writable<boolean>,
 		public volume: Writable<number>,
 	)
-	{
-	}
+	{}
 
 	public OverrideTag(el: HTMLAudioElement)
 	{
@@ -48,11 +47,8 @@ export class HeadlessMusicPlayer
 
 	public SetVolume(volume: number)
 	{
-		this.volume.set(volume / 100);
+		if (volume < 0 || volume > 1) throw new Error("Attemted to set a invalid volume level: " + volume)
 
-		// Convert linear slider position to logarithmic volume perception
-		// const logarithmicVolume = Math.pow(volume / 100, 2);
-		// console.log("To set volume:", logarithmicVolume)
-		// this.volume.set(logarithmicVolume);
+		this.volume.set(volume);
 	}
 }
