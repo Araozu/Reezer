@@ -18,6 +18,9 @@
 	let player = GetCurrentPlayer();
 	let song = $derived(player.currentSong);
 	let isPaused = player.isPaused;
+	let volume = player.volume;
+	let sliderVolume = $derived(Math.round($volume * 100));
+
 	let coverUrl = $derived(
 		song ? `/api/Albums/${song.albumId}/cover` : "/vinyl.jpg",
 	);
@@ -125,7 +128,10 @@
 						orientation={collapsed
 							? "vertical"
 							: "horizontal"}
-						bind:value={player.volume}
+						value={Math.round(
+							$volume * 100,
+						)}
+						min={0}
 						max={100}
 						step={1}
 						onValueChange={(

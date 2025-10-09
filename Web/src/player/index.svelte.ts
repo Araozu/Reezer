@@ -4,9 +4,9 @@ import type { Readable, Writable } from "svelte/store";
 
 const playerKey = Symbol("music_player");
 
-export function CreatePlayerContext(paused: Writable<boolean>)
+export function CreatePlayerContext(paused: Writable<boolean>, volume: Writable<number>)
 {
-	const player = new HeadlessMusicPlayer(paused);
+	const player = new HeadlessMusicPlayer(paused, volume);
 	setContext(playerKey, player);
 }
 

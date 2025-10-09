@@ -5,14 +5,12 @@ export class HeadlessMusicPlayer
 {
 	private audioTag = new Audio("/_.opus");
 	public currentSong = $state<ISong | null>(null);
-	public volume = $state(33);
 
 	constructor(
-		public isPaused: Writable<boolean>
+		public isPaused: Writable<boolean>,
+		public volume: Writable<number>,
 	)
 	{
-		// Initialize audio volume with logarithmic scaling
-		this.audioTag.volume = Math.pow(this.volume / 100, 2);
 	}
 
 	public OverrideTag(el: HTMLAudioElement)
@@ -50,9 +48,11 @@ export class HeadlessMusicPlayer
 
 	public SetVolume(volume: number)
 	{
-		this.volume = Math.max(0, Math.min(100, volume));
+		this.volume.set(volume / 100);
+
 		// Convert linear slider position to logarithmic volume perception
-		const logarithmicVolume = Math.pow(this.volume / 100, 2);
-		this.audioTag.volume = logarithmicVolume;
+		// const logarithmicVolume = Math.pow(volume / 100, 2);
+		// console.log("To set volume:", logarithmicVolume)
+		// this.volume.set(logarithmicVolume);
 	}
 }

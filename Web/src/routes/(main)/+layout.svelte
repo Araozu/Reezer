@@ -11,14 +11,17 @@
 	let audioTagSetup = $state(false);
 
 	// Audio bindings
-	let audioBPaused = $state(false);
+	let aPaused = $state(false);
+	let aVolume = $state(0.5);
 
 	CreatePlayerContext(
 		toStore(
-			() => audioBPaused,
-			(v) => {
-				audioBPaused = v;
-			},
+			() => aPaused,
+			(v) => (aPaused = v),
+		),
+		toStore(
+			() => aVolume,
+			(v) => (aVolume = v),
 		),
 	);
 	let player = GetCurrentPlayer();
@@ -46,7 +49,12 @@
 			{@render children()}
 		{/if}
 	</div>
-	<audio src="/_.opus" bind:this={audioTag} bind:paused={audioBPaused}>
+	<audio
+		src="/_.opus"
+		bind:this={audioTag}
+		bind:volume={aVolume}
+		bind:paused={aPaused}
+	>
 	</audio>
 	<MusicPlayer bind:collapsed={playerCollapsed} />
 </div>
