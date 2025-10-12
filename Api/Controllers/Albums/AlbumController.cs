@@ -45,6 +45,7 @@ public class AlbumsController(
     )
     {
         var result = await getAlbumCoverUseCase.GetAlbumCoverAsync(albumId, cancellationToken);
+        Response.Headers.CacheControl = "public, max-age=2592000";
         return File(result.Stream, result.ContentType);
     }
 }
