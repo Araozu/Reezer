@@ -24,9 +24,11 @@
 		{#each $songsQuery.data as song (song.id)}
 			<button onclick={() => PlaySong(song)}>
 				<li
-					class="p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-					class:bg-blue-50={currentlyPlayingId ===
-						song.id}
+					class={[
+						"p-4 border rounded-lg cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors",
+						currentlyPlayingId == song.id &&
+							"bg-blue-50 dark:bg-primary/50",
+					]}
 				>
 					<div class="flex items-center gap-3">
 						<div

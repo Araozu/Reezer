@@ -2,6 +2,7 @@ using FFMpegCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Reezer.Application.Repositories;
+using Reezer.Domain.Entities;
 using Reezer.Domain.Entities.Songs;
 using Reezer.Infrastructure.Data;
 using Reezer.Infrastructure.Options;
@@ -116,5 +117,24 @@ public class SongRepository(ReezerDbContext dbContext, IOptions<StorageOptions> 
             new FileStream(album.CoverPath, FileMode.Open, FileAccess.Read, FileShare.Read),
             contentType
         );
+    }
+
+    public async Task<(IEnumerable<Album> Albums, int TotalCount)> GetPaginatedAlbumsAsync(
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var query = dbContext.Albums.Include(a => a.Artist).AsNoTracking();
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var albums = await query
+            .OrderBy(a => a.Name)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (albums, totalCount);
     }
 }

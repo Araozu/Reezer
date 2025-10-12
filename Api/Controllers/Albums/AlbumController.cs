@@ -1,12 +1,42 @@
 using Microsoft.AspNetCore.Mvc;
+using Reezer.Application.DTOs;
 using Reezer.Application.UseCases;
 
 namespace Reezer.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AlbumsController(GetAlbumCoverUseCase getAlbumCoverUseCase) : ControllerBase
+public class AlbumsController(
+    GetAlbumCoverUseCase getAlbumCoverUseCase,
+    GetPaginatedAlbumsUseCase getPaginatedAlbumsUseCase
+) : ControllerBase
 {
+    [EndpointSummary("Get paginated list of albums")]
+    [HttpGet]
+    public async Task<ActionResult<PaginatedResult<AlbumDto>>> GetAlbums(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (page < 1)
+        {
+            page = 1;
+        }
+
+        if (pageSize < 1 || pageSize > 100)
+        {
+            pageSize = 20;
+        }
+
+        var result = await getPaginatedAlbumsUseCase.GetPaginatedAlbumsAsync(
+            page,
+            pageSize,
+            cancellationToken
+        );
+        return Ok(result);
+    }
+
     [EndpointSummary("Get album cover by album ID")]
     [HttpGet("{albumId}/cover")]
     public async Task<IActionResult> GetAlbumCover(

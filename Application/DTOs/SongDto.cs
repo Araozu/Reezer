@@ -8,3 +8,5 @@ public record SongDto(
     Guid ArtistId,
     Guid AlbumId
 );
+
+public record AlbumDto(Guid Id, string Name, Guid ArtistId, string ArtistName, string? CoverPath);
