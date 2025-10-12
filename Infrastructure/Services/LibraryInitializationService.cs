@@ -59,9 +59,16 @@ public class LibraryInitializationService(
 
             if (existingSong is null)
             {
-                var artist =
-                    await dbContext.Artists.FirstOrDefaultAsync(a => a.Name == parsedInfo.Artist)
-                    ?? Artist.Create(parsedInfo.Artist);
+                var artist = await dbContext.Artists.FirstOrDefaultAsync(a =>
+                    a.Name == parsedInfo.Artist
+                );
+
+                if (artist is null)
+                {
+                    artist = Artist.Create(parsedInfo.Artist);
+                    dbContext.Artists.Add(artist);
+                    await dbContext.SaveChangesAsync();
+                }
 
                 var albumDirectory = Path.GetDirectoryName(audioFile);
                 var coverPath =
@@ -69,10 +76,16 @@ public class LibraryInitializationService(
 
                 var albumCoverPath = coverPath != null && File.Exists(coverPath) ? coverPath : null;
 
-                var album =
-                    await dbContext.Albums.FirstOrDefaultAsync(a =>
-                        a.Name == parsedInfo.Album && a.ArtistId == artist.Id
-                    ) ?? Album.Create(parsedInfo.Album, artist, albumCoverPath);
+                var album = await dbContext.Albums.FirstOrDefaultAsync(a =>
+                    a.Name == parsedInfo.Album && a.ArtistId == artist.Id
+                );
+
+                if (album is null)
+                {
+                    album = Album.Create(parsedInfo.Album, artist, albumCoverPath);
+                    dbContext.Albums.Add(album);
+                    await dbContext.SaveChangesAsync();
+                }
 
                 var song = Song.CreateFromLibrary(parsedInfo.SongName, audioFile, album);
                 dbContext.Songs.Add(song);
