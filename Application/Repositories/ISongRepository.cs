@@ -20,4 +20,5 @@ public interface ISongRepository
         int pageSize,
         CancellationToken cancellationToken = default
     );
+    Task<Album> GetAlbumWithSongsAsync(Guid albumId, CancellationToken cancellationToken = default);
 }

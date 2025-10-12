@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using Reezer.Domain.Entities.Songs;
+
 namespace Reezer.Domain.Entities;
 
 public class Album
@@ -9,6 +12,7 @@ public class Album
     // Navigation properties
     public Artist Artist { get; private set; }
     public Guid ArtistId { get; private set; }
+    public ICollection<Song> Songs { get; private set; }
 
     public static Album Create(string name, Artist artist, string? coverPath = null) =>
         new()

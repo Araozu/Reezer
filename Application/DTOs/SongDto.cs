@@ -10,3 +10,12 @@ public record SongDto(
 );
 
 public record AlbumDto(Guid Id, string Name, Guid ArtistId, string ArtistName, string? CoverPath);
+
+public record AlbumWithTracklistDto(
+    Guid Id,
+    string Name,
+    Guid ArtistId,
+    string ArtistName,
+    string? CoverPath,
+    IEnumerable<SongDto> Songs
+);

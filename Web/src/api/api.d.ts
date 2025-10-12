@@ -45,6 +45,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/Albums/{albumId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get album with tracklist by album ID */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    albumId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AlbumWithTracklistDto"];
+                        "application/json": components["schemas"]["AlbumWithTracklistDto"];
+                        "text/json": components["schemas"]["AlbumWithTracklistDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/Albums/{albumId}/cover": {
         parameters: {
             query?: never;
@@ -167,6 +207,16 @@ export interface components {
             artistId: string;
             artistName: string;
             coverPath: null | string;
+        };
+        AlbumWithTracklistDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: uuid */
+            artistId: string;
+            artistName: string;
+            coverPath: null | string;
+            songs: components["schemas"]["SongDto"][];
         };
         PaginatedResultOfAlbumDto: {
             items: components["schemas"]["AlbumDto"][];

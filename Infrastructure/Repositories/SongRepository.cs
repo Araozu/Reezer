@@ -137,4 +137,16 @@ public class SongRepository(ReezerDbContext dbContext, IOptions<StorageOptions> 
 
         return (albums, totalCount);
     }
+
+    public async Task<Album> GetAlbumWithSongsAsync(
+        Guid albumId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return await dbContext
+                .Albums.Include(a => a.Artist)
+                .Include(a => a.Songs)
+                .FirstOrDefaultAsync(a => a.Id == albumId, cancellationToken)
+            ?? throw new KeyNotFoundException($"Album with ID {albumId} not found.");
+    }
 }

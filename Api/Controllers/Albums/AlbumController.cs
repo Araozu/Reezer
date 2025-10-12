@@ -8,7 +8,8 @@ namespace Reezer.Api.Controllers;
 [Route("api/[controller]")]
 public class AlbumsController(
     GetAlbumCoverUseCase getAlbumCoverUseCase,
-    GetPaginatedAlbumsUseCase getPaginatedAlbumsUseCase
+    GetPaginatedAlbumsUseCase getPaginatedAlbumsUseCase,
+    GetAlbumWithTracklistUseCase getAlbumWithTracklistUseCase
 ) : ControllerBase
 {
     [EndpointSummary("Get paginated list of albums")]
@@ -37,8 +38,22 @@ public class AlbumsController(
         return Ok(result);
     }
 
+    [EndpointSummary("Get album with tracklist by album ID")]
+    [HttpGet("{albumId}")]
+    public async Task<ActionResult<AlbumWithTracklistDto>> GetAlbum(
+        Guid albumId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var result = await getAlbumWithTracklistUseCase.GetAlbumWithTracklistAsync(
+            albumId,
+            cancellationToken
+        );
+        return Ok(result);
+    }
+
     [EndpointSummary("Get album cover by album ID")]
-    [HttpGet("{albumId}/cover")]
+    [HttpGet("{albumId:guid}/cover")]
     public async Task<IActionResult> GetAlbumCover(
         Guid albumId,
         CancellationToken cancellationToken
