@@ -44,7 +44,7 @@ ungrouped:
                             steps {
                                 script {
                                     withDockerRegistry(credentialsId: "${REGISTRY_CREDENTIALS}") {
-                                        def image = docker.build("${FULL_REGISTRY_URL}:${BUILD_REF}", "-f +devops/docker/Dockerfile ./src")
+                                        def image = docker.build("${FULL_REGISTRY_URL}:${BUILD_REF}", "-f +devops/docker/Dockerfile .")
                                         // image.push()
                                     }
                                 }
