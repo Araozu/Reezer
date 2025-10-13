@@ -3,6 +3,7 @@ namespace Reezer.Application.DTOs;
 public record SongDto(
     Guid Id,
     string Name,
+    int? TrackNumber,
     string Artist,
     string Album,
     Guid ArtistId,

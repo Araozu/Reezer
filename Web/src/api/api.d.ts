@@ -231,6 +231,8 @@ export interface components {
             /** Format: uuid */
             id: string;
             name: string;
+            /** Format: int32 */
+            trackNumber: null | number | string;
             artist: string;
             album: string;
             /** Format: uuid */

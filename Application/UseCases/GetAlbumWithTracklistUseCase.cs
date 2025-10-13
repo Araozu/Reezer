@@ -12,14 +12,17 @@ public class GetAlbumWithTracklistUseCase(ISongRepository songRepository)
     {
         var album = await songRepository.GetAlbumWithSongsAsync(albumId, cancellationToken);
 
-        var songDtos = album.Songs.Select(song => new SongDto(
-            song.Id,
-            song.Name,
-            album.Artist.Name,
-            album.Name,
-            album.ArtistId,
-            album.Id
-        ));
+        var songDtos = album
+            .Songs.OrderBy(song => song.TrackNumber)
+            .Select(song => new SongDto(
+                song.Id,
+                song.Name,
+                song.TrackNumber,
+                album.Artist.Name,
+                album.Name,
+                album.ArtistId,
+                album.Id
+            ));
 
         return new AlbumWithTracklistDto(
             album.Id,

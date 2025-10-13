@@ -46,10 +46,11 @@ public class LibraryInitializationService(
             var parsedInfo = ParseAudioFilePath(audioFile, libraryInitPath);
 
             logger.LogInformation(
-                "Parsed: Artist='{Artist}', Album='{Album}', Disc={Disc}, Song='{Song}'",
+                "Parsed: Artist='{Artist}', Album='{Album}', Disc={Disc}, Track={Track}, Song='{Song}'",
                 parsedInfo.Artist,
                 parsedInfo.Album,
                 parsedInfo.DiscNumber ?? 0,
+                parsedInfo.TrackNumber ?? 0,
                 parsedInfo.SongName
             );
 
@@ -87,7 +88,12 @@ public class LibraryInitializationService(
                     await dbContext.SaveChangesAsync();
                 }
 
-                var song = Song.CreateFromLibrary(parsedInfo.SongName, audioFile, album);
+                var song = Song.CreateFromLibrary(
+                    parsedInfo.SongName,
+                    audioFile,
+                    album,
+                    parsedInfo.TrackNumber
+                );
                 dbContext.Songs.Add(song);
                 logger.LogInformation(
                     "Added song '{SongName}' to database (from {Artist}/{Album}){CoverInfo}",
@@ -109,6 +115,7 @@ public class LibraryInitializationService(
         var pathParts = relativePath.Split(Path.DirectorySeparatorChar);
 
         var songName = Path.GetFileNameWithoutExtension(audioFilePath);
+        var trackNumber = ExtractTrackNumber(songName);
         songName = TrimLeadingNumbers(songName);
         string artist;
         string album;
@@ -146,8 +153,31 @@ public class LibraryInitializationService(
             Artist = artist,
             Album = album,
             DiscNumber = discNumber,
+            TrackNumber = trackNumber,
             SongName = songName,
         };
+    }
+
+    private static int? ExtractTrackNumber(string songName)
+    {
+        var trimmed = songName.TrimStart();
+        var index = 0;
+
+        while (index < trimmed.Length && char.IsDigit(trimmed[index]))
+        {
+            index++;
+        }
+
+        if (index > 0 && index < trimmed.Length)
+        {
+            var numberStr = trimmed[..index];
+            if (int.TryParse(numberStr, out var trackNumber))
+            {
+                return trackNumber;
+            }
+        }
+
+        return null;
     }
 
     private static string TrimLeadingNumbers(string songName)
@@ -183,6 +213,7 @@ public class LibraryInitializationService(
         public required string Artist { get; init; }
         public required string Album { get; init; }
         public int? DiscNumber { get; init; }
+        public int? TrackNumber { get; init; }
         public required string SongName { get; init; }
     }
 }

@@ -5,6 +5,10 @@
 	import type { ISong } from "../../../../providers";
 	import { GetCurrentPlayer } from "../../../../player/index.svelte";
 	import type { PageProps } from "./$types";
+	import type { components } from "../../../../api";
+	import { Play } from "lucide-svelte";
+
+	type SongDto = components["schemas"]["SongDto"];
 
 	let { data }: PageProps = $props();
 
@@ -13,38 +17,63 @@
 	let dataStore = toStore(() => data.albumData);
 	let albumQuery = useAlbumByIdQuery(albumId, dataStore);
 
+	let albumName = $derived($albumQuery.data?.name ?? "");
+
 	function PlaySong(song: ISong) {
 		player.PlaySong(song);
 	}
 </script>
 
 <svelte:head>
-	<title>Reezer - Album</title>
+	<title>{albumName}</title>
 </svelte:head>
 
 <h1 class="font-display text-4xl font-semibold py-8 px-4">
 	<a href="." class="hover:underline">Albums</a>
 	&gt;
-	<span class="font-medium"> NewJeans </span>
+	<span class="font-medium">{albumName}</span>
 </h1>
 
-<img
-	class="rounded-md w-64 h-64"
-	src={`/api/Albums/${$albumId}/cover`}
-	alt=""
-/>
+<div class="px-4">
+	<img
+		class="rounded-md w-64 h-64"
+		src={`/api/Albums/${$albumId}/cover`}
+		alt=""
+	/>
 
-{#if $albumQuery.data}
-	{#each $albumQuery.data.songs as song}
-		<div>
-			<button
-				class="cursor-pointer hover:text-primary transition-colors inline-block w-full text-left"
-				onclick={() => PlaySong(song)}
+	<div class="py-6">
+		{#if $albumQuery.data}
+			{#each $albumQuery.data.songs as song}
+				{@render Song(song)}
+			{/each}
+		{/if}
+	</div>
+</div>
+
+{#snippet Song(song: SongDto)}
+	<div>
+		<button
+			class="cursor-pointer transition-colors inline-block w-full text-left dark:hover:bg-zinc-900 border-b border-border/50"
+			onclick={() => PlaySong(song)}
+		>
+			<div
+				class="grid grid-cols-[2rem_auto] gap-4 items-center group p-2"
 			>
-				<p>
+				<div
+					class="inline-flex items-center justify-center h-6"
+				>
+					<Play
+						class="opacity-50 group-hover:inline-block hidden"
+					/>
+					<span
+						class="group-hover:hidden inline-block"
+						>{song.trackNumber}</span
+					>
+				</div>
+				<div class="inline-block">
 					{song.name}
-				</p>
-			</button>
-		</div>
-	{/each}
-{/if}
+				</div>
+			</div>
+		</button>
+	</div>
+{/snippet}

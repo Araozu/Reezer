@@ -59,8 +59,15 @@ public class AlbumsController(
         CancellationToken cancellationToken
     )
     {
-        var result = await getAlbumCoverUseCase.GetAlbumCoverAsync(albumId, cancellationToken);
-        Response.Headers.CacheControl = "public, max-age=2592000";
-        return File(result.Stream, result.ContentType);
+        try
+        {
+            var result = await getAlbumCoverUseCase.GetAlbumCoverAsync(albumId, cancellationToken);
+            Response.Headers.CacheControl = "public, max-age=2592000";
+            return File(result.Stream, result.ContentType);
+        }
+        catch (FileNotFoundException)
+        {
+            return NotFound();
+        }
     }
 }

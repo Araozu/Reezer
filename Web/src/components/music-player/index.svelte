@@ -79,7 +79,13 @@
 						<span class="underline">
 							{song?.artist ?? "-"}
 						</span>
-						• {song?.album ?? "-"}
+						•
+						<a
+							class="hover:underline"
+							href={`/albums/${song?.albumId}`}
+						>
+							{song?.album ?? "-"}
+						</a>
 					</p>
 				</div>
 			{/if}
