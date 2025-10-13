@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0.100-rc.1-alpine3.22 as build-env
+FROM mcr.microsoft.com/dotnet/sdk:10.0.100-rc.1-alpine3.22 AS build-env
 WORKDIR /app
 
 COPY *.sln ./
