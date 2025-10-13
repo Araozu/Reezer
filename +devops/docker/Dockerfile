@@ -30,6 +30,7 @@ RUN dotnet publish Api -c Release -r linux-musl-x64 \
 COPY Web/build /app/out/wwwroot
 
 # Create EF migrations bundle (self-contained)
+ENV ConnectionStrings__DefaultConnection=Host=localhost;Database=reezer;Username=root;Password=root
 RUN dotnet ef migrations bundle --project Api \
     -r linux-musl-x64 \
     --configuration Release \
