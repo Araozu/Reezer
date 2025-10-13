@@ -13,6 +13,7 @@ public class GetAllSongsUseCase(ISongRepository songRepository)
         return songs.Select(song => new SongDto(
             song.Id,
             song.Name,
+            song.TrackNumber,
             song.Album.Artist.Name,
             song.Album.Name,
             song.Album.Artist.Id,
