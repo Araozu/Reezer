@@ -4,10 +4,14 @@
 	import { useAlbumByIdQuery } from "./queries";
 	import type { ISong } from "../../../../providers";
 	import { GetCurrentPlayer } from "../../../../player/index.svelte";
+	import type { PageProps } from "./$types";
+
+	let { data }: PageProps = $props();
 
 	const player = GetCurrentPlayer();
 	let albumId = toStore(() => page.params.albumId ?? "-");
-	let albumQuery = useAlbumByIdQuery(albumId);
+	let dataStore = toStore(() => data.albumData);
+	let albumQuery = useAlbumByIdQuery(albumId, dataStore);
 
 	function PlaySong(song: ISong) {
 		player.PlaySong(song);
