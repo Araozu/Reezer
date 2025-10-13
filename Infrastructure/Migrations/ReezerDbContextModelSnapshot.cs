@@ -22,10 +22,54 @@ namespace Reezer.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Reezer.Domain.Entities.Album", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ArtistId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CoverPath")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArtistId");
+
+                    b.ToTable("Albums");
+                });
+
+            modelBuilder.Entity("Reezer.Domain.Entities.Artist", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Artists");
+                });
+
             modelBuilder.Entity("Reezer.Domain.Entities.Songs.Song", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AlbumId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ArtistId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
@@ -40,7 +84,42 @@ namespace Reezer.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AlbumId");
+
+                    b.HasIndex("ArtistId");
+
                     b.ToTable("Songs");
+                });
+
+            modelBuilder.Entity("Reezer.Domain.Entities.Album", b =>
+                {
+                    b.HasOne("Reezer.Domain.Entities.Artist", "Artist")
+                        .WithMany()
+                        .HasForeignKey("ArtistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Artist");
+                });
+
+            modelBuilder.Entity("Reezer.Domain.Entities.Songs.Song", b =>
+                {
+                    b.HasOne("Reezer.Domain.Entities.Album", "Album")
+                        .WithMany()
+                        .HasForeignKey("AlbumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Reezer.Domain.Entities.Artist", null)
+                        .WithMany("Songs")
+                        .HasForeignKey("ArtistId");
+
+                    b.Navigation("Album");
+                });
+
+            modelBuilder.Entity("Reezer.Domain.Entities.Artist", b =>
+                {
+                    b.Navigation("Songs");
                 });
 #pragma warning restore 612, 618
         }

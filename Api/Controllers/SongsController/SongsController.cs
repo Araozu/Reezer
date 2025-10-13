@@ -25,7 +25,7 @@ public class SongsController(
     [HttpGet("{songId}/stream")]
     public async Task<IActionResult> StreamSong(Guid songId, CancellationToken cancellationToken)
     {
-        var stream = await streamSongUseCase.StreamSongAsync(songId, cancellationToken);
-        return File(stream, "audio/flac", enableRangeProcessing: true);
+        var result = await streamSongUseCase.StreamSongAsync(songId, cancellationToken);
+        return File(result.Stream, result.ContentType, enableRangeProcessing: true);
     }
 }

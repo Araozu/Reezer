@@ -10,6 +10,13 @@ public class GetAllSongsUseCase(ISongRepository songRepository)
     )
     {
         var songs = await songRepository.GetAllSongsAsync(cancellationToken);
-        return songs.Select(song => new SongDto(song.Id, song.Name));
+        return songs.Select(song => new SongDto(
+            song.Id,
+            song.Name,
+            song.Album.Artist.Name,
+            song.Album.Name,
+            song.Album.Artist.Id,
+            song.Album.Id
+        ));
     }
 }

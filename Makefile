@@ -25,8 +25,10 @@ ef-update:
 	dotnet ef database update --project Infrastructure --startup-project Api
 
 ef-drop:
-	dotnet ef database drop --project Api
+	dotnet ef database drop  --project Infrastructure --startup-project Api
 
-format:
+ef-reset: ef-drop ef-update
+
+fmt:
 	dotnet csharpier format .
 

@@ -1,3 +1,7 @@
+import {type components} from "../../api"
+
+type ServerSong = components["schemas"]["SongDto"]
+
 /**
  * Represents a song in the music library.
  */
@@ -6,6 +10,6 @@ export interface ISong {
     name: string;
     artist: string;
     album: string;
-    artist_id: string | null;
-    album_id: string | null;
+    artistId: string;
+    albumId: string;
 }

@@ -13,8 +13,8 @@ const songsList: Array<SongWithUrl> = [
 		artist: "PinkPantheress",
 		url: "/musique/Tonight.flac",
 		cover: "https://navidrome.araozu.dev/rest/getCoverArt?u=fernando&t=da9e8ddbb4fef837b69abfc0e3cd0730&s=d84d22&f=json&v=1.8.0&c=NavidromeUI&id=al-7fa3c84acaf11e1e7891874205242942&_=2025-04-19T23%3A51%3A46.7439648Z&square=true",
-		album_id: "1",
-		artist_id: "1",
+		albumId: "1",
+		artistId: "1",
 	},
 	{
 		id: "2",
@@ -23,8 +23,8 @@ const songsList: Array<SongWithUrl> = [
 		artist: "PinkPantheress",
 		url: "/musique/Capable of love.flac",
 		cover: "https://navidrome.araozu.dev/rest/getCoverArt?u=fernando&t=c2eaf7d7349840e4ed02e5f4ca78832e&s=dc12ac&f=json&v=1.8.0&c=NavidromeUI&id=al-2abacb18c196bd654a6d4588e814f6be&_=2025-04-19T23%3A53%3A13.4895869Z&square=true",
-		album_id: "1",
-		artist_id: "1",
+		albumId: "1",
+		artistId: "1",
 	},
 	{
 		id: "3",
@@ -33,8 +33,8 @@ const songsList: Array<SongWithUrl> = [
 		artist: "Joji",
 		url: "/musique/Your Man.flac",
 		cover: "https://navidrome.araozu.dev/rest/getCoverArt?u=fernando&t=c2eaf7d7349840e4ed02e5f4ca78832e&s=dc12ac&f=json&v=1.8.0&c=NavidromeUI&id=al-6ea3d7862d98cff35736f28711257f4e&_=2024-10-04T01%3A15%3A32.239568Z",
-		album_id: "1",
-		artist_id: "1",
+		albumId: "1",
+		artistId: "1",
 	},
 	{
 		id: "4",
@@ -43,8 +43,8 @@ const songsList: Array<SongWithUrl> = [
 		artist: "NewJeans",
 		url: "/musique/New Jeans.flac",
 		cover: "https://navidrome.araozu.dev/rest/getCoverArt?u=fernando&t=c2eaf7d7349840e4ed02e5f4ca78832e&s=dc12ac&f=json&v=1.8.0&c=NavidromeUI&id=al-27535642c68cdd039b37553f9eb43122&_=2024-10-03T23%3A54%3A38.5063976Z",
-		album_id: "1",
-		artist_id: "1",
+		albumId: "1",
+		artistId: "1",
 	},
 	{
 		id: "5",
@@ -53,8 +53,8 @@ const songsList: Array<SongWithUrl> = [
 		artist: "Kendrick Lamar",
 		url: "/musique/United In Grief.flac",
 		cover: "https://navidrome.araozu.dev/rest/getCoverArt?u=fernando&t=c2eaf7d7349840e4ed02e5f4ca78832e&s=dc12ac&f=json&v=1.8.0&c=NavidromeUI&id=al-1b053b50022822726a512ec83631392a&_=2024-10-04T01%3A17%3A44.9119933Z&square=true",
-		album_id: "1",
-		artist_id: "1",
+		albumId: "1",
+		artistId: "1",
 	},
 	{
 		id: "6",
@@ -63,8 +63,8 @@ const songsList: Array<SongWithUrl> = [
 		artist: "Kanye West",
 		url: "/musique/No More Parties In LA.flac",
 		cover: "https://navidrome.araozu.dev/rest/getCoverArt?u=fernando&t=c2eaf7d7349840e4ed02e5f4ca78832e&s=dc12ac&f=json&v=1.8.0&c=NavidromeUI&id=al-309c94aee7aa9f20a94848d0ba183bc5&_=2024-10-04T00%3A59%3A34.8313877Z&square=true",
-		album_id: "1",
-		artist_id: "1",
+		albumId: "1",
+		artistId: "1",
 	},
 	{
 		id: "7",
@@ -73,8 +73,8 @@ const songsList: Array<SongWithUrl> = [
 		artist: "Tyler, The Creator",
 		url: "/musique/Glitter.flac",
 		cover: "https://navidrome.araozu.dev/rest/getCoverArt?u=fernando&t=c2eaf7d7349840e4ed02e5f4ca78832e&s=dc12ac&f=json&v=1.8.0&c=NavidromeUI&id=al-e60d9d9d58cc6d71a48e711560825436&_=2024-10-04T00%3A59%3A52.4008848Z&square=true",
-		album_id: "1",
-		artist_id: "1",
+		albumId: "1",
+		artistId: "1",
 	},
 ]
 
@@ -150,7 +150,7 @@ export class LocalMusicProvider implements IMusicProvider
 		await new Promise((resolve) => setTimeout(resolve, 1000)) // Simulate network delay
 
 		// Find any song with the matching album_id to get the cover
-		const song = songsList.find((song) => song.album_id === albumId)
+		const song = songsList.find((song) => song.albumId === albumId)
 		if (!song) throw { message: "Album not found" }
 
 		// Fetch the image from the URL and convert to base64
@@ -178,12 +178,12 @@ export class LocalMusicProvider implements IMusicProvider
 		const albumMap = new Map<string, IAlbum>()
 		for (const song of songsList)
 		{
-			if (!song.album_id)
+			if (!song.albumId)
 
 			{
 				continue
 			}
-			const id = song.album_id
+			const id = song.albumId
 			if (!albumMap.has(id))
 
 			{
@@ -220,14 +220,14 @@ export class LocalMusicProvider implements IMusicProvider
 		const albumMap = new Map<string, IAlbum>()
 		for (const song of songsList)
 		{
-			if (!song.album_id)
+			if (!song.albumId)
 
 			{
 				continue
 			}
 			const nameMatch = song.album.toLowerCase().includes(query.toLowerCase())
 			const artistMatch = song.artist.toLowerCase().includes(query.toLowerCase())
-			const id = song.album_id
+			const id = song.albumId
 			if ((nameMatch || artistMatch) && !albumMap.has(id))
 
 			{
@@ -260,8 +260,8 @@ export class LocalMusicProvider implements IMusicProvider
 	{
 		// Gather all songs for this album
 		const songs = songsList
-			.filter((song) => song.album_id === albumId)
-			.map((song) => ({ id: song.id, name: song.name, artist: song.artist, album: song.album, artist_id: song.artist_id, album_id: song.album_id }))
+			.filter((song) => song.albumId === albumId)
+			.map((song) => ({ id: song.id, name: song.name, artist: song.artist, album: song.album, artist_id: song.artistId, album_id: song.albumId }))
 		if (songs.length === 0)
 
 		{
@@ -281,9 +281,9 @@ export class LocalMusicProvider implements IMusicProvider
 		const albumMap = new Map<string, IAlbum>()
 		for (const song of songsList)
 		{
-			if (song.artist_id === artistId && song.album_id)
+			if (song.artistId === artistId && song.albumId)
 			{
-				const id = song.album_id
+				const id = song.albumId
 				if (!albumMap.has(id))
 				{
 					albumMap.set(id, {

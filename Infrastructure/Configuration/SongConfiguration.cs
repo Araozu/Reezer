@@ -8,6 +8,7 @@ public class SongConfiguration : IEntityTypeConfiguration<Song>
 {
     public void Configure(EntityTypeBuilder<Song> builder)
     {
+        builder.HasKey(s => s.Id);
         builder.Property(s => s.Id).ValueGeneratedOnAdd();
     }
 }

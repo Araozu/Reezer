@@ -1,53 +1,42 @@
+import type { Readable, Writable } from "svelte/store";
+import type { ISong } from "../providers";
+
 export class HeadlessMusicPlayer
 {
-	private audioTag: HTMLAudioElement | null = null;
+	private audioTag = new Audio("/_.opus");
+	public currentSong = $state<ISong | null>(null);
 
-	// Bindings for svelte
-	public paused = $state(true);
-	public ready = $state(false);
+	constructor(
+		public isPaused: Writable<boolean>,
+		public volume: Writable<number>,
+		public currentTime: Writable<number>,
+		public duration: Readable<number>,
+	)
+	{}
 
-	/**
-	 * Initializes the audio tag for the music player.
-	 * All audio operations will be performed on this tag.
-	 *
-	 * It is essential to call this method before using any other functionality of the music player.
-	 *
-	 * @param tag The HTMLAudioElement to be used for audio playback.
-	 */
-	public InitializeAudioTag(tag: HTMLAudioElement)
+	public OverrideTag(el: HTMLAudioElement)
 	{
-		this.audioTag = tag;
-		this.ready = true;
+		this.audioTag = el;
+
+		const onclick = () => {
+			this.audioTag.play()
+				.catch(e => console.error(e))
+				.finally(() => this.audioTag.pause());
+			document.removeEventListener("click", onclick);
+		};
+		document.addEventListener("click", onclick);
 	}
 
-	/**
-	 * Plays and pauses the audio playback.
-	 * This method must be called on a user interaction event (e.g., button click)
-	 * to comply with browser autoplay policies.
-	 */
-	public SetupOnClick()
+	public PlaySong(song: ISong)
 	{
-		if (!this.audioTag) throw new Error("Audio tag not initialized. Call InitializeAudioTag first.");
-
-		this.audioTag.play().finally(() => this.audioTag?.pause());
-	}
-
-	public DoSomething()
-	{
-		console.log("Doing something in the music player");
-	}
-
-	public SetSong(src: string)
-	{
-		if (!this.audioTag) throw new Error("Audio tag not initialized. Call InitializeAudioTag first. (when calling SetSong)");
-	
-		this.audioTag.src = src;
+		this.currentSong = song;
+		this.audioTag.pause()
+		this.audioTag.src = `/api/Songs/${song.id}/stream`;
+		this.audioTag.play().catch(e => console.error(e));
 	}
 
 	public TogglePlayPause()
 	{
-		if (!this.audioTag) throw new Error("Audio tag not initialized. Call InitializeAudioTag first. (when calling TogglePlayPause)");
-
 		if (this.audioTag.paused)
 		{
 			this.audioTag.play();
@@ -57,5 +46,16 @@ export class HeadlessMusicPlayer
 			this.audioTag.pause();
 		}
 	}
-}
 
+	public SetVolume(volume: number)
+	{
+		if (volume < 0 || volume > 1) throw new Error("Attemted to set a invalid volume level: " + volume)
+
+		this.volume.set(volume);
+	}
+
+	public SetCurrentTime(time: number)
+	{
+		this.currentTime.set(time)
+	}
+}

@@ -4,6 +4,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+:root {
+  --font-display: "Funnel Display", sans-serif;
+  --font-body: "Funnel Sans", sans-serif;
+}
 
 :root {
   --radius: 0.65rem;
@@ -19,10 +23,10 @@
   --secondary-foreground: oklch(0.21 0.006 285.885);
   --muted: oklch(0.967 0.001 286.375);
   --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
+  --accent: oklch(0.8709 0.001 41.13);
   --accent-foreground: oklch(0.21 0.006 285.885);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
+  --border: oklch(0.8412 0.004 37.92);
   --input: oklch(0.92 0.004 286.32);
   --ring: oklch(0.705 0.213 47.604);
   --chart-1: oklch(0.646 0.222 41.116);
@@ -120,4 +124,13 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@theme {
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+}
+
+html, body {
+  font-family: var(--font-body);
 }

@@ -1,16 +1,69 @@
 <script lang="ts">
-	import MusicPlayer from "../../components/music-player.svelte";
-	import { CreatePlayerContext } from "../../player/index.svelte";
+	import { toStore } from "svelte/store";
+	import MusicPlayer from "../../components/music-player/index.svelte";
+	import {
+		CreatePlayerContext,
+		GetCurrentPlayer,
+	} from "../../player/index.svelte";
 
 	let { children } = $props();
-	CreatePlayerContext();
+	let audioTag = $state<HTMLAudioElement | null>(null);
+	let audioTagSetup = $state(false);
+
+	// Audio bindings
+	let aPaused = $state(false);
+	let aVolume = $state(0.5);
+	let aCurrentTime = $state(0);
+	let aDuration = $state(0);
+
+	CreatePlayerContext(
+		toStore(
+			() => aPaused,
+			(v) => (aPaused = v),
+		),
+		toStore(
+			() => aVolume,
+			(v) => (aVolume = v),
+		),
+		toStore(
+			() => aCurrentTime,
+			(v) => (aCurrentTime = v),
+		),
+		toStore(() => aDuration),
+	);
+	let player = GetCurrentPlayer();
+
+	$effect(() => {
+		if (audioTag === null) return;
+
+		player.OverrideTag(audioTag);
+		audioTagSetup = true;
+	});
+
+	let playerCollapsed = $state(true);
 </script>
 
-<div class="grid grid-cols-[auto_30rem]">
+<div
+	class={[
+		"grid",
+		playerCollapsed
+			? "grid-cols-[auto_6rem]"
+			: "grid-cols-[auto_30rem]",
+	]}
+>
 	<div>
-		{@render children()}
+		{#if audioTagSetup}
+			{@render children()}
+		{/if}
 	</div>
-	<div>
-		<MusicPlayer />
-	</div>
+	<audio
+		src="/_.opus"
+		bind:this={audioTag}
+		bind:volume={aVolume}
+		bind:paused={aPaused}
+		bind:currentTime={aCurrentTime}
+		bind:duration={aDuration}
+	>
+	</audio>
+	<MusicPlayer bind:collapsed={playerCollapsed} />
 </div>
