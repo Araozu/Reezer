@@ -37,7 +37,7 @@ RUN dotnet ef migrations bundle --project Api \
     -o /app/out/efbundle
 
 
-FROM mcr.microsoft.com/dotnet/runtime:10.0.0-rc.1-alpine3.22 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0.0-rc.1-alpine3.22 AS runtime
 WORKDIR /app
 
 # Install minimal runtime dependencies
