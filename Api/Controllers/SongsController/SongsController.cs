@@ -26,6 +26,8 @@ public class SongsController(
     public async Task<IActionResult> StreamSong(Guid songId, CancellationToken cancellationToken)
     {
         var result = await streamSongUseCase.StreamSongAsync(songId, cancellationToken);
+
+        Response.Headers.CacheControl = "public, max-age=2592000"; // 30 days
         return File(result.Stream, result.ContentType, enableRangeProcessing: true);
     }
 }
