@@ -38,8 +38,24 @@ ungrouped:
         }
         stage("Build & Push") {
             parallel {
-                stage("backend") {
+                stage("Fullstack") {
                     stages {
+                        stage("Build svelte assets") {
+                            agent {
+                                docker {
+                                    image "node:22"
+                                    reuseNode true
+                                    args '-u 0:0'
+                                }
+                            }
+                            steps {
+                                dir("Web") {
+                                    sh "npm i -g pnpm"
+                                    sh "pnpm i"
+                                    sh "pnpm build"
+                                }
+                            }
+                        }
                         stage("Build & Push") {
                             steps {
                                 script {
