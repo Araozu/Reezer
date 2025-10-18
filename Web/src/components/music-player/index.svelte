@@ -97,6 +97,7 @@
 			>
 				<button
 					class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors"
+					onclick={() => player.Previous()}
 				>
 					<SkipBack class="m-2" size={16} />
 				</button>
@@ -112,6 +113,7 @@
 				</button>
 				<button
 					class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors"
+					onclick={() => player.Next()}
 				>
 					<SkipForward class="m-2" size={16} />
 				</button>
