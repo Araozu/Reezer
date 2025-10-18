@@ -7,6 +7,7 @@
 	import type { PageProps } from "./$types";
 	import type { components } from "../../../../api";
 	import { Play } from "lucide-svelte";
+	import Button from "$lib/components/ui/button/button.svelte";
 
 	type SongDto = components["schemas"]["SongDto"];
 
@@ -22,6 +23,11 @@
 	function PlaySong(song: ISong) {
 		player.PlaySong(song);
 	}
+
+	function PlayAll() {
+		const songs = $albumQuery.data?.songs ?? [];
+		player.PlaySongs(songs);
+	}
 </script>
 
 <svelte:head>
@@ -35,11 +41,20 @@
 </h1>
 
 <div class="px-4">
-	<img
-		class="rounded-md w-64 h-64"
-		src={`/api/Albums/${$albumId}/cover`}
-		alt=""
-	/>
+	<div class="grid grid-cols-[20rem_auto]">
+		<img
+			class="rounded-md w-64 h-64"
+			src={`/api/Albums/${$albumId}/cover`}
+			alt=""
+		/>
+
+		<div>
+			<Button onclick={PlayAll}>
+				<Play />
+				Play All
+			</Button>
+		</div>
+	</div>
 
 	<div class="py-6">
 		{#if $albumQuery.data}
