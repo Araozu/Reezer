@@ -1,5 +1,6 @@
-import type { Readable, Writable } from "svelte/store";
+import { type Readable,type  Writable, get } from "svelte/store";
 import type { ISong } from "../providers";
+import { api } from "../api";
 
 export class HeadlessMusicPlayer
 {
@@ -7,6 +8,8 @@ export class HeadlessMusicPlayer
 	public currentSongIdx = $state(0);
 	public queue = $state<Array<ISong>>([]);
 	public readonly currentSong = $derived(this.queue[this.currentSongIdx] ?? null)
+
+	private lastPreloadId = ""
 
 	constructor(
 		public isPaused: Writable<boolean>,
@@ -16,6 +19,37 @@ export class HeadlessMusicPlayer
 	)
 	{
 		this.setupAudioTag();
+
+		// schedule song preloading
+		setInterval(() => {
+			if (get(isPaused)) return
+
+			const nextSong = this.queue[this.currentSongIdx + 1]
+			if (!nextSong) return
+
+			const current = get(currentTime)
+			const total = get(duration)
+			const difference = Math.floor(total - current)
+
+			if (difference > 20) return
+
+			if (this.lastPreloadId === nextSong.id) {
+				console.log("already preloaded")
+				return
+			}
+
+			this.lastPreloadId = nextSong.id
+
+			// Actually preload
+			api.POST("/api/Songs/{songId}/prepare", {
+				params: {
+					path: {
+						songId: nextSong.id
+					}
+				}
+			})
+				.catch(() => {})
+		}, 2500)
 	}
 
 	private setupAudioTag()
@@ -23,6 +57,12 @@ export class HeadlessMusicPlayer
 		this.audioTag.addEventListener("ended", () => {
 			this.Next();
 		});
+	}
+
+	private PreloadSong(song: ISong)
+	{
+		// FIXME: should call the backend via a provider...
+
 	}
 
 	public OverrideTag(el: HTMLAudioElement)
