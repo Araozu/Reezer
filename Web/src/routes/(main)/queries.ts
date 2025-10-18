@@ -1,5 +1,6 @@
 import { createQuery } from "@tanstack/svelte-query";
 import { api, sv, type components } from "../../api";
+import { derived, type Readable } from "svelte/store";
 
 export type AlbumDto = components["schemas"]["AlbumDto"];
 export type PaginatedAlbumsResult = components["schemas"]["PaginatedResultOfAlbumDto"];
@@ -12,14 +13,19 @@ export function useSongs() {
 	});
 }
 
-export function useAlbums(page: number = 1, pageSize: number = 20) {
-	return createQuery({
-		queryKey: ["albums", page, pageSize],
-		queryFn: sv(() => api.GET("/api/Albums", {
-			params: {
-				query: { page, pageSize }
-			}
-		})),
-		staleTime: 5 * 60 * 1000,
-	});
+export function useAlbums(
+	$page: Readable<number>,
+	$pageSize: Readable<number>,
+) {
+	return createQuery(
+		derived([$page, $pageSize], ([page, pageSize]) => ({
+			queryKey: ["albums", page, pageSize],
+			queryFn: sv(() => api.GET("/api/Albums", {
+				params: {
+					query: { page, pageSize }
+				}
+			})),
+			staleTime: 5 * 60 * 1000,
+		}))
+	);
 }

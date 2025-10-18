@@ -3,10 +3,20 @@
 	import * as Card from "$lib/components/ui/card/index.js";
 	import type { components } from "../../../api";
 	import { Skeleton } from "$lib/components/ui/skeleton";
+	import * as Pagination from "$lib/components/ui/pagination/index.js";
+	import { toStore } from "svelte/store";
 
 	type Album = components["schemas"]["AlbumDto"];
 
-	const albumsQuery = useAlbums();
+	let requestPage = $state(1);
+	let requestPageSize = $state(20);
+
+	const albumsQuery = useAlbums(
+		toStore(() => requestPage),
+		toStore(() => requestPageSize),
+	);
+	const totalCount = ($albumsQuery.data?.totalCount as number) ?? 1;
+	const pageSize = ($albumsQuery.data?.pageSize as number) ?? 20;
 </script>
 
 <svelte:head>
@@ -26,6 +36,40 @@
 				{@render AlbumCardSkeleton()}
 			{/each}
 		{/if}
+
+		<Pagination.Root count={totalCount} perPage={pageSize}>
+			{#snippet children({ pages, currentPage })}
+				<Pagination.Content>
+					<Pagination.Item>
+						<Pagination.PrevButton />
+					</Pagination.Item>
+					{#each pages as page (page.key)}
+						{#if page.type === "ellipsis"}
+							<Pagination.Item>
+								<Pagination.Ellipsis
+								/>
+							</Pagination.Item>
+						{:else}
+							<Pagination.Item>
+								<Pagination.Link
+									{page}
+									isActive={currentPage ===
+										page.value}
+									onclick={() =>
+										(requestPage =
+											page.value)}
+								>
+									{page.value}
+								</Pagination.Link>
+							</Pagination.Item>
+						{/if}
+					{/each}
+					<Pagination.Item>
+						<Pagination.NextButton />
+					</Pagination.Item>
+				</Pagination.Content>
+			{/snippet}
+		</Pagination.Root>
 	</div>
 </div>
 
