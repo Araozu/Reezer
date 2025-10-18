@@ -37,7 +37,7 @@
 
 <div class="px-4">
 	<AlbumPagination {totalCount} {pageSize} bind:requestPage />
-	<div class="flex flex-wrap gap-2">
+	<div class="grid grid-cols-5 gap-2">
 		{#if $albumsQuery.data}
 			{#each $albumsQuery.data.items as album}
 				{@render AlbumCard(album)}
@@ -48,16 +48,17 @@
 			{/each}
 		{/if}
 	</div>
+	<AlbumPagination {totalCount} {pageSize} bind:requestPage />
 </div>
 
 {#snippet AlbumCard(album: Album)}
 	<a class="inline-block" href={`/albums/${album.id}`}>
 		<Card.Root
-			class="w-full max-w-76 hover:border-primary transition-colors"
+			class="w-full hover:border-primary transition-colors"
 		>
 			<Card.Content>
 				<img
-					class="rounded-md w-64 h-64"
+					class="rounded-md w-full aspect-square object-cover"
 					src={`/api/Albums/${album.id}/cover`}
 					alt=""
 				/>
@@ -75,11 +76,11 @@
 {/snippet}
 
 {#snippet AlbumCardSkeleton()}
-	<Card.Root
-		class="w-full max-w-76 hover:border-primary transition-colors"
-	>
+	<Card.Root class="w-full hover:border-primary transition-colors">
 		<Card.Content>
-			<Skeleton class="rounded-md w-64 h-64" />
+			<Skeleton
+				class="rounded-md w-full aspect-square object-cover"
+			/>
 		</Card.Content>
 		<Card.Header>
 			<Card.Title class="font-display">

@@ -13,65 +13,55 @@
 		requestPage: number;
 	} = $props();
 
-	let pageCount = $derived(Math.ceil(totalCount / pageSize));
+	let cachedPageNumber = $state(requestPage);
 
-	function UpdateUrlQuery() {
+	function UpdateUrlQuery(requestPage: number) {
 		let query = page.url.searchParams;
 		query.set("page", requestPage.toString());
 		goto(`?${query.toString()}`);
 	}
 
-	function PreviousPage() {
-		if (requestPage > 1) {
-			requestPage -= 1;
-			UpdateUrlQuery();
-		}
-	}
+	$effect(() => {
+		if (requestPage == cachedPageNumber) return;
 
-	function NextPage() {
-		if (requestPage < pageCount) {
-			requestPage += 1;
-			UpdateUrlQuery();
-		}
-	}
-
-	function GoToPage(n: number) {
-		requestPage = n;
-		UpdateUrlQuery();
-	}
+		UpdateUrlQuery(requestPage);
+		cachedPageNumber = requestPage;
+	});
 </script>
 
-<Pagination.Root bind:page={requestPage} count={totalCount} perPage={pageSize}>
-	{#snippet children({ pages, currentPage })}
-		<Pagination.Content>
-			<Pagination.Item>
-				<Pagination.PrevButton onclick={PreviousPage} />
-			</Pagination.Item>
-			{#each pages as page (page.key)}
-				{#if page.type === "ellipsis"}
-					<Pagination.Item>
-						<Pagination.Ellipsis />
-					</Pagination.Item>
-				{:else}
-					<Pagination.Item>
-						<Pagination.Link
-							{page}
-							isActive={currentPage ===
-								page.value}
-							onclick={() => {
-								GoToPage(
-									page.value,
-								);
-							}}
-						>
-							{page.value}
-						</Pagination.Link>
-					</Pagination.Item>
-				{/if}
-			{/each}
-			<Pagination.Item>
-				<Pagination.NextButton onclick={NextPage} />
-			</Pagination.Item>
-		</Pagination.Content>
-	{/snippet}
-</Pagination.Root>
+<div class="py-4">
+	<Pagination.Root
+		bind:page={requestPage}
+		count={totalCount}
+		perPage={pageSize}
+		siblingCount={2}
+	>
+		{#snippet children({ pages, currentPage })}
+			<Pagination.Content>
+				<Pagination.Item>
+					<Pagination.PrevButton />
+				</Pagination.Item>
+				{#each pages as page (page.key)}
+					{#if page.type === "ellipsis"}
+						<Pagination.Item>
+							<Pagination.Ellipsis />
+						</Pagination.Item>
+					{:else}
+						<Pagination.Item>
+							<Pagination.Link
+								{page}
+								isActive={currentPage ===
+									page.value}
+							>
+								{page.value}
+							</Pagination.Link>
+						</Pagination.Item>
+					{/if}
+				{/each}
+				<Pagination.Item>
+					<Pagination.NextButton />
+				</Pagination.Item>
+			</Pagination.Content>
+		{/snippet}
+	</Pagination.Root>
+</div>
