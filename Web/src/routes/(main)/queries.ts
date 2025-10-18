@@ -10,6 +10,7 @@ export function useSongs() {
 		queryKey: ["songs"],
 		queryFn: sv(() => api.GET("/api/Songs")),
 		staleTime: 5 * 60 * 1000,
+		refetchOnWindowFocus: false,
 	});
 }
 
@@ -26,6 +27,7 @@ export function useAlbums(
 				}
 			})),
 			staleTime: 5 * 60 * 1000,
+			refetchOnWindowFocus: false,
 		}))
 	);
 }

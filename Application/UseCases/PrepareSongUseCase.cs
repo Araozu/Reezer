@@ -1,25 +1,22 @@
+using Microsoft.Extensions.Logging;
 using Reezer.Application.Repositories;
 
 namespace Reezer.Application.UseCases;
 
-public class PrepareSongUseCase(ISongRepository songRepository)
+public class PrepareSongUseCase(ISongRepository songRepository, ILogger<PrepareSongUseCase> logger)
 {
-    public void PrepareSongAsync(Guid songId)
+    public async Task PrepareSongAsync(Guid songId)
     {
-        _ = Task.Run(async () =>
+        try
         {
-            try
-            {
-                var (stream, _) = await songRepository.GetSongStreamWithContentTypeAsync(
-                    songId,
-                    CancellationToken.None
-                );
-                await stream.DisposeAsync();
-            }
-            catch
-            {
-                // Silently ignore errors in background preparation
-            }
-        });
+            logger.LogInformation("Preparing song {SongId}", songId);
+            _ = await songRepository.GetSongStreamWithContentTypeAsync(songId);
+            logger.LogInformation("Song {SongId} prepared", songId);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error preparing song {SongId}", songId);
+            throw;
+        }
     }
 }
