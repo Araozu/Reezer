@@ -13,27 +13,20 @@
 		requestPage: number;
 	} = $props();
 
-	let pageCount = $derived(Math.ceil(totalCount / pageSize));
+	let cachedPageNumber = $state(requestPage);
 
-	function UpdateUrlQuery() {
+	function UpdateUrlQuery(requestPage: number) {
 		let query = page.url.searchParams;
 		query.set("page", requestPage.toString());
 		goto(`?${query.toString()}`);
 	}
 
-	function PreviousPage() {
-		if (requestPage > 1) {
-			requestPage -= 1;
-			UpdateUrlQuery();
-		}
-	}
+	$effect(() => {
+		if (requestPage == cachedPageNumber) return;
 
-	function NextPage() {
-		if (requestPage < pageCount) {
-			requestPage += 1;
-			UpdateUrlQuery();
-		}
-	}
+		UpdateUrlQuery(requestPage);
+		cachedPageNumber = requestPage;
+	});
 </script>
 
 <Pagination.Root
@@ -45,7 +38,7 @@
 	{#snippet children({ pages, currentPage })}
 		<Pagination.Content>
 			<Pagination.Item>
-				<Pagination.PrevButton onclick={PreviousPage} />
+				<Pagination.PrevButton />
 			</Pagination.Item>
 			{#each pages as page (page.key)}
 				{#if page.type === "ellipsis"}
@@ -58,7 +51,6 @@
 							{page}
 							isActive={currentPage ===
 								page.value}
-							onclick={UpdateUrlQuery}
 						>
 							{page.value}
 						</Pagination.Link>
@@ -66,7 +58,7 @@
 				{/if}
 			{/each}
 			<Pagination.Item>
-				<Pagination.NextButton onclick={NextPage} />
+				<Pagination.NextButton />
 			</Pagination.Item>
 		</Pagination.Content>
 	{/snippet}
