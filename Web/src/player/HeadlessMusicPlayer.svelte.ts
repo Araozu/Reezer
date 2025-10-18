@@ -14,11 +14,21 @@ export class HeadlessMusicPlayer
 		public currentTime: Writable<number>,
 		public duration: Readable<number>,
 	)
-	{}
+	{
+		this.setupAudioTag();
+	}
+
+	private setupAudioTag()
+	{
+		this.audioTag.addEventListener("ended", () => {
+			this.Next();
+		});
+	}
 
 	public OverrideTag(el: HTMLAudioElement)
 	{
 		this.audioTag = el;
+		this.setupAudioTag();
 
 		const onclick = () => {
 			this.audioTag.play()
