@@ -8,7 +8,8 @@ namespace Reezer.Api.Controllers;
 [Route("api/[controller]")]
 public class SongsController(
     GetAllSongsUseCase getAllSongsUseCase,
-    StreamSongUseCase streamSongUseCase
+    StreamSongUseCase streamSongUseCase,
+    PrepareSongUseCase prepareSongUseCase
 ) : ControllerBase
 {
     [EndpointSummary("Get all songs")]
@@ -29,5 +30,13 @@ public class SongsController(
 
         Response.Headers.CacheControl = "public, max-age=2592000"; // 30 days
         return File(result.Stream, result.ContentType, enableRangeProcessing: true);
+    }
+
+    [EndpointSummary("Prepare a song for streaming by transcoding it in the background")]
+    [HttpPost("{songId}/prepare")]
+    public IActionResult PrepareSong(Guid songId)
+    {
+        prepareSongUseCase.PrepareSongAsync(songId);
+        return Ok();
     }
 }
