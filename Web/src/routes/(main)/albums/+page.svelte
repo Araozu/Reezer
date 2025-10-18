@@ -3,10 +3,13 @@
 	import * as Card from "$lib/components/ui/card/index.js";
 	import type { components } from "../../../api";
 	import { Skeleton } from "$lib/components/ui/skeleton";
-	import * as Pagination from "$lib/components/ui/pagination/index.js";
 	import { toStore } from "svelte/store";
+	import AlbumPagination from "./album_pagination.svelte";
+	import { page } from "$app/state";
 
 	type Album = components["schemas"]["AlbumDto"];
+
+	let queryPage = page.url.searchParams;
 
 	let requestPage = $state(1);
 	let requestPageSize = $state(20);
@@ -15,8 +18,12 @@
 		toStore(() => requestPage),
 		toStore(() => requestPageSize),
 	);
-	const totalCount = ($albumsQuery.data?.totalCount as number) ?? 1;
-	const pageSize = ($albumsQuery.data?.pageSize as number) ?? 20;
+	const totalCount = $derived(
+		($albumsQuery.data?.totalCount as number) ?? 1,
+	);
+	const pageSize = $derived(
+		($albumsQuery.data?.pageSize as number) ?? 20,
+	);
 </script>
 
 <svelte:head>
@@ -26,6 +33,7 @@
 <h1 class="font-display text-4xl font-semibold py-8 px-4">Albums</h1>
 
 <div class="px-4">
+	<AlbumPagination {totalCount} {pageSize} bind:requestPage />
 	<div class="flex flex-wrap gap-2">
 		{#if $albumsQuery.data}
 			{#each $albumsQuery.data.items as album}
@@ -36,40 +44,6 @@
 				{@render AlbumCardSkeleton()}
 			{/each}
 		{/if}
-
-		<Pagination.Root count={totalCount} perPage={pageSize}>
-			{#snippet children({ pages, currentPage })}
-				<Pagination.Content>
-					<Pagination.Item>
-						<Pagination.PrevButton />
-					</Pagination.Item>
-					{#each pages as page (page.key)}
-						{#if page.type === "ellipsis"}
-							<Pagination.Item>
-								<Pagination.Ellipsis
-								/>
-							</Pagination.Item>
-						{:else}
-							<Pagination.Item>
-								<Pagination.Link
-									{page}
-									isActive={currentPage ===
-										page.value}
-									onclick={() =>
-										(requestPage =
-											page.value)}
-								>
-									{page.value}
-								</Pagination.Link>
-							</Pagination.Item>
-						{/if}
-					{/each}
-					<Pagination.Item>
-						<Pagination.NextButton />
-					</Pagination.Item>
-				</Pagination.Content>
-			{/snippet}
-		</Pagination.Root>
 	</div>
 </div>
 
