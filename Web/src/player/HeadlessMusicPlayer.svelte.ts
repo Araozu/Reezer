@@ -4,8 +4,9 @@ import type { ISong } from "../providers";
 export class HeadlessMusicPlayer
 {
 	private audioTag = new Audio("/_.opus");
-	public currentSong = $state<ISong | null>(null);
+	public currentSongIdx = $state(0);
 	public queue = $state<Array<ISong>>([]);
+	public readonly currentSong = $derived(this.queue[this.currentSongIdx] ?? null)
 
 	constructor(
 		public isPaused: Writable<boolean>,
@@ -13,11 +14,21 @@ export class HeadlessMusicPlayer
 		public currentTime: Writable<number>,
 		public duration: Readable<number>,
 	)
-	{}
+	{
+		this.setupAudioTag();
+	}
+
+	private setupAudioTag()
+	{
+		this.audioTag.addEventListener("ended", () => {
+			this.Next();
+		});
+	}
 
 	public OverrideTag(el: HTMLAudioElement)
 	{
 		this.audioTag = el;
+		this.setupAudioTag();
 
 		const onclick = () => {
 			this.audioTag.play()
@@ -38,8 +49,7 @@ export class HeadlessMusicPlayer
 		const currentSong = this.currentSong;
 		if (currentSong !== null)
 		{
-			const currentSongIdx = this.queue.findIndex(s => s.id === currentSong.id);
-			this.queue.splice(currentSongIdx + 1)
+			this.queue.splice(this.currentSongIdx + 1)
 		}
 		else
 		{
@@ -48,7 +58,7 @@ export class HeadlessMusicPlayer
 
 		this.audioTag.pause();
 		this.queue.push(song);
-		this.currentSong = song;
+		this.currentSongIdx = this.queue.length - 1;
 		this.audioTag.src = `/api/Songs/${song.id}/stream`;
 		this.audioTag.play().catch(e => console.error(e));
 	}
@@ -59,7 +69,7 @@ export class HeadlessMusicPlayer
 
 		this.audioTag.pause();
 		this.queue = songs;
-		this.currentSong = songs[0];
+		this.currentSongIdx = 0;
 		this.audioTag.src = `/api/Songs/${songs[0].id}/stream`;
 		this.audioTag.play().catch(e => console.error(e));
 	}
@@ -67,12 +77,10 @@ export class HeadlessMusicPlayer
 	public Next()
 	{
 		if (this.currentSong === null) return;
+		if (this.currentSongIdx === -1 || this.currentSongIdx === this.queue.length - 1) return;
 
-		const currentSongIdx = this.queue.findIndex(s => s.id === this.currentSong!.id);
-		if (currentSongIdx === -1 || currentSongIdx === this.queue.length - 1) return;
-
-		const nextSong = this.queue[currentSongIdx + 1];
-		this.currentSong = nextSong;
+		this.currentSongIdx += 1;
+		const nextSong = this.currentSong;
 		this.audioTag.src = `/api/Songs/${nextSong.id}/stream`;
 		this.audioTag.play().catch(e => console.error(e));
 	}
@@ -80,12 +88,10 @@ export class HeadlessMusicPlayer
 	public Previous()
 	{
 		if (this.currentSong === null) return;
+		if (this.currentSongIdx === -1 || this.currentSongIdx === 0) return;
 
-		const currentSongIdx = this.queue.findIndex(s => s.id === this.currentSong!.id);
-		if (currentSongIdx === -1 || currentSongIdx === 0) return;
-
-		const previousSong = this.queue[currentSongIdx - 1];
-		this.currentSong = previousSong;
+		this.currentSongIdx -= 1;
+		const previousSong = this.currentSong;
 		this.audioTag.src = `/api/Songs/${previousSong.id}/stream`;
 		this.audioTag.play().catch(e => console.error(e));
 	}
