@@ -34,14 +34,14 @@
 			UpdateUrlQuery();
 		}
 	}
-
-	function GoToPage(n: number) {
-		requestPage = n;
-		UpdateUrlQuery();
-	}
 </script>
 
-<Pagination.Root bind:page={requestPage} count={totalCount} perPage={pageSize}>
+<Pagination.Root
+	bind:page={requestPage}
+	count={totalCount}
+	perPage={pageSize}
+	siblingCount={2}
+>
 	{#snippet children({ pages, currentPage })}
 		<Pagination.Content>
 			<Pagination.Item>
@@ -58,11 +58,7 @@
 							{page}
 							isActive={currentPage ===
 								page.value}
-							onclick={() => {
-								GoToPage(
-									page.value,
-								);
-							}}
+							onclick={UpdateUrlQuery}
 						>
 							{page.value}
 						</Pagination.Link>
