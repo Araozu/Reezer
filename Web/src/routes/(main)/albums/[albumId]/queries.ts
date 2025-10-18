@@ -18,6 +18,7 @@ export function useAlbumByIdQuery(
 			})),
 			staleTime: 5 * 60 * 1000,
 			placeholderData,
+			refetchOnWindowFocus: false,
 		}))
 	);
 }

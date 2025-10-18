@@ -34,9 +34,9 @@ public class SongsController(
 
     [EndpointSummary("Prepare a song for streaming by transcoding it in the background")]
     [HttpPost("{songId}/prepare")]
-    public IActionResult PrepareSong(Guid songId)
+    public async Task<IActionResult> PrepareSong(Guid songId)
     {
-        prepareSongUseCase.PrepareSongAsync(songId);
+        await prepareSongUseCase.PrepareSongAsync(songId);
         return Ok();
     }
 }

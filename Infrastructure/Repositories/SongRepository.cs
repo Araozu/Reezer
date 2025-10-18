@@ -76,29 +76,47 @@ public class SongRepository(ReezerDbContext dbContext, IOptions<StorageOptions> 
             // Ensure transcoded directory exists
             Directory.CreateDirectory(StorageOptions.LibraryTranscodedPath);
 
-            // Perform transcoding (blocking)
-            await FFMpegArguments
-                .FromFileInput(song.RawPath)
-                .OutputToFile(
-                    opusPath,
-                    false,
-                    options =>
-                        options
-                            .WithAudioCodec("libopus")
-                            .WithAudioBitrate(64)
-                            .WithCustomArgument("-avoid_negative_ts make_zero")
-                )
-                .ProcessAsynchronously();
+            // Clean up any partial/corrupted file from previous failed attempts
+            if (File.Exists(opusPath))
+            {
+                File.Delete(opusPath);
+            }
 
-            // Update database with transcoded path
-            song.SetTranscodedPath(opusPath);
-            await dbContext.SaveChangesAsync(cancellationToken);
+            try
+            {
+                // Perform transcoding (blocking)
+                await FFMpegArguments
+                    .FromFileInput(song.RawPath)
+                    .OutputToFile(
+                        opusPath,
+                        false,
+                        options =>
+                            options
+                                .WithAudioCodec("libopus")
+                                .WithAudioBitrate(64)
+                                .WithCustomArgument("-avoid_negative_ts make_zero")
+                    )
+                    .ProcessAsynchronously();
 
-            // Return stream to the transcoded OPUS file
-            return (
-                new FileStream(opusPath, FileMode.Open, FileAccess.Read, FileShare.Read),
-                "audio/opus"
-            );
+                // Update database with transcoded path only after successful transcoding
+                song.SetTranscodedPath(opusPath);
+                await dbContext.SaveChangesAsync(cancellationToken);
+
+                // Return stream to the transcoded OPUS file
+                return (
+                    new FileStream(opusPath, FileMode.Open, FileAccess.Read, FileShare.Read),
+                    "audio/opus"
+                );
+            }
+            catch
+            {
+                // Clean up partial file if transcoding fails or is cancelled
+                if (File.Exists(opusPath))
+                {
+                    File.Delete(opusPath);
+                }
+                throw;
+            }
         }
         finally
         {
