@@ -195,6 +195,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/Songs/{songId}/prepare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Prepare a song for streaming by transcoding it in the background */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    songId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
