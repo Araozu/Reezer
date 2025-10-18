@@ -10,8 +10,6 @@ let
 in
 
 pkgs.mkShellNoCC {
-  name = "perucontrol-dev-env";
-
   packages = with pkgs; [
     # Editors & tools
     neovim
