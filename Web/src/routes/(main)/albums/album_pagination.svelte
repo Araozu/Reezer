@@ -36,12 +36,12 @@
 	}
 
 	function GoToPage(n: number) {
-		requestPage += 1;
+		requestPage = n;
 		UpdateUrlQuery();
 	}
 </script>
 
-<Pagination.Root count={totalCount} perPage={pageSize}>
+<Pagination.Root bind:page={requestPage} count={totalCount} perPage={pageSize}>
 	{#snippet children({ pages, currentPage })}
 		<Pagination.Content>
 			<Pagination.Item>

@@ -9,9 +9,12 @@
 
 	type Album = components["schemas"]["AlbumDto"];
 
-	let queryPage = page.url.searchParams;
+	// Not reactive, because we only care about the initial state
+	const pageNumberQuery = Number.parseInt(
+		page.url.searchParams.get("page") ?? "1",
+	);
 
-	let requestPage = $state(1);
+	let requestPage = $state(pageNumberQuery);
 	let requestPageSize = $state(20);
 
 	const albumsQuery = useAlbums(
