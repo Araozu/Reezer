@@ -6,7 +6,7 @@
 	import { GetCurrentPlayer } from "../../../../player/index.svelte";
 	import type { PageProps } from "./$types";
 	import type { components } from "../../../../api";
-	import { ListStart, Play, Plus } from "lucide-svelte";
+	import { ListEnd, ListStart, Play, Plus } from "lucide-svelte";
 	import Button from "$lib/components/ui/button/button.svelte";
 	import { toast } from "svelte-sonner";
 
@@ -30,6 +30,12 @@
 		const songs = $albumQuery.data?.songs ?? [];
 		player.PlaySongs(songs);
 		toast.success("Playing all now");
+	}
+
+	function PlayAllLast() {
+		const songs = $albumQuery.data?.songs ?? [];
+		player.AddSongsToQueue(songs);
+		toast.success("Will play all last");
 	}
 
 	function PlayLast(song: ISong) {
@@ -65,6 +71,11 @@
 			<Button onclick={PlayAllNow}>
 				<Play />
 				Play All
+			</Button>
+
+			<Button onclick={PlayAllLast} variant="outline">
+				<ListEnd />
+				Add to queue
 			</Button>
 		</div>
 	</div>
