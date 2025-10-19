@@ -24,7 +24,7 @@
 
 	$effect(() =>
 	{
-		if (requestPage == cachedPageNumber) return;
+		if (requestPage === cachedPageNumber) return;
 
 		UpdateUrlQuery(requestPage);
 		cachedPageNumber = requestPage;

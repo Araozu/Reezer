@@ -29,7 +29,6 @@
 			>
 				{#if !collapsed}
 					<Tabs.Root
-						class="w-[400px]"
 						bind:value={currentTab}
 					>
 						<Tabs.List>
@@ -47,8 +46,8 @@
 
 				<button
 					class={[
-						"hover:bg-zinc-200 rounded-sm cursor-pointer transition-colors",
-						!collapsed && "mr-2",
+						"hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors px-1 py-2",
+						!collapsed && "mr-1",
 					]}
 					onclick={() =>
 					{

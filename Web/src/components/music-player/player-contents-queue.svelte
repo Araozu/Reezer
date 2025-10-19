@@ -1,14 +1,13 @@
 <script lang="ts">
 	import { GetCurrentPlayer } from "../../player/index.svelte";
-	import type { ISong } from "../../providers";
 
 	let player = GetCurrentPlayer();
 	let queue = $derived(player.queue);
 	let currentSongIdx = $derived(player.currentSongIdx);
 </script>
 
-<div class="space-y-1">
-	{#each queue as song, index (song.id)}
+<div class="space-y-1 max-h-[calc(100vh-8rem)] overflow-scroll">
+	{#each queue as song, index (song.id + index)}
 		<button
 			class={[
 				"w-full text-left p-3 border rounded-lg cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900",
