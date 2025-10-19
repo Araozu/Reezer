@@ -1,3 +1,7 @@
+<script>
+	import MainPage from "./main-page.svelte";
+</script>
+
 <svelte:head>
 	<title>Reezer - Albums</title>
 </svelte:head>

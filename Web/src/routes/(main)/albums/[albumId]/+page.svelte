@@ -6,7 +6,7 @@
 	import { GetCurrentPlayer } from "../../../../player/index.svelte";
 	import type { PageProps } from "./$types";
 	import type { components } from "../../../../api";
-	import { Play, Plus } from "lucide-svelte";
+	import { ListStart, Play, Plus } from "lucide-svelte";
 	import Button from "$lib/components/ui/button/button.svelte";
 	import { toast } from "svelte-sonner";
 
@@ -21,20 +21,25 @@
 
 	let albumName = $derived($albumQuery.data?.name ?? "");
 
-	function PlaySong(song: ISong) {
+	function PlayNow(song: ISong) {
 		player.PlaySong(song);
 		toast.success("Playing now");
 	}
 
-	function PlayAll() {
+	function PlayAllNow() {
 		const songs = $albumQuery.data?.songs ?? [];
 		player.PlaySongs(songs);
 		toast.success("Playing all now");
 	}
 
-	function AddSongToQueue(song: ISong) {
+	function PlayLast(song: ISong) {
 		player.AddSongToQueue(song);
 		toast.success("Will play last");
+	}
+
+	function PlayNext(song: ISong) {
+		player.PlaySongNext(song);
+		toast.success("Will play next");
 	}
 </script>
 
@@ -57,7 +62,7 @@
 		/>
 
 		<div>
-			<Button onclick={PlayAll}>
+			<Button onclick={PlayAllNow}>
 				<Play />
 				Play All
 			</Button>
@@ -74,10 +79,10 @@
 </div>
 
 {#snippet Song(song: SongDto)}
-	<div class="grid grid-cols-[auto_3rem]">
+	<div class="grid grid-cols-[auto_3rem_3rem]">
 		<button
 			class="cursor-pointer transition-colors inline-block w-full text-left dark:hover:bg-zinc-900 border-b border-border/50"
-			onclick={() => PlaySong(song)}
+			onclick={() => PlayNow(song)}
 		>
 			<div
 				class="grid grid-cols-[2rem_auto] gap-4 items-center group p-2"
@@ -102,9 +107,17 @@
 			class="cursor-pointer transition-colors text-left dark:hover:bg-zinc-900 border-b border-border/50
 				inline-flex items-center justify-center
 			"
-			onclick={() => AddSongToQueue(song)}
+			onclick={() => PlayLast(song)}
 		>
 			<Plus class="h-4 w-4" />
+		</button>
+		<button
+			class="cursor-pointer transition-colors text-left dark:hover:bg-zinc-900 border-b border-border/50
+				inline-flex items-center justify-center
+			"
+			onclick={() => PlayNext(song)}
+		>
+			<ListStart class="h-4 w-4" />
 		</button>
 	</div>
 {/snippet}

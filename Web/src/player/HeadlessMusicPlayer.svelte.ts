@@ -123,6 +123,19 @@ export class HeadlessMusicPlayer
 		}
 	}
 
+	public PlaySongNext(song: ISong)
+	{
+		// Insert the song right after the current song
+		this.queue.splice(this.currentSongIdx + 1, 0, song);
+
+		// If nothing is currently playing, start playing this song
+		if (this.currentSong === null) {
+			this.currentSongIdx = 0;
+			this.audioTag.src = `/api/Songs/${song.id}/stream`;
+			this.audioTag.play().catch(e => console.error(e));
+		}
+	}
+
 	public Next()
 	{
 		if (this.currentSong === null) return;
