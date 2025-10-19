@@ -1,23 +1,22 @@
 <script lang="ts">
-	import { Slider } from "$lib/components/ui/slider";
-	import { GetCurrentPlayer } from "../../player/index.svelte";
+	import { Slider } from "$lib/components/ui/slider"
+	import { GetCurrentPlayer } from "../../player/index.svelte"
 
-	let player = GetCurrentPlayer();
-	let duration = player.duration;
-	let currentTime = player.currentTime;
+	let player = GetCurrentPlayer()
+	let duration = player.duration
+	let currentTime = player.currentTime
 
-	let positionValue = $derived(
-		$duration > 0 ? ($currentTime / $duration) * 100 : 0,
-	);
+	let positionValue = $derived($duration > 0 ? ($currentTime / $duration) * 100 : 0)
 
-	function HandleSliderClick(event: MouseEvent) {
-		const progressBar = event.currentTarget as HTMLElement;
-		const rect = progressBar.getBoundingClientRect();
-		const clickX = event.clientX - rect.left;
-		const percentage = clickX / rect.width;
-		const seekTime = percentage * $duration;
+	function HandleSliderClick(event: MouseEvent)
+	{
+		const progressBar = event.currentTarget as HTMLElement
+		const rect = progressBar.getBoundingClientRect()
+		const clickX = event.clientX - rect.left
+		const percentage = clickX / rect.width
+		const seekTime = percentage * $duration
 
-		player.SetCurrentTime(seekTime);
+		player.SetCurrentTime(seekTime)
 	}
 </script>
 

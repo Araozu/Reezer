@@ -1,13 +1,13 @@
-import { fileURLToPath } from "node:url"
-import { includeIgnoreFile } from "@eslint/compat"
-import js from "@eslint/js"
-import svelte from "eslint-plugin-svelte"
-import { defineConfig } from "eslint/config"
-import globals from "globals"
-import ts from "typescript-eslint"
-import svelteConfig from "./svelte.config.js"
+import { fileURLToPath } from "node:url";
+import { includeIgnoreFile } from "@eslint/compat";
+import js from "@eslint/js";
+import svelte from "eslint-plugin-svelte";
+import { defineConfig } from "eslint/config";
+import globals from "globals";
+import ts from "typescript-eslint";
+import svelteConfig from "./svelte.config.js";
 
-const gitignorePath = fileURLToPath(new URL("./.gitignore", import.meta.url))
+const gitignorePath = fileURLToPath(new URL("./.gitignore", import.meta.url));
 
 export default defineConfig(
 	includeIgnoreFile(gitignorePath),
@@ -18,7 +18,7 @@ export default defineConfig(
 			"brace-style": ["error", "allman"],
 			"no-tabs": "off",
 			"quotes": ["error", "double"],
-			"semi": ["error", "never"],
+			"semi": ["error", "always"],
 			"semi-spacing": ["error", { "before": false, "after": true }],
 			"no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 1 }],
 			// migrated
@@ -74,9 +74,11 @@ export default defineConfig(
 		languageOptions: {
 			globals: { ...globals.browser, ...globals.node },
 		},
-		rules: { // typescript-eslint strongly recommend that you do not use the no-undef lint rule on TypeScript projects.
-		// see: https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
-			"no-undef": "off" },
+		rules: {
+			// typescript-eslint strongly recommend that you do not use the no-undef lint rule on TypeScript projects.
+			// see: https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
+			"no-undef": "off",
+		},
 	},
 	{
 		files: [
@@ -93,4 +95,4 @@ export default defineConfig(
 			},
 		},
 	},
-)
+);

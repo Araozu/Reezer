@@ -7,9 +7,9 @@ export class HeadlessMusicPlayer
 	private audioTag = new Audio("/_.opus");
 	public currentSongIdx = $state(0);
 	public queue = $state<Array<ISong>>([]);
-	public readonly currentSong = $derived(this.queue[this.currentSongIdx] ?? null)
+	public readonly currentSong = $derived(this.queue[this.currentSongIdx] ?? null);
 
-	private lastPreloadId = ""
+	private lastPreloadId = "";
 
 	constructor(
 		public isPaused: Writable<boolean>,
@@ -21,45 +21,42 @@ export class HeadlessMusicPlayer
 		this.setupAudioTag();
 
 		// schedule song preloading
-		setInterval(() => {
-			if (get(isPaused)) return
+		setInterval(() =>
+		{
+			if (get(isPaused)) return;
 
-			const nextSong = this.queue[this.currentSongIdx + 1]
-			if (!nextSong) return
+			const nextSong = this.queue[this.currentSongIdx + 1];
+			if (!nextSong) return;
 
-			const current = get(currentTime)
-			const total = get(duration)
-			const difference = Math.floor(total - current)
+			const current = get(currentTime);
+			const total = get(duration);
+			const difference = Math.floor(total - current);
 
-			if (difference > 20) return
+			if (difference > 20) return;
 
-			if (this.lastPreloadId === nextSong.id) return
+			if (this.lastPreloadId === nextSong.id) return;
 
-			this.lastPreloadId = nextSong.id
+			this.lastPreloadId = nextSong.id;
 
 			// Actually preload
 			api.POST("/api/Songs/{songId}/prepare", {
 				params: {
 					path: {
-						songId: nextSong.id
-					}
-				}
+						songId: nextSong.id,
+					},
+				},
 			})
-				.catch(() => {})
-		}, 2500)
+				.catch(() =>
+				{});
+		}, 2500);
 	}
 
 	private setupAudioTag()
 	{
-		this.audioTag.addEventListener("ended", () => {
+		this.audioTag.addEventListener("ended", () =>
+		{
 			this.Next();
 		});
-	}
-
-	private PreloadSong(song: ISong)
-	{
-		// FIXME: should call the backend via a provider...
-
 	}
 
 	public OverrideTag(el: HTMLAudioElement)
@@ -67,9 +64,10 @@ export class HeadlessMusicPlayer
 		this.audioTag = el;
 		this.setupAudioTag();
 
-		const onclick = () => {
+		const onclick = () =>
+		{
 			this.audioTag.play()
-				.catch(e => console.error(e))
+				.catch((e) => console.error(e))
 				.finally(() => this.audioTag.pause());
 			document.removeEventListener("click", onclick);
 		};
@@ -86,7 +84,7 @@ export class HeadlessMusicPlayer
 		const currentSong = this.currentSong;
 		if (currentSong !== null)
 		{
-			this.queue.splice(this.currentSongIdx + 1)
+			this.queue.splice(this.currentSongIdx + 1);
 		}
 		else
 		{
@@ -97,7 +95,7 @@ export class HeadlessMusicPlayer
 		this.queue.push(song);
 		this.currentSongIdx = this.queue.length - 1;
 		this.audioTag.src = `/api/Songs/${song.id}/stream`;
-		this.audioTag.play().catch(e => console.error(e));
+		this.audioTag.play().catch((e) => console.error(e));
 	}
 
 	public PlaySongs(songs: ISong[])
@@ -108,7 +106,7 @@ export class HeadlessMusicPlayer
 		this.queue = songs;
 		this.currentSongIdx = 0;
 		this.audioTag.src = `/api/Songs/${songs[0].id}/stream`;
-		this.audioTag.play().catch(e => console.error(e));
+		this.audioTag.play().catch((e) => console.error(e));
 	}
 
 	public AddSongToQueue(song: ISong)
@@ -116,10 +114,11 @@ export class HeadlessMusicPlayer
 		this.queue.push(song);
 
 		// If nothing is currently playing, start playing this song
-		if (this.currentSong === null) {
+		if (this.currentSong === null)
+		{
 			this.currentSongIdx = 0;
 			this.audioTag.src = `/api/Songs/${song.id}/stream`;
-			this.audioTag.play().catch(e => console.error(e));
+			this.audioTag.play().catch((e) => console.error(e));
 		}
 	}
 
@@ -130,10 +129,11 @@ export class HeadlessMusicPlayer
 		this.queue.push(...songs);
 
 		// If nothing is currently playing, start playing the first added song
-		if (this.currentSong === null) {
+		if (this.currentSong === null)
+		{
 			this.currentSongIdx = 0;
 			this.audioTag.src = `/api/Songs/${songs[0].id}/stream`;
-			this.audioTag.play().catch(e => console.error(e));
+			this.audioTag.play().catch((e) => console.error(e));
 		}
 	}
 
@@ -143,10 +143,11 @@ export class HeadlessMusicPlayer
 		this.queue.splice(this.currentSongIdx + 1, 0, song);
 
 		// If nothing is currently playing, start playing this song
-		if (this.currentSong === null) {
+		if (this.currentSong === null)
+		{
 			this.currentSongIdx = 0;
 			this.audioTag.src = `/api/Songs/${song.id}/stream`;
-			this.audioTag.play().catch(e => console.error(e));
+			this.audioTag.play().catch((e) => console.error(e));
 		}
 	}
 
@@ -158,7 +159,7 @@ export class HeadlessMusicPlayer
 		this.currentSongIdx += 1;
 		const nextSong = this.currentSong;
 		this.audioTag.src = `/api/Songs/${nextSong.id}/stream`;
-		this.audioTag.play().catch(e => console.error(e));
+		this.audioTag.play().catch((e) => console.error(e));
 	}
 
 	public Previous()
@@ -169,7 +170,7 @@ export class HeadlessMusicPlayer
 		this.currentSongIdx -= 1;
 		const previousSong = this.currentSong;
 		this.audioTag.src = `/api/Songs/${previousSong.id}/stream`;
-		this.audioTag.play().catch(e => console.error(e));
+		this.audioTag.play().catch((e) => console.error(e));
 	}
 
 	public TogglePlayPause()
@@ -186,13 +187,13 @@ export class HeadlessMusicPlayer
 
 	public SetVolume(volume: number)
 	{
-		if (volume < 0 || volume > 1) throw new Error("Attemted to set a invalid volume level: " + volume)
+		if (volume < 0 || volume > 1) throw new Error(`Attemted to set a invalid volume level: ${volume}`);
 
 		this.volume.set(volume);
 	}
 
 	public SetCurrentTime(time: number)
 	{
-		this.currentTime.set(time)
+		this.currentTime.set(time);
 	}
 }
