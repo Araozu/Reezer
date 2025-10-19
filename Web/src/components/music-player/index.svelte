@@ -1,28 +1,19 @@
 <script lang="ts">
 	import * as Card from "$lib/components/ui/card/index.js";
-	import {
-		ChevronsRight,
-		ChevronsLeft,
-		Play,
-		Pause,
-		SkipForward,
-		SkipBack,
-		Volume1,
-		Volume2,
-	} from "lucide-svelte";
+	import * as Tabs from "$lib/components/ui/tabs/index.js";
+	import { ChevronsRight, ChevronsLeft } from "lucide-svelte";
 	import { GetCurrentPlayer } from "../../player/index.svelte";
-	import VolumeSlider from "./volume-slider.svelte";
-	import PositionSlider from "./position-slider.svelte";
+	import PlayerContentsCollapsed from "./player-contents-collapsed.svelte";
+	import PlayerContentsPlaying from "./player-contents-playing.svelte";
+	import PlayerContentsQueue from "./player-contents-queue.svelte";
 
 	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
 	let player = GetCurrentPlayer();
 	let song = $derived(player.currentSong);
-	let isPaused = player.isPaused;
+	let currentTab = $state<"playing" | "queue">("playing");
 
-	let coverUrl = $derived(
-		song ? `/api/Albums/${song.albumId}/cover` : "/vinyl.jpg",
-	);
+	let coverUrl = $derived(song ? `/api/Albums/${song.albumId}/cover` : "/vinyl.jpg");
 </script>
 
 <div class="p-1 h-screen sticky top-0">
@@ -37,15 +28,29 @@
 				]}
 			>
 				{#if !collapsed}
-					<span>Now playing</span>
+					<Tabs.Root
+						bind:value={currentTab}
+					>
+						<Tabs.List>
+							<Tabs.Trigger
+								value="playing"
+								>Now Playing</Tabs.Trigger
+							>
+							<Tabs.Trigger
+								value="queue"
+								>Queue</Tabs.Trigger
+							>
+						</Tabs.List>
+					</Tabs.Root>
 				{/if}
 
 				<button
 					class={[
-						"hover:bg-zinc-200 rounded-sm cursor-pointer transition-colors",
-						!collapsed && "mr-2",
+						"hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors px-1 py-2",
+						!collapsed && "mr-1",
 					]}
-					onclick={() => {
+					onclick={() =>
+					{
 						collapsed = !collapsed;
 					}}
 				>
@@ -58,91 +63,19 @@
 			</Card.Title>
 		</Card.Header>
 		<Card.Content class={collapsed ? "px-2" : ""}>
-			<img
-				class={[
-					"shadow",
-					collapsed ? "rounded" : "rounded-xl",
-				]}
-				src={coverUrl}
-				alt="Album portrait"
-			/>
-			{#if !collapsed}
-				<div class="py-2">
-					<p
-						class="font-bold font-display text-xl"
-					>
-						{song?.name ?? "-"}
-					</p>
-					<p
-						class="font-medium text-foreground/80"
-					>
-						<span class="underline">
-							{song?.artist ?? "-"}
-						</span>
-						•
-						<a
-							class="hover:underline"
-							href={`/albums/${song?.albumId}`}
-						>
-							{song?.album ?? "-"}
-						</a>
-					</p>
-				</div>
+			{#if collapsed}
+				<PlayerContentsCollapsed
+					bind:coverUrl
+					bind:song
+				/>
+			{:else if !collapsed && currentTab === "playing"}
+				<PlayerContentsPlaying
+					bind:coverUrl
+					bind:song
+				/>
+			{:else if !collapsed && currentTab === "queue"}
+				<PlayerContentsQueue />
 			{/if}
-			<div
-				class={[
-					"flex items-center gap-1 my-8",
-					collapsed && "flex-col",
-				]}
-			>
-				<button
-					class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors"
-					onclick={() => player.Previous()}
-				>
-					<SkipBack class="m-2" size={16} />
-				</button>
-				<button
-					class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-full cursor-pointer transition-colors"
-					onclick={() => player.TogglePlayPause()}
-				>
-					{#if $isPaused}
-						<Play class="m-2" size={32} />
-					{:else}
-						<Pause class="m-2" size={32} />
-					{/if}
-				</button>
-				<button
-					class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors"
-					onclick={() => player.Next()}
-				>
-					<SkipForward class="m-2" size={16} />
-				</button>
-				{#if !collapsed}
-					<div class="flex-1 ml-4">
-						<PositionSlider />
-					</div>
-				{/if}
-			</div>
-			<div
-				class={[
-					!collapsed &&
-						"grid grid-cols-[1.5rem_auto_2rem] items-center gap-2",
-				]}
-			>
-				{#if !collapsed}
-					<div class="text-center">
-						<Volume1 />
-					</div>
-				{/if}
-				<div>
-					<VolumeSlider {collapsed} />
-				</div>
-				{#if !collapsed}
-					<div class="text-center">
-						<Volume2 />
-					</div>
-				{/if}
-			</div>
 		</Card.Content>
 	</Card.Root>
 </div>

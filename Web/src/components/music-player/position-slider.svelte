@@ -6,11 +6,10 @@
 	let duration = player.duration;
 	let currentTime = player.currentTime;
 
-	let positionValue = $derived(
-		$duration > 0 ? ($currentTime / $duration) * 100 : 0,
-	);
+	let positionValue = $derived($duration > 0 ? ($currentTime / $duration) * 100 : 0);
 
-	function HandleSliderClick(event: MouseEvent) {
+	function HandleSliderClick(event: MouseEvent)
+	{
 		const progressBar = event.currentTarget as HTMLElement;
 		const rect = progressBar.getBoundingClientRect();
 		const clickX = event.clientX - rect.left;

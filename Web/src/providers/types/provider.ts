@@ -1,6 +1,6 @@
-import type { ISong } from "./song"
-import type { IAlbum } from "./album"
-import type { IPaginatedResult, IPaginationOptions } from "./pagination"
+import type { ISong } from "./song";
+import type { IAlbum } from "./album";
+import type { IPaginatedResult, IPaginationOptions } from "./pagination";
 
 export interface IAlbumDetails extends IAlbum {
   songs: ISong[];

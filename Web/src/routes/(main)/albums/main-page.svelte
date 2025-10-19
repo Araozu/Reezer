@@ -10,9 +10,7 @@
 	type Album = components["schemas"]["AlbumDto"];
 
 	// Not reactive, because we only care about the initial state
-	const pageNumberQuery = Number.parseInt(
-		page.url.searchParams.get("page") ?? "1",
-	);
+	const pageNumberQuery = Number.parseInt(page.url.searchParams.get("page") ?? "1", 10);
 
 	let requestPage = $state(pageNumberQuery);
 	let requestPageSize = $state(20);
@@ -21,12 +19,8 @@
 		toStore(() => requestPage),
 		toStore(() => requestPageSize),
 	);
-	const totalCount = $derived(
-		($albumsQuery.data?.totalCount as number) ?? 1,
-	);
-	const pageSize = $derived(
-		($albumsQuery.data?.pageSize as number) ?? 20,
-	);
+	const totalCount = $derived(($albumsQuery.data?.totalCount as number) ?? 1);
+	const pageSize = $derived(($albumsQuery.data?.pageSize as number) ?? 20);
 </script>
 
 <div class="px-4">

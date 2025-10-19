@@ -6,8 +6,8 @@ export type AlbumDto = components["schemas"]["AlbumDto"];
 export type PaginatedAlbumsResult = components["schemas"]["PaginatedResultOfAlbumDto"];
 export type AlbumData = components["schemas"]["PaginatedResultOfAlbumDto"];
 
-
-export function useSongs() {
+export function useSongs()
+{
 	return createQuery({
 		queryKey: ["songs"],
 		queryFn: sv(() => api.GET("/api/Songs")),
@@ -19,17 +19,16 @@ export function useSongs() {
 export function useAlbums(
 	$page: Readable<number>,
 	$pageSize: Readable<number>,
-) {
-	return createQuery(
-		derived([$page, $pageSize], ([page, pageSize]) => ({
-			queryKey: ["albums", page, pageSize],
-			queryFn: sv(() => api.GET("/api/Albums", {
-				params: {
-					query: { page, pageSize }
-				}
-			})),
-			staleTime: 5 * 60 * 1000,
-			refetchOnWindowFocus: false,
-		}))
-	);
+)
+{
+	return createQuery(derived([$page, $pageSize], ([page, pageSize]) => ({
+		queryKey: ["albums", page, pageSize],
+		queryFn: sv(() => api.GET("/api/Albums", {
+			params: {
+				query: { page, pageSize },
+			},
+		})),
+		staleTime: 5 * 60 * 1000,
+		refetchOnWindowFocus: false,
+	})));
 }

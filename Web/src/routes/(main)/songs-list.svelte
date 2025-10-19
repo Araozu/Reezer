@@ -8,7 +8,8 @@
 
 	let currentlyPlayingId = $state<string | null>(null);
 
-	function PlaySong(song: ISong) {
+	function PlaySong(song: ISong)
+	{
 		// Start new playback
 		currentlyPlayingId = song.id;
 		player.PlaySong(song);

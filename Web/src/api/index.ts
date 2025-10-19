@@ -6,13 +6,14 @@ export const api = createClient<paths>({
 	credentials: "include", // Include cookies in requests
 	...(import.meta.env.DEV
 		? {
-				// Add latency on dev
-				fetch: async (req) => {
-					await new Promise((res) => setTimeout(res, 500));
+			// Add latency on dev
+			fetch: async(req) =>
+			{
+				await new Promise((res) => setTimeout(res, 500));
 
-					return fetch(req);
-				},
-			}
+				return fetch(req);
+			},
+		}
 		: {}),
 });
 
@@ -30,20 +31,25 @@ export type FetchError<T = any> = {
 };
 
 export const sv =
-	<Data, Error>(fn: () => Promise<FetchResult<Data, Error>>) =>
-	async (): Promise<Data> => {
-		try {
+	<Data, Error>(fn: () => Promise<FetchResult<Data, Error>>) => async(): Promise<Data> =>
+	{
+		try
+		{
 			const data = await fn();
-			if (data.response.ok) {
+			if (data.response.ok)
+			{
 				// biome-ignore lint/style/noNonNullAssertion: needed for typing
 				return data.data!;
 			}
 
-			if (data.error) {
+			if (data.error)
+			{
 				// attempt to extract error messages from validation errors
-				if (data.response.status === 400) {
+				if (data.response.status === 400)
+				{
 					const e = data.error as Error;
-					if (typeof e === "object" && e !== null && "errors" in e) {
+					if (typeof e === "object" && e !== null && "errors" in e)
+					{
 						const errors = e.errors as Record<string, string>;
 						const errorsStr = Object.entries(errors)
 							.map(([, v]) => `${v}`)
@@ -58,7 +64,8 @@ export const sv =
 				}
 
 				const e = data.error as Error;
-				if (typeof e === "object" && e !== null && "title" in e) {
+				if (typeof e === "object" && e !== null && "title" in e)
+				{
 					throw {
 						statusCode: data.response.status,
 						message: `${e.title}`,
@@ -66,7 +73,8 @@ export const sv =
 					};
 				}
 
-				if (typeof e === "string") {
+				if (typeof e === "string")
+				{
 					throw {
 						statusCode: data.response.status,
 						message: e,
@@ -79,7 +87,9 @@ export const sv =
 					message: "Error interno del servidor",
 					error: data.error,
 				};
-			} else {
+			}
+			else
+			{
 				throw {
 					statusCode: data.response.status,
 					message: "Error interno del servidor",
@@ -87,8 +97,11 @@ export const sv =
 					error: data.error!,
 				};
 			}
-		} catch (e) {
-			if (import.meta.env.DEV) {
+		}
+		catch (e)
+		{
+			if (import.meta.env.DEV)
+			{
 				console.error(e);
 			}
 			throw {
