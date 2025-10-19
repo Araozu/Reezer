@@ -1,32 +1,10 @@
 <script lang="ts">
-	import { useAlbums } from "../queries";
 	import * as Card from "$lib/components/ui/card/index.js";
-	import type { components } from "../../../api";
 	import { Skeleton } from "$lib/components/ui/skeleton";
-	import { toStore } from "svelte/store";
 	import AlbumPagination from "./album_pagination.svelte";
-	import { page } from "$app/state";
+	import MainPage from "./main-page.svelte";
 
-	type Album = components["schemas"]["AlbumDto"];
-
-	// Not reactive, because we only care about the initial state
-	const pageNumberQuery = Number.parseInt(
-		page.url.searchParams.get("page") ?? "1",
-	);
-
-	let requestPage = $state(pageNumberQuery);
-	let requestPageSize = $state(20);
-
-	const albumsQuery = useAlbums(
-		toStore(() => requestPage),
-		toStore(() => requestPageSize),
-	);
-	const totalCount = $derived(
-		($albumsQuery.data?.totalCount as number) ?? 1,
-	);
-	const pageSize = $derived(
-		($albumsQuery.data?.pageSize as number) ?? 20,
-	);
+	let { data } = $props();
 </script>
 
 <svelte:head>
@@ -35,45 +13,19 @@
 
 <h1 class="font-display text-4xl font-semibold py-8 px-4">Albums</h1>
 
-<div class="px-4">
-	<AlbumPagination {totalCount} {pageSize} bind:requestPage />
-	<div class="grid grid-cols-5 gap-2">
-		{#if $albumsQuery.data}
-			{#each $albumsQuery.data.items as album}
-				{@render AlbumCard(album)}
-			{/each}
-		{:else}
-			{#each new Array(10).fill(null) as _}
+{#await data.albumsData}
+	<div class="px-4">
+		<AlbumPagination totalCount={1} pageSize={20} requestPage={1} />
+		<div class="grid grid-cols-5 gap-2">
+			{#each new Array(20).fill(null) as _}
 				{@render AlbumCardSkeleton()}
 			{/each}
-		{/if}
+		</div>
+		<AlbumPagination totalCount={1} pageSize={20} requestPage={1} />
 	</div>
-	<AlbumPagination {totalCount} {pageSize} bind:requestPage />
-</div>
-
-{#snippet AlbumCard(album: Album)}
-	<a class="inline-block" href={`/albums/${album.id}`}>
-		<Card.Root
-			class="w-full hover:border-primary transition-colors"
-		>
-			<Card.Content>
-				<img
-					class="rounded-md w-full aspect-square object-cover"
-					src={`/api/Albums/${album.id}/cover`}
-					alt=""
-				/>
-			</Card.Content>
-			<Card.Header>
-				<Card.Title class="font-display">
-					{album.name}
-				</Card.Title>
-				<Card.Description>
-					<span>{album.artistName}</span>
-				</Card.Description>
-			</Card.Header>
-		</Card.Root>
-	</a>
-{/snippet}
+{:then albumsData}
+	<MainPage {albumsData} />
+{/await}
 
 {#snippet AlbumCardSkeleton()}
 	<Card.Root class="w-full hover:border-primary transition-colors">
