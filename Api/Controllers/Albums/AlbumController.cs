@@ -35,6 +35,8 @@ public class AlbumsController(
             pageSize,
             cancellationToken
         );
+
+        Response.Headers.CacheControl = "public, max-age=1800"; // 30 minutes
         return Ok(result);
     }
 
@@ -49,6 +51,7 @@ public class AlbumsController(
             albumId,
             cancellationToken
         );
+        Response.Headers.CacheControl = "public, max-age=1800"; // 30 minutes
         return Ok(result);
     }
 

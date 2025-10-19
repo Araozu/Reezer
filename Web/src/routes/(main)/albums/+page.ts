@@ -11,9 +11,13 @@ export const load: PageLoad = async ({url, fetch}) => {
 	const requestParams = new URLSearchParams()
 	requestParams.set("page", pageNumber.toString())
 
-	const albumsData: Promise<AlbumData> = fetch(`/api/Albums?${requestParams.toString()}`)
-		.then(data => data.json())
-		.catch(() => {});
+	console.log("[debug]: loading albums data on +page.ts");
+	const albumsData: Promise<AlbumData> = (async() => {
+		// await new Promise(res => setTimeout(res, 500))
+		return await fetch(`/api/Albums?${requestParams.toString()}`)
+			.then(data => data.json())
+			.catch(() => {});
+	})()
 
 	return {
 		albumsData,
