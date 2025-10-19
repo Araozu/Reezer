@@ -17,7 +17,8 @@
 	const albumsQuery = useAlbums(
 		toStore(() => requestPage),
 		toStore(() => requestPageSize),
-		toStore(() => albumsData),
+		albumsData,
+		albumsData.page as number,
 	);
 	const totalCount = $derived(
 		($albumsQuery.data?.totalCount as number) ?? 1,
