@@ -15,13 +15,15 @@
 
 	let cachedPageNumber = $state(requestPage);
 
-	function UpdateUrlQuery(requestPage: number) {
+	function UpdateUrlQuery(requestPage: number)
+	{
 		let query = page.url.searchParams;
 		query.set("page", requestPage.toString());
 		goto(`?${query.toString()}`);
 	}
 
-	$effect(() => {
+	$effect(() =>
+	{
 		if (requestPage == cachedPageNumber) return;
 
 		UpdateUrlQuery(requestPage);

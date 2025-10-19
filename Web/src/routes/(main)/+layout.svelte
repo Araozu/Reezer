@@ -33,7 +33,8 @@
 	);
 	let player = GetCurrentPlayer();
 
-	$effect(() => {
+	$effect(() =>
+	{
 		if (audioTag === null) return;
 
 		player.OverrideTag(audioTag);

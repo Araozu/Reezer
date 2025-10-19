@@ -1,1 +1,1 @@
-export type { ISong, IPaginatedResult, IPaginationOptions, IMusicProvider } from "./types/index"
+export type { ISong, IPaginatedResult, IPaginationOptions, IMusicProvider } from "./types/index";

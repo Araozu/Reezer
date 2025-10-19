@@ -1,4 +1,4 @@
-import {type components} from "../../api"
+import {type components} from "../../api";
 
 type ServerSong = components["schemas"]["SongDto"]
 
