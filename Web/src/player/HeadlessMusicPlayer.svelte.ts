@@ -173,6 +173,16 @@ export class HeadlessMusicPlayer
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
+	public PlaySongAtIndex(index: number)
+	{
+		if (index < 0 || index >= this.queue.length) return;
+
+		this.currentSongIdx = index;
+		const song = this.queue[index];
+		this.audioTag.src = `/api/Songs/${song.id}/stream`;
+		this.audioTag.play().catch((e) => console.error(e));
+	}
+
 	public TogglePlayPause()
 	{
 		if (this.audioTag.paused)

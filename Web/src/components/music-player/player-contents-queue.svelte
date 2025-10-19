@@ -9,11 +9,12 @@
 
 <div class="space-y-1">
 	{#each queue as song, index (song.id)}
-		<div
+		<button
 			class={[
-				"p-3 border rounded-lg",
+				"w-full text-left p-3 border rounded-lg cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900",
 				index === currentSongIdx && "bg-primary/10 border-primary",
 			]}
+			onclick={() => player.PlaySongAtIndex(index)}
 		>
 			<p class="font-medium">
 				{song.name}
@@ -23,7 +24,7 @@
 				•
 				{song.album}
 			</p>
-		</div>
+		</button>
 	{/each}
 	{#if queue.length === 0}
 		<p class="text-center text-foreground/60 py-8">No songs in queue</p>
