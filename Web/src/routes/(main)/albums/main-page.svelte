@@ -4,6 +4,7 @@
 	import type { components } from "../../../api";
 	import { toStore } from "svelte/store";
 	import AlbumPagination from "./album_pagination.svelte";
+	import { Skeleton } from "$lib/components/ui/skeleton";
 
 	type Album = components["schemas"]["AlbumDto"];
 	export type AlbumData =
@@ -32,8 +33,12 @@
 	<AlbumPagination {totalCount} {pageSize} bind:requestPage />
 	<div class="grid grid-cols-5 gap-2">
 		{#if $albumsQuery.data}
-			{#each $albumsQuery.data.items as album}
+			{#each $albumsQuery.data.items as album (album.id)}
 				{@render AlbumCard(album)}
+			{/each}
+		{:else}
+			{#each new Array(20).fill(null) as _, idx (idx)}
+				{@render AlbumCardSkeleton()}
 			{/each}
 		{/if}
 	</div>
@@ -62,4 +67,22 @@
 			</Card.Header>
 		</Card.Root>
 	</a>
+{/snippet}
+
+{#snippet AlbumCardSkeleton()}
+	<Card.Root class="w-full hover:border-primary transition-colors">
+		<Card.Content>
+			<Skeleton
+				class="rounded-md w-full aspect-square object-cover"
+			/>
+		</Card.Content>
+		<Card.Header>
+			<Card.Title class="font-display">
+				<Skeleton class="inline-block w-32 h-4" />
+			</Card.Title>
+			<Card.Description>
+				<Skeleton class="inline-block w-24 h-4" />
+			</Card.Description>
+		</Card.Header>
+	</Card.Root>
 {/snippet}

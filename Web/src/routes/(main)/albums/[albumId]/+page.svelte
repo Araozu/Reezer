@@ -8,6 +8,7 @@
 	import type { components } from "../../../../api";
 	import { Play, Plus } from "lucide-svelte";
 	import Button from "$lib/components/ui/button/button.svelte";
+	import { toast } from "svelte-sonner";
 
 	type SongDto = components["schemas"]["SongDto"];
 
@@ -22,15 +23,18 @@
 
 	function PlaySong(song: ISong) {
 		player.PlaySong(song);
+		toast.success("Playing now");
 	}
 
 	function PlayAll() {
 		const songs = $albumQuery.data?.songs ?? [];
 		player.PlaySongs(songs);
+		toast.success("Playing all now");
 	}
 
 	function AddSongToQueue(song: ISong) {
 		player.AddSongToQueue(song);
+		toast.success("Will play last");
 	}
 </script>
 
