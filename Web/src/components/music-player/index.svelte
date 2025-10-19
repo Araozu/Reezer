@@ -5,6 +5,7 @@
 	import { GetCurrentPlayer } from "../../player/index.svelte";
 	import PlayerContentsCollapsed from "./player-contents-collapsed.svelte";
 	import PlayerContentsPlaying from "./player-contents-playing.svelte";
+	import PlayerContentsQueue from "./player-contents-queue.svelte";
 
 	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
@@ -74,7 +75,7 @@
 					bind:song
 				/>
 			{:else if !collapsed && currentTab === "queue"}
-				the queue
+				<PlayerContentsQueue />
 			{/if}
 		</Card.Content>
 	</Card.Root>
