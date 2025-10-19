@@ -19,8 +19,6 @@ export function useSongs() {
 export function useAlbums(
 	$page: Readable<number>,
 	$pageSize: Readable<number>,
-	placeholderData: AlbumData,
-	placeholderIdx: number,
 ) {
 	return createQuery(
 		derived([$page, $pageSize], ([page, pageSize]) => ({
@@ -32,7 +30,6 @@ export function useAlbums(
 			})),
 			staleTime: 5 * 60 * 1000,
 			refetchOnWindowFocus: false,
-			placeholderData: placeholderIdx === page? placeholderData : undefined,
 		}))
 	);
 }

@@ -5,21 +5,21 @@
 	import { toStore } from "svelte/store";
 	import AlbumPagination from "./album_pagination.svelte";
 	import { Skeleton } from "$lib/components/ui/skeleton";
+	import { page } from "$app/state";
 
 	type Album = components["schemas"]["AlbumDto"];
-	export type AlbumData =
-		components["schemas"]["PaginatedResultOfAlbumDto"];
 
-	let { albumsData }: { albumsData: AlbumData } = $props();
+	// Not reactive, because we only care about the initial state
+	const pageNumberQuery = Number.parseInt(
+		page.url.searchParams.get("page") ?? "1",
+	);
 
-	let requestPage = $state(albumsData.page as number);
-	let requestPageSize = $state(albumsData.pageSize as number);
+	let requestPage = $state(pageNumberQuery);
+	let requestPageSize = $state(20);
 
 	const albumsQuery = useAlbums(
 		toStore(() => requestPage),
 		toStore(() => requestPageSize),
-		albumsData,
-		albumsData.page as number,
 	);
 	const totalCount = $derived(
 		($albumsQuery.data?.totalCount as number) ?? 1,
@@ -58,10 +58,10 @@
 				/>
 			</Card.Content>
 			<Card.Header>
-				<Card.Title class="font-display">
+				<Card.Title class="font-display truncate">
 					{album.name}
 				</Card.Title>
-				<Card.Description>
+				<Card.Description class="truncate">
 					<span>{album.artistName}</span>
 				</Card.Description>
 			</Card.Header>
