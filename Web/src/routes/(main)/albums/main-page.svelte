@@ -58,10 +58,10 @@
 				/>
 			</Card.Content>
 			<Card.Header>
-				<Card.Title class="font-display">
+				<Card.Title class="font-display truncate">
 					{album.name}
 				</Card.Title>
-				<Card.Description>
+				<Card.Description class="truncate">
 					<span>{album.artistName}</span>
 				</Card.Description>
 			</Card.Header>
