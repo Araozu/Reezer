@@ -33,10 +33,7 @@ export class HeadlessMusicPlayer
 
 			if (difference > 20) return
 
-			if (this.lastPreloadId === nextSong.id) {
-				console.log("already preloaded")
-				return
-			}
+			if (this.lastPreloadId === nextSong.id) return
 
 			this.lastPreloadId = nextSong.id
 
@@ -112,6 +109,18 @@ export class HeadlessMusicPlayer
 		this.currentSongIdx = 0;
 		this.audioTag.src = `/api/Songs/${songs[0].id}/stream`;
 		this.audioTag.play().catch(e => console.error(e));
+	}
+
+	public AddSongToQueue(song: ISong)
+	{
+		this.queue.push(song);
+
+		// If nothing is currently playing, start playing this song
+		if (this.currentSong === null) {
+			this.currentSongIdx = 0;
+			this.audioTag.src = `/api/Songs/${song.id}/stream`;
+			this.audioTag.play().catch(e => console.error(e));
+		}
 	}
 
 	public Next()

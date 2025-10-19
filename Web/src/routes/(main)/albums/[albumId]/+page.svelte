@@ -6,7 +6,7 @@
 	import { GetCurrentPlayer } from "../../../../player/index.svelte";
 	import type { PageProps } from "./$types";
 	import type { components } from "../../../../api";
-	import { Play } from "lucide-svelte";
+	import { Play, Plus } from "lucide-svelte";
 	import Button from "$lib/components/ui/button/button.svelte";
 
 	type SongDto = components["schemas"]["SongDto"];
@@ -27,6 +27,10 @@
 	function PlayAll() {
 		const songs = $albumQuery.data?.songs ?? [];
 		player.PlaySongs(songs);
+	}
+
+	function AddSongToQueue(song: ISong) {
+		player.AddSongToQueue(song);
 	}
 </script>
 
@@ -66,7 +70,7 @@
 </div>
 
 {#snippet Song(song: SongDto)}
-	<div>
+	<div class="grid grid-cols-[auto_3rem]">
 		<button
 			class="cursor-pointer transition-colors inline-block w-full text-left dark:hover:bg-zinc-900 border-b border-border/50"
 			onclick={() => PlaySong(song)}
@@ -89,6 +93,14 @@
 					{song.name}
 				</div>
 			</div>
+		</button>
+		<button
+			class="cursor-pointer transition-colors text-left dark:hover:bg-zinc-900 border-b border-border/50
+				inline-flex items-center justify-center
+			"
+			onclick={() => AddSongToQueue(song)}
+		>
+			<Plus class="h-4 w-4" />
 		</button>
 	</div>
 {/snippet}
