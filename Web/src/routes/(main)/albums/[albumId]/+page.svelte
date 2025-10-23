@@ -9,6 +9,7 @@
 	import { ListEnd, ListStart, Play, Plus } from "lucide-svelte";
 	import Button from "$lib/components/ui/button/button.svelte";
 	import { toast } from "svelte-sonner";
+    import Realtime from "./realtime.svelte";
 
 	type SongDto = components["schemas"]["SongDto"];
 
@@ -82,6 +83,8 @@
 				<ListEnd />
 				Add to queue
 			</Button>
+
+			<Realtime />
 		</div>
 	</div>
 

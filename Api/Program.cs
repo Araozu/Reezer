@@ -1,3 +1,4 @@
+using Reezer.Api.Hubs;
 using Reezer.Application;
 using Reezer.Infrastructure;
 using Scalar.AspNetCore;
@@ -10,7 +11,23 @@ builder.Services.AddHealthChecks();
 builder.Services.AddControllers();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplicationServices();
+builder.Services.AddSignalR();
 builder.Services.AddOpenApi();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        "Allow Frontend",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:5173")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        }
+    );
+});
 
 var app = builder.Build();
 
@@ -20,6 +37,11 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+app.UseCors("Allow Frontend");
+
+// Hubs
+app.MapHub<ChatHub>("api/hub");
 
 // Serve static files from wwwroot (frontend assets)
 app.UseStaticFiles();
