@@ -46,7 +46,7 @@
 
 				<button
 					class={[
-						"hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors px-1 py-2",
+						"hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors px-1",
 						!collapsed && "mr-1",
 					]}
 					onclick={() =>

@@ -1,5 +1,5 @@
 using Reezer.Application.DTOs;
-using Reezer.Application.Repositories;
+using Reezer.Domain.Repositories;
 
 namespace Reezer.Application.UseCases;
 

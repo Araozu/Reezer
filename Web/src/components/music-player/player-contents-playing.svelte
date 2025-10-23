@@ -41,9 +41,12 @@ let {
 		<p
 			class="font-medium text-foreground/80"
 		>
-			<span class="underline">
+			<a
+				class="underline"
+				href={`/artists/${song?.artistId ?? ""}`}
+			>
 				{song?.artist ?? "-"}
-			</span>
+			</a>
 			•
 			<a
 				class="hover:underline"

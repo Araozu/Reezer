@@ -55,7 +55,7 @@
 </script>
 
 <svelte:head>
-	<title>{albumName}</title>
+	<title>Reezer - {albumName}</title>
 </svelte:head>
 
 <h1 class="font-display text-4xl font-semibold py-8 px-4">
@@ -87,7 +87,7 @@
 
 	<div class="py-6">
 		{#if $albumQuery.data}
-			{#each $albumQuery.data.songs as song}
+			{#each $albumQuery.data.songs as song (song.id)}
 				{@render Song(song)}
 			{/each}
 		{/if}
