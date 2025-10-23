@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Reezer.Application.DTOs;
 using Reezer.Application.UseCases;
 
-namespace Reezer.Api.Controllers;
+namespace Reezer.Api.Controllers.Albums;
 
 [ApiController]
 [Route("api/[controller]")]

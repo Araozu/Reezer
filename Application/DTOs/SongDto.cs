@@ -20,3 +20,5 @@ public record AlbumWithTracklistDto(
     string? CoverPath,
     IEnumerable<SongDto> Songs
 );
+
+public record ArtistDto(Guid Id, string Name, IEnumerable<AlbumDto> Albums);

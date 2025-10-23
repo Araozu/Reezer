@@ -1,7 +1,7 @@
 using Reezer.Domain.Entities;
 using Reezer.Domain.Entities.Songs;
 
-namespace Reezer.Application.Repositories;
+namespace Reezer.Domain.Repositories;
 
 public interface ISongRepository
 {

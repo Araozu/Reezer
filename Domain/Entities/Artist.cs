@@ -8,6 +8,7 @@ public class Artist
     public string Name { get; private set; }
 
     // Navigation properties
+    public ICollection<Album> Albums { get; private set; } = [];
     public ICollection<Song> Songs { get; private set; } = [];
 
     public static Artist Create(string name) => new() { Name = name };
