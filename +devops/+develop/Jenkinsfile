@@ -48,6 +48,10 @@ ungrouped:
                                     args '-u 0:0'
                                 }
                             }
+                            environment {
+                                VITE_PUBLIC_BACKEND_URL = "https://reezer.araoz.dev"
+                                VITE_PUBLIC_WS_URL = "wss://reezer.araoz.dev"
+                            }
                             steps {
                                 dir("Web") {
                                     sh "npm i -g pnpm"
