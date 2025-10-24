@@ -89,7 +89,7 @@ export class HeadlessMusicPlayer
 	public PlaySong(song: ISong, fromServer: boolean = false)
 	{
 		// send to the backend
-		if (!fromServer) this.hub?.playSong(song.id);
+		if (!fromServer) this.hub?.playSong(song);
 
 		// Clear remaining queue
 		const currentSong = this.currentSong;

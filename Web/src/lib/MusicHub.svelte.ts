@@ -3,6 +3,7 @@ import * as SignalR from "@microsoft/signalr";
 import { BACKEND_URL } from "~/env";
 import { CalculateVariance, type SyncResult } from "./sync-utils";
 import type { HeadlessMusicPlayer } from "~/player/HeadlessMusicPlayer.svelte";
+import type { ISong } from "~/providers";
 
 export interface SyncResponse {
   serverReceiveTime: number;
@@ -66,23 +67,16 @@ export class MusicHub
 		return await this.connection!.invoke("GetPlayerState");
 	}
 
-	async playSong(songId: string)
+	async playSong(song: ISong)
 	{
-		await this.connection!.invoke("PlaySong", this.clientId, songId);
+		await this.connection!.invoke("PlaySong", this.clientId, song);
 	}
 
-	async ReceivePlaySong(clientId: string, songId: string)
+	async ReceivePlaySong(clientId: string, song: ISong)
 	{
 		if (clientId === this.clientId) return;
 
-		this.musicPlayer?.PlaySong({
-			id: songId,
-			name: "<stub>",
-			artist: "<stub>",
-			album: "<stub>",
-			artistId: "0",
-			albumId: "0",
-		}, true);
+		this.musicPlayer?.PlaySong(song, true);
 	}
 
 	/**

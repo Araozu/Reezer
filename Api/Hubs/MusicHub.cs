@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Components.HtmlRendering.Infrastructure;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Reezer.Api.Hubs;
@@ -5,9 +6,7 @@ namespace Reezer.Api.Hubs;
 public class MusicHub : Hub
 {
     private static IHubContext<MusicHub>? _hubContext;
-    private static PlayerState playerState = new(
-        Guid.Parse("0199f710-7969-7860-bf2a-f9d1e74ba400")
-    );
+    private static PlayerState playerState = new(null);
 
     public MusicHub(IHubContext<MusicHub> hubContext)
     {
@@ -35,19 +34,21 @@ public class MusicHub : Hub
         return Task.FromResult(Guid.NewGuid());
     }
 
-    public Task<PlayerState> GetPlayerState()
+    public Task<ISong?> GetPlayerState()
     {
-        return Task.FromResult(playerState);
+        return Task.FromResult(playerState.CurrentSong);
     }
 
-    public Task PlaySong(Guid clientId, Guid songId)
+    public Task PlaySong(Guid clientId, ISong songState)
     {
-        playerState = playerState with { CurrentSongId = songId };
-        _hubContext?.Clients.All.SendAsync("PlaySong", clientId, songId);
+        playerState = playerState with { CurrentSong = songState };
+        _hubContext?.Clients.All.SendAsync("PlaySong", clientId, songState);
         return Task.CompletedTask;
     }
 }
 
 public record SyncResponse(long ServerReceiveTime, long ServerSendTime);
 
-public record PlayerState(Guid? CurrentSongId);
+public record PlayerState(ISong? CurrentSong);
+
+public record ISong(Guid Id, string Name, string Artist, string Album, Guid ArtistId, Guid AlbumId);
