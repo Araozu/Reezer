@@ -2,6 +2,7 @@ import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import * as SignalR from "@microsoft/signalr";
 import { BACKEND_URL } from "~/env";
 import { CalculateVariance, type SyncResult } from "./sync-utils";
+import type { HeadlessMusicPlayer } from "~/player/HeadlessMusicPlayer.svelte";
 
 export interface SyncResponse {
   serverReceiveTime: number;
@@ -16,9 +17,14 @@ export class MusicHub
 {
 	private connection: SignalR.HubConnection | null = null;
 	public connected = $state(false);
+	private musicPlayer: HeadlessMusicPlayer | null = null;
 
 	constructor(private readonly hubUrl = `${BACKEND_URL}/api/hubs/music`)
 	{}
+
+	public setPlayer(p: HeadlessMusicPlayer) {
+		this.musicPlayer = p
+	}
 
 	async connect(): Promise<void>
 	{
@@ -34,6 +40,7 @@ export class MusicHub
 			.build();
 
 		await this.connection.start();
+		this.connection.on("PlaySong", (songId: string) => this.ReceivePlaySong(songId))
 		this.connected = true;
 	}
 
@@ -54,6 +61,22 @@ export class MusicHub
 		}
 
 		return await this.connection!.invoke("GetPlayerState");
+	}
+
+	async playSong(songId: string)
+	{
+		await this.connection!.invoke("PlaySong", songId)
+	}
+
+	async ReceivePlaySong(songId: string) {
+		this.musicPlayer?.PlaySong({
+            id: songId,
+            name: "<stub>",
+            artist: "<stub>",
+            album: "<stub>",
+            artistId: "0",
+            albumId: "0"
+        }, true)
 	}
 
 	/**
@@ -162,6 +185,4 @@ export class MusicHub
 			accuracy: "low", // Will be determined by aggregate
 		};
 	}
-
 }
-

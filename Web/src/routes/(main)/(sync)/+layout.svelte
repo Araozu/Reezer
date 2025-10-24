@@ -2,12 +2,9 @@
 	import { getContext, onMount } from "svelte";
 	import { toStore } from "svelte/store";
 	import MusicPlayer from "~/components/music-player/index.svelte";
-	import {
-		CreatePlayerContext,
-		GetCurrentPlayer,
-	} from "../../../player/index.svelte";
+	import { CreatePlayerContext } from "../../../player/index.svelte";
 	import type { MusicHub } from "~/lib/MusicHub.svelte";
-    import ClickTrap from "./click-trap.svelte";
+	import ClickTrap from "./click-trap.svelte";
 
 	let { children } = $props();
 	let audioTag = $state<HTMLAudioElement | null>(null);
@@ -21,6 +18,7 @@
 	let aDuration = $state(0);
 
 	let player = CreatePlayerContext(
+		musicHub,
 		toStore(
 			() => aPaused,
 			(v) => (aPaused = v),
@@ -37,10 +35,9 @@
 	);
 	let audioTagSetup = $derived(player.audioReady);
 
-	onMount(() =>
-{
+	onMount(() => {
 		player.OverrideTag(audioTag!);
-})
+	});
 
 	$effect(() => {
 		if (audioTag === null) return;
@@ -82,6 +79,6 @@
 	>
 	</audio>
 	{#if audioTagSetup}
-	<MusicPlayer bind:collapsed={playerCollapsed} />
+		<MusicPlayer bind:collapsed={playerCollapsed} />
 	{/if}
 </div>

@@ -4,5 +4,8 @@ namespace Reezer.Domain.Repositories;
 
 public interface IArtistRepository
 {
-    Task<Artist> GetArtistByIdWithAlbumsAsync(Guid artistId, CancellationToken cancellationToken = default);
+    Task<Artist> GetArtistByIdWithAlbumsAsync(
+        Guid artistId,
+        CancellationToken cancellationToken = default
+    );
 }

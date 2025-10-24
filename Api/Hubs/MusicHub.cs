@@ -5,8 +5,9 @@ namespace Reezer.Api.Hubs;
 public class MusicHub : Hub
 {
     private static IHubContext<MusicHub>? _hubContext;
-    private static PlayerState playerState =
-        new(Guid.Parse("0199f710-7969-7860-bf2a-f9d1e74ba400"));
+    private static PlayerState playerState = new(
+        Guid.Parse("0199f710-7969-7860-bf2a-f9d1e74ba400")
+    );
 
     public MusicHub(IHubContext<MusicHub> hubContext)
     {
@@ -32,6 +33,13 @@ public class MusicHub : Hub
     public Task<PlayerState> GetPlayerState()
     {
         return Task.FromResult(playerState);
+    }
+
+    public Task PlaySong(Guid songId)
+    {
+        playerState = playerState with { CurrentSongId = songId };
+        _hubContext?.Clients.All.SendAsync("PlaySong", songId);
+        return Task.CompletedTask;
     }
 }
 
