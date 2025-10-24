@@ -3,6 +3,7 @@ import * as SignalR from "@microsoft/signalr";
 import { BACKEND_URL } from "~/env";
 import { CalculateVariance, type SyncResult } from "./sync-utils";
 import type { HeadlessMusicPlayer } from "~/player/HeadlessMusicPlayer.svelte";
+import type { ISong } from "~/providers";
 
 export interface SyncResponse {
   serverReceiveTime: number;
@@ -18,12 +19,14 @@ export class MusicHub
 	private connection: SignalR.HubConnection | null = null;
 	public connected = $state(false);
 	private musicPlayer: HeadlessMusicPlayer | null = null;
+	public clientId: string | null = null;
 
 	constructor(private readonly hubUrl = `${BACKEND_URL}/api/hubs/music`)
 	{}
 
-	public setPlayer(p: HeadlessMusicPlayer) {
-		this.musicPlayer = p
+	public setPlayer(p: HeadlessMusicPlayer)
+	{
+		this.musicPlayer = p;
 	}
 
 	async connect(): Promise<void>
@@ -40,7 +43,8 @@ export class MusicHub
 			.build();
 
 		await this.connection.start();
-		this.connection.on("PlaySong", (songId: string) => this.ReceivePlaySong(songId))
+		this.clientId = await this.connection.invoke<string>("GeneratePlayerId");
+		this.connection.on("PlaySong", this.ReceivePlaySong.bind(this));
 		this.connected = true;
 	}
 
@@ -63,20 +67,16 @@ export class MusicHub
 		return await this.connection!.invoke("GetPlayerState");
 	}
 
-	async playSong(songId: string)
+	async playSong(song: ISong)
 	{
-		await this.connection!.invoke("PlaySong", songId)
+		await this.connection!.invoke("PlaySong", this.clientId, song);
 	}
 
-	async ReceivePlaySong(songId: string) {
-		this.musicPlayer?.PlaySong({
-            id: songId,
-            name: "<stub>",
-            artist: "<stub>",
-            album: "<stub>",
-            artistId: "0",
-            albumId: "0"
-        }, true)
+	async ReceivePlaySong(clientId: string, song: ISong)
+	{
+		if (clientId === this.clientId) return;
+
+		this.musicPlayer?.PlaySong(song, true);
 	}
 
 	/**
