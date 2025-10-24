@@ -56,6 +56,31 @@
 
   let accuracyInfo = $derived(getAccuracyInfo(syncResult.accuracy));
   let offsetInfo = $derived(getOffsetInfo(syncResult.clockOffset));
+
+  // Live server clock
+  let currentServerTime = $state(new Date(syncResult.serverTime));
+
+  // Update server time every second based on offset
+  $effect(() => {
+    const interval = setInterval(() => {
+      // Calculate current server time by adding elapsed time since sync
+      const now = Date.now();
+      const elapsed = now - (syncResult.serverTime - syncResult.clockOffset);
+      currentServerTime = new Date(syncResult.serverTime + elapsed);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  });
+
+  // Format server time as HH:MM:SS
+  function formatServerClock(time: Date): string {
+    return time.toLocaleTimeString([], {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  }
 </script>
 
 <Dialog.Root>
@@ -146,6 +171,24 @@
           </div>
           <p class="text-sm text-muted-foreground mt-1">
             Current server time adjusted for network delay
+          </p>
+        </Card.Content>
+      </Card.Root>
+
+      <!-- Live Server Clock -->
+      <Card.Root>
+        <Card.Header>
+          <Card.Title class="flex items-center gap-2 text-base">
+            <Clock4 class="w-4 h-4" />
+            Live Server Clock
+          </Card.Title>
+        </Card.Header>
+        <Card.Content>
+          <div class="text-3xl font-mono font-bold text-center">
+            {formatServerClock(currentServerTime)}
+          </div>
+          <p class="text-sm text-muted-foreground mt-1">
+            Real-time server time with offset correction
           </p>
         </Card.Content>
       </Card.Root>

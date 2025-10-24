@@ -30,15 +30,20 @@ public class MusicHub : Hub
         return Task.FromResult(new SyncResponse(serverReceiveTime, serverSendTime));
     }
 
+    public Task<Guid> GeneratePlayerId()
+    {
+        return Task.FromResult(Guid.NewGuid());
+    }
+
     public Task<PlayerState> GetPlayerState()
     {
         return Task.FromResult(playerState);
     }
 
-    public Task PlaySong(Guid songId)
+    public Task PlaySong(Guid clientId, Guid songId)
     {
         playerState = playerState with { CurrentSongId = songId };
-        _hubContext?.Clients.All.SendAsync("PlaySong", songId);
+        _hubContext?.Clients.All.SendAsync("PlaySong", clientId, songId);
         return Task.CompletedTask;
     }
 }

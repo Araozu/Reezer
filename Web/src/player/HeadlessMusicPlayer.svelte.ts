@@ -22,7 +22,7 @@ export class HeadlessMusicPlayer
 	)
 	{
 		this.setupAudioTag();
-		hub?.setPlayer(this)
+		hub?.setPlayer(this);
 
 		// schedule song preloading
 		setInterval(() =>
@@ -72,10 +72,11 @@ export class HeadlessMusicPlayer
 		{
 			this.audioTag.play()
 				.catch((e) => console.error(e))
-				.finally(() => {
+				.finally(() =>
+				{
 					this.audioTag.pause();
 					this.audioReady = true;
-		});
+				});
 			document.removeEventListener("click", onclick);
 		};
 		document.addEventListener("click", onclick);
@@ -85,10 +86,10 @@ export class HeadlessMusicPlayer
 	 * Playing a single song clears the remaining queue &
 	 * plays the song.
 	 */
-	public PlaySong(song: ISong, ignoreHub: boolean = false)
+	public PlaySong(song: ISong, fromServer: boolean = false)
 	{
 		// send to the backend
-		if (!ignoreHub) this.hub?.playSong(song.id)
+		if (!fromServer) this.hub?.playSong(song.id);
 
 		// Clear remaining queue
 		const currentSong = this.currentSong;
