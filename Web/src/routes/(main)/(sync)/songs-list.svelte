@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { useSongs } from "./queries";
-	import { GetCurrentPlayer } from "../../player/index.svelte";
-	import type { ISong } from "../../providers";
+	import { GetCurrentPlayer } from "../../../player/index.svelte";
+	import type { ISong } from "../../../providers";
 
 	const songsQuery = useSongs();
 	const player = GetCurrentPlayer();

@@ -2,14 +2,13 @@
 	import { page } from "$app/state";
 	import { toStore } from "svelte/store";
 	import { useAlbumByIdQuery } from "./queries";
-	import type { ISong } from "../../../../providers";
-	import { GetCurrentPlayer } from "../../../../player/index.svelte";
+	import type { ISong } from "../../../../../providers";
+	import { GetCurrentPlayer } from "../../../../../player/index.svelte";
 	import type { PageProps } from "./$types";
-	import type { components } from "../../../../api";
+	import type { components } from "../../../../../api";
 	import { ListEnd, ListStart, Play, Plus } from "lucide-svelte";
 	import Button from "$lib/components/ui/button/button.svelte";
 	import { toast } from "svelte-sonner";
-    import Realtime from "./realtime.svelte";
 
 	type SongDto = components["schemas"]["SongDto"];
 
@@ -83,8 +82,6 @@
 				<ListEnd />
 				Add to queue
 			</Button>
-
-			<Realtime />
 		</div>
 	</div>
 

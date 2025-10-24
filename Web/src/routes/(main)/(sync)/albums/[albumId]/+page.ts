@@ -1,4 +1,4 @@
-import type { components } from "../../../../api";
+import type { components } from "../../../../../api";
 import type { PageLoad } from "./$types";
 
 type AlbumWithTracklistDto = components["schemas"]["AlbumWithTracklistDto"]
