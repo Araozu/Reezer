@@ -1,7 +1,3 @@
-import {type components} from "../../api";
-
-type ServerSong = components["schemas"]["SongDto"]
-
 /**
  * Represents a song in the music library.
  */
