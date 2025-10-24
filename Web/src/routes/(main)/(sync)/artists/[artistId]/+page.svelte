@@ -2,7 +2,7 @@
 	import { page } from "$app/state";
 	import { toStore } from "svelte/store";
 	import { useArtistByIdQuery } from "./queries";
-	import type { components } from "../../../../api";
+	import type { components } from "../../../../../api";
 	import * as Card from "$lib/components/ui/card/index.js";
 
 	type AlbumDto = components["schemas"]["AlbumDto"];

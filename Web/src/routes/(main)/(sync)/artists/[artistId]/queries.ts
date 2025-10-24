@@ -1,5 +1,5 @@
 import { createQuery } from "@tanstack/svelte-query";
-import { api, sv, type components } from "../../../../api";
+import { api, sv, type components } from "../../../../../api";
 import { derived, type Readable } from "svelte/store";
 
 type ArtistDto = components["schemas"]["ArtistDto"];

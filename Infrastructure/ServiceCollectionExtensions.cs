@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Reezer.Domain.Repositories;
 using Reezer.Application.Services;
+using Reezer.Domain.Repositories;
 using Reezer.Infrastructure.Data;
 using Reezer.Infrastructure.Options;
 using Reezer.Infrastructure.Repositories;

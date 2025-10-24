@@ -1,10 +1,12 @@
 import { type Readable,type  Writable, get } from "svelte/store";
 import type { ISong } from "../providers";
 import { api } from "../api";
+import type { MusicHub } from "~/lib/MusicHub.svelte";
 
 export class HeadlessMusicPlayer
 {
 	private audioTag = new Audio("/_.opus");
+	public audioReady = $state(false);
 	public currentSongIdx = $state(0);
 	public queue = $state<Array<ISong>>([]);
 	public readonly currentSong = $derived(this.queue[this.currentSongIdx] ?? null);
@@ -12,6 +14,7 @@ export class HeadlessMusicPlayer
 	private lastPreloadId = "";
 
 	constructor(
+		public hub: MusicHub | null,
 		public isPaused: Writable<boolean>,
 		public volume: Writable<number>,
 		public currentTime: Writable<number>,
@@ -19,6 +22,7 @@ export class HeadlessMusicPlayer
 	)
 	{
 		this.setupAudioTag();
+		hub?.setPlayer(this)
 
 		// schedule song preloading
 		setInterval(() =>
@@ -68,7 +72,10 @@ export class HeadlessMusicPlayer
 		{
 			this.audioTag.play()
 				.catch((e) => console.error(e))
-				.finally(() => this.audioTag.pause());
+				.finally(() => {
+					this.audioTag.pause();
+					this.audioReady = true;
+		});
 			document.removeEventListener("click", onclick);
 		};
 		document.addEventListener("click", onclick);
@@ -78,8 +85,11 @@ export class HeadlessMusicPlayer
 	 * Playing a single song clears the remaining queue &
 	 * plays the song.
 	 */
-	public PlaySong(song: ISong)
+	public PlaySong(song: ISong, ignoreHub: boolean = false)
 	{
+		// send to the backend
+		if (!ignoreHub) this.hub?.playSong(song.id)
+
 		// Clear remaining queue
 		const currentSong = this.currentSong;
 		if (currentSong !== null)
@@ -96,6 +106,29 @@ export class HeadlessMusicPlayer
 		this.currentSongIdx = this.queue.length - 1;
 		this.audioTag.src = `/api/Songs/${song.id}/stream`;
 		this.audioTag.play().catch((e) => console.error(e));
+	}
+
+	public async PlaySongById(songId: string)
+	{
+		const response = await api.GET("/api/Songs");
+
+		if (response.data)
+		{
+			const songData = response.data.find((s) => s.id === songId);
+			if (songData)
+			{
+				const song: ISong = {
+					id: songData.id,
+					name: songData.name,
+					artist: songData.artist,
+					album: songData.album,
+					artistId: songData.artistId,
+					albumId: songData.albumId,
+				};
+
+				this.PlaySong(song);
+			}
+		}
 	}
 
 	public PlaySongs(songs: ISong[])

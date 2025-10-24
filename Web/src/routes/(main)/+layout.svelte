@@ -1,70 +1,32 @@
 <script lang="ts">
-	import { toStore } from "svelte/store";
-	import MusicPlayer from "../../components/music-player/index.svelte";
-	import {
-		CreatePlayerContext,
-		GetCurrentPlayer,
-	} from "../../player/index.svelte";
+    import { onDestroy, setContext } from "svelte";
+    import { MusicHub } from "~/lib/MusicHub.svelte";
+    import SyncData from "./sync-data.svelte";
 
-	let { children } = $props();
-	let audioTag = $state<HTMLAudioElement | null>(null);
-	let audioTagSetup = $state(false);
+    let { children } = $props();
 
-	// Audio bindings
-	let aPaused = $state(false);
-	let aVolume = $state(0.5);
-	let aCurrentTime = $state(0);
-	let aDuration = $state(0);
+    const tyme_sync = new MusicHub();
+    const sync_promise = tyme_sync
+        .connect()
+        .then(() => tyme_sync.synchronize());
 
-	CreatePlayerContext(
-		toStore(
-			() => aPaused,
-			(v) => (aPaused = v),
-		),
-		toStore(
-			() => aVolume,
-			(v) => (aVolume = v),
-		),
-		toStore(
-			() => aCurrentTime,
-			(v) => (aCurrentTime = v),
-		),
-		toStore(() => aDuration),
-	);
-	let player = GetCurrentPlayer();
+    setContext("musicHub", tyme_sync);
 
-	$effect(() =>
-	{
-		if (audioTag === null) return;
-
-		player.OverrideTag(audioTag);
-		audioTagSetup = true;
-	});
-
-	let playerCollapsed = $state(true);
+    onDestroy(() => tyme_sync.disconnect());
 </script>
 
-<div
-	class={[
-		"grid",
-		playerCollapsed
-			? "grid-cols-[auto_6rem]"
-			: "grid-cols-[auto_30rem]",
-	]}
->
-	<div>
-		{#if audioTagSetup}
-			{@render children()}
-		{/if}
-	</div>
-	<audio
-		src="/_.opus"
-		bind:this={audioTag}
-		bind:volume={aVolume}
-		bind:paused={aPaused}
-		bind:currentTime={aCurrentTime}
-		bind:duration={aDuration}
-	>
-	</audio>
-	<MusicPlayer bind:collapsed={playerCollapsed} />
+<div>
+    {#await sync_promise}
+        <div
+            class="fixed top-0 w-screen bg-orange-600/50 text-white text-xs text-center"
+        >
+            Syncronizing...
+        </div>
+    {:then syncResult}
+        <div class="fixed top-0 w-screen text-xs">
+            <SyncData {syncResult} />
+        </div>
+    {/await}
+
+    {@render children()}
 </div>

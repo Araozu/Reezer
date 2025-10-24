@@ -21,9 +21,9 @@ builder.Services.AddCors(options =>
         policy =>
         {
             policy
-                .WithOrigins("http://localhost:5173")
                 .AllowAnyHeader()
                 .AllowAnyMethod()
+                .SetIsOriginAllowed(origin => true)
                 .AllowCredentials();
         }
     );
@@ -41,7 +41,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("Allow Frontend");
 
 // Hubs
-app.MapHub<ChatHub>("api/hub");
+app.MapHub<MusicHub>("api/hubs/music");
 
 // Serve static files from wwwroot (frontend assets)
 app.UseStaticFiles();
