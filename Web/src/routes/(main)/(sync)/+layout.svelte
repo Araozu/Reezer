@@ -1,14 +1,18 @@
 <script lang="ts">
+	import { getContext, onMount } from "svelte";
 	import { toStore } from "svelte/store";
-	import MusicPlayer from "../../../components/music-player/index.svelte";
+	import MusicPlayer from "~/components/music-player/index.svelte";
 	import {
 		CreatePlayerContext,
 		GetCurrentPlayer,
 	} from "../../../player/index.svelte";
+	import type { MusicHub } from "~/lib/MusicHub.svelte";
+    import ClickTrap from "./click-trap.svelte";
 
 	let { children } = $props();
 	let audioTag = $state<HTMLAudioElement | null>(null);
-	let audioTagSetup = $state(false);
+
+	const musicHub = getContext<MusicHub>("musicHub");
 
 	// Audio bindings
 	let aPaused = $state(false);
@@ -16,7 +20,7 @@
 	let aCurrentTime = $state(0);
 	let aDuration = $state(0);
 
-	CreatePlayerContext(
+	let player = CreatePlayerContext(
 		toStore(
 			() => aPaused,
 			(v) => (aPaused = v),
@@ -31,14 +35,23 @@
 		),
 		toStore(() => aDuration),
 	);
-	let player = GetCurrentPlayer();
+	let audioTagSetup = $derived(player.audioReady);
 
-	$effect(() =>
-	{
+	onMount(() =>
+{
+		player.OverrideTag(audioTag!);
+})
+
+	$effect(() => {
 		if (audioTag === null) return;
+		if (!audioTagSetup) return;
+		if (!musicHub.connected) return;
 
-		player.OverrideTag(audioTag);
-		audioTagSetup = true;
+		musicHub.getPlayerState().then((state) => {
+			if (state.currentSongId) {
+				player.PlaySongById(state.currentSongId);
+			}
+		});
 	});
 
 	let playerCollapsed = $state(true);
@@ -55,6 +68,8 @@
 	<div>
 		{#if audioTagSetup}
 			{@render children()}
+		{:else}
+			<ClickTrap />
 		{/if}
 	</div>
 	<audio
@@ -66,5 +81,7 @@
 		bind:duration={aDuration}
 	>
 	</audio>
+	{#if audioTagSetup}
 	<MusicPlayer bind:collapsed={playerCollapsed} />
+	{/if}
 </div>

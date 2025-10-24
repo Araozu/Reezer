@@ -8,9 +8,14 @@ export interface SyncResponse {
   serverSendTime: number;
 }
 
+export interface PlayerState {
+  currentSongId: string | null;
+}
+
 export class MusicHub
 {
 	private connection: SignalR.HubConnection | null = null;
+	public connected = $state(false);
 
 	constructor(private readonly hubUrl = `${BACKEND_URL}/api/hubs/music`)
 	{}
@@ -29,6 +34,7 @@ export class MusicHub
 			.build();
 
 		await this.connection.start();
+		this.connected = true;
 	}
 
 	async disconnect(): Promise<void>
@@ -38,6 +44,16 @@ export class MusicHub
 			await this.connection.stop();
 			this.connection = null;
 		}
+	}
+
+	async getPlayerState(): Promise<PlayerState>
+	{
+		if (!this.connection || this.connection.state !== "Connected")
+		{
+			await this.connect();
+		}
+
+		return await this.connection!.invoke("GetPlayerState");
 	}
 
 	/**

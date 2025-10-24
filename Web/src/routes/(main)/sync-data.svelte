@@ -150,35 +150,6 @@
         </Card.Content>
       </Card.Root>
 
-      <!-- Technical Details -->
-      <Card.Root class="border-dashed">
-        <Card.Header>
-          <Card.Title class="flex items-center gap-2 text-base">
-            <Target class="w-4 h-4" />
-            Technical Details
-          </Card.Title>
-        </Card.Header>
-        <Card.Content>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-            <div>
-              <span class="text-muted-foreground">Raw RTT:</span>
-              <span class="font-mono ml-2">{syncResult.roundTripTime.toFixed(2)}ms</span>
-            </div>
-            <div>
-              <span class="text-muted-foreground">Raw Offset:</span>
-              <span class="font-mono ml-2">{syncResult.clockOffset.toFixed(2)}ms</span>
-            </div>
-            <div>
-              <span class="text-muted-foreground">Accuracy Level:</span>
-              <span class="font-mono ml-2 capitalize">{syncResult.accuracy}</span>
-            </div>
-            <div>
-              <span class="text-muted-foreground">Timestamp:</span>
-              <span class="font-mono ml-2">{syncResult.serverTime}</span>
-            </div>
-          </div>
-        </Card.Content>
-      </Card.Root>
     </div>
   </Dialog.Content>
 </Dialog.Root>

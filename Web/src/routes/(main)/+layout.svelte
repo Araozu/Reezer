@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { onDestroy } from "svelte";
-    import { MusicHub } from "~/lib/sync";
+    import { onDestroy, setContext } from "svelte";
+    import { MusicHub } from "~/lib/MusicHub.svelte";
     import SyncData from "./sync-data.svelte";
 
     let { children } = $props();
@@ -9,6 +9,8 @@
     const sync_promise = tyme_sync
         .connect()
         .then(() => tyme_sync.synchronize());
+
+    setContext("musicHub", tyme_sync);
 
     onDestroy(() => tyme_sync.disconnect());
 </script>

@@ -5,6 +5,7 @@ import { api } from "../api";
 export class HeadlessMusicPlayer
 {
 	private audioTag = new Audio("/_.opus");
+	public audioReady = $state(false);
 	public currentSongIdx = $state(0);
 	public queue = $state<Array<ISong>>([]);
 	public readonly currentSong = $derived(this.queue[this.currentSongIdx] ?? null);
@@ -68,7 +69,10 @@ export class HeadlessMusicPlayer
 		{
 			this.audioTag.play()
 				.catch((e) => console.error(e))
-				.finally(() => this.audioTag.pause());
+				.finally(() => {
+					this.audioTag.pause();
+					this.audioReady = true;
+		});
 			document.removeEventListener("click", onclick);
 		};
 		document.addEventListener("click", onclick);
@@ -96,6 +100,29 @@ export class HeadlessMusicPlayer
 		this.currentSongIdx = this.queue.length - 1;
 		this.audioTag.src = `/api/Songs/${song.id}/stream`;
 		this.audioTag.play().catch((e) => console.error(e));
+	}
+
+	public async PlaySongById(songId: string)
+	{
+		const response = await api.GET("/api/Songs");
+
+		if (response.data)
+		{
+			const songData = response.data.find((s) => s.id === songId);
+			if (songData)
+			{
+				const song: ISong = {
+					id: songData.id,
+					name: songData.name,
+					artist: songData.artist,
+					album: songData.album,
+					artistId: songData.artistId,
+					albumId: songData.albumId,
+				};
+
+				this.PlaySong(song);
+			}
+		}
 	}
 
 	public PlaySongs(songs: ISong[])
