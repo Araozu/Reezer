@@ -4,51 +4,44 @@
     "net10.0": {
       "Microsoft.AspNetCore.OpenApi": {
         "type": "Direct",
-        "requested": "[10.0.0-rc.1.25451.107, )",
-        "resolved": "10.0.0-rc.1.25451.107",
-        "contentHash": "qDH09sfjprh4NnjJbg0LX07G/xFn1AEB4B0zphrWFkC/OhtJHv+MnGi2NU9KbXwnHedIBrmMDGt0MSD+Ipo53g==",
+        "requested": "[10.0.0-rc.2.25502.107, )",
+        "resolved": "10.0.0-rc.2.25502.107",
+        "contentHash": "50Egznb0tgVvITuuQQhhQ2fCQqKsy+I7Cy2QopLZziDw/IRhvM+L5ZKA7AdsEr4x/lmuB0HnZPKjD8eRjkbVog==",
         "dependencies": {
           "Microsoft.OpenApi": "2.0.0"
         }
       },
-      "Microsoft.AspNetCore.SignalR": {
-        "type": "Direct",
-        "requested": "[1.2.0, )",
-        "resolved": "1.2.0",
-        "contentHash": "XoCcsOTdtBiXyOzUtpbCl0IaqMOYjnr+6dbDxvUCFn7NR6bu7CwrlQ3oQzkltTwDZH0b6VEUN9wZPOYvPHi+Lg=="
-      },
       "Microsoft.EntityFrameworkCore.Design": {
         "type": "Direct",
-        "requested": "[10.0.0-rc.1.25451.107, )",
-        "resolved": "10.0.0-rc.1.25451.107",
-        "contentHash": "1Rs5ljF2F7Zr43kLhyuGuRL/jGneL+USb/tbLrOzTjpLnu8kIjpOBPX6KaSAC5RN6pOyciQ+KeI7fuRSiH8c6w==",
+        "requested": "[10.0.0-rc.2.25502.107, )",
+        "resolved": "10.0.0-rc.2.25502.107",
+        "contentHash": "IDUB1W47bhNiV/kpZlJKs+EGUubEnMMTalYgyLN6WFlAHXUlfVOqsFrmtAXP9Kaj0RzwrHC+pkInGWYnCOu+1w==",
         "dependencies": {
           "Humanizer.Core": "2.14.1",
           "Microsoft.Build.Framework": "17.14.8",
-          "Microsoft.Build.Locator": "1.9.1",
           "Microsoft.Build.Tasks.Core": "17.14.8",
           "Microsoft.Build.Utilities.Core": "17.14.8",
           "Microsoft.CodeAnalysis.CSharp": "4.14.0",
           "Microsoft.CodeAnalysis.CSharp.Workspaces": "4.14.0",
           "Microsoft.CodeAnalysis.Workspaces.MSBuild": "4.14.0",
-          "Microsoft.EntityFrameworkCore.Relational": "10.0.0-rc.1.25451.107",
-          "Microsoft.Extensions.DependencyModel": "10.0.0-rc.1.25451.107",
+          "Microsoft.EntityFrameworkCore.Relational": "10.0.0-rc.2.25502.107",
+          "Microsoft.Extensions.DependencyModel": "10.0.0-rc.2.25502.107",
           "Mono.TextTemplating": "3.0.0",
           "Newtonsoft.Json": "13.0.3"
         }
       },
       "Scalar.AspNetCore": {
         "type": "Direct",
-        "requested": "[2.8.10, )",
-        "resolved": "2.8.10",
-        "contentHash": "/7dX5P9C+mVrc2xS/b7YB89w+kZPp/jn/m8T3Iv5163Vu3awZPHmkwJ1/VRGn5in66+gkGMWcL7j9NbLnTrcrA=="
+        "requested": "[2.9.0, )",
+        "resolved": "2.9.0",
+        "contentHash": "m+8h+QmtmBmA1ZuzWW3p/0oFc82pq0k1Vm0LuIupRqjG3BzudMpbxeeHH8qAR3sxt6rPABeF43OzqDthGEtMpA=="
       },
       "FFMpegCore": {
         "type": "Transitive",
-        "resolved": "5.2.0",
-        "contentHash": "VpTM8mNo41Upj2zrlroEroQp7TGaXa+jDlGbekvy7Vcvz7bQTesUhf0LWvvwgakcCo9j9OlhP1bzkaZpEyn8WA==",
+        "resolved": "5.3.0",
+        "contentHash": "reCfH80nwImDl1PpC3h+1XHTUCIdvuNoSW+U5iN4wXmmHmheGo+wps0nlUeQiZthM+0yZraanQTw1TWYB5VuqQ==",
         "dependencies": {
-          "Instances": "3.0.1"
+          "Instances": "3.0.2"
         }
       },
       "Humanizer.Core": {
@@ -58,8 +51,8 @@
       },
       "Instances": {
         "type": "Transitive",
-        "resolved": "3.0.1",
-        "contentHash": "HSMGZF4g/VcmVyoWH2fRkgZMAW50FcsKvDttwH1jVS2oIz7V9xw9e/b2KhbCO4RSJKJEgTuPKQb6sQvqcDOl2A=="
+        "resolved": "3.0.2",
+        "contentHash": "LfhegDpmA8PuHW58RmgVvCDG/mfVCTU+Vhy4ppmXLJfAer33Xl0NocDy92OwSL6CnkVdx41O/I0+BjNhU1JtMQ=="
       },
       "Microsoft.Build": {
         "type": "Transitive",
@@ -77,11 +70,6 @@
         "type": "Transitive",
         "resolved": "17.14.8",
         "contentHash": "hwpXdyiD8phuIRtYK4fcPrSKRXn6MHI37IkbvAM2D50OnPRbmKGPwtrXi/vYQ7+VQbMzmw1zaKp+rsroBwNGtg=="
-      },
-      "Microsoft.Build.Locator": {
-        "type": "Transitive",
-        "resolved": "1.9.1",
-        "contentHash": "UTO1acAAxYkpI8lU9ff5D9kn4p85bFwph28Y3QPVM9qy5HKQy3kpB6gWcuVGtlSPtvfzfC67CMDHO/JDys2gNQ=="
       },
       "Microsoft.Build.Tasks.Core": {
         "type": "Transitive",
@@ -181,35 +169,35 @@
       },
       "Microsoft.EntityFrameworkCore": {
         "type": "Transitive",
-        "resolved": "10.0.0-rc.1.25451.107",
-        "contentHash": "tE6qyRUFoVI+5HmJy5oGyPRvv4SfJH/jpDb94b40MxnNQhRtkIDQUuinWfMd8B2YAgXtVXANBNWjQ3ojsW/1Wg==",
+        "resolved": "10.0.0-rc.2.25502.107",
+        "contentHash": "Zx81hY7e1SBSTFV7u/UmDRSemfTN3jTj2mtdGrKealCMLCdR5qIarPx3OX8eXK6cr+QVoB0e+ygoIq2aMMrJAQ==",
         "dependencies": {
-          "Microsoft.EntityFrameworkCore.Abstractions": "10.0.0-rc.1.25451.107",
-          "Microsoft.EntityFrameworkCore.Analyzers": "10.0.0-rc.1.25451.107"
+          "Microsoft.EntityFrameworkCore.Abstractions": "10.0.0-rc.2.25502.107",
+          "Microsoft.EntityFrameworkCore.Analyzers": "10.0.0-rc.2.25502.107"
         }
       },
       "Microsoft.EntityFrameworkCore.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.0-rc.1.25451.107",
-        "contentHash": "447K5zsovuadqFj8k9nOXiD4bI+iCwteVYp2BUys9CFhnOi42VVDzXzTzrMK1bLhfyawk6X3ZP1sKD0lodTToA=="
+        "resolved": "10.0.0-rc.2.25502.107",
+        "contentHash": "TbkTMhQxPoHahVFb83i+3+ZnJJKnzp4qdhLblXl1VnLX7A695aUTY+sAY05Rn052PAXA61MpqY3DXmdRWGdYQQ=="
       },
       "Microsoft.EntityFrameworkCore.Analyzers": {
         "type": "Transitive",
-        "resolved": "10.0.0-rc.1.25451.107",
-        "contentHash": "9iNDa8n9neV+SnjMx8FnaOTwpuyuQg/LMiOSEiJbCSHsb66qLbOCJ3HtMm9nh6TXabYdq3ysUC4y2StYB7+6hA=="
+        "resolved": "10.0.0-rc.2.25502.107",
+        "contentHash": "wWHWVZXIq+4YtO8fd6qlwtyr0CN0vpHAW3PoabbncAvNUwJoPIZ1EDrdsb9n9e13a6X5b1rsv1YSaJez6KzL1A=="
       },
       "Microsoft.EntityFrameworkCore.Relational": {
         "type": "Transitive",
-        "resolved": "10.0.0-rc.1.25451.107",
-        "contentHash": "LQhyp5JclWH3OvCW29NNgc1ZSPZ6wMotRPzCO69wOMCf+WVXa8GpiILF2qvbx9ax0dSjz36UuG2I5ZQ5so+e7Q==",
+        "resolved": "10.0.0-rc.2.25502.107",
+        "contentHash": "s4zFt5n0xVCPdE4gR1QKi4tyr5VFHg/ZTEBrLu6n9epZrkDLmTj+q/enmxc9JyQ6y7cUUTPmG+qknBebTLGDUg==",
         "dependencies": {
-          "Microsoft.EntityFrameworkCore": "10.0.0-rc.1.25451.107"
+          "Microsoft.EntityFrameworkCore": "10.0.0-rc.2.25502.107"
         }
       },
       "Microsoft.Extensions.DependencyModel": {
         "type": "Transitive",
-        "resolved": "10.0.0-rc.1.25451.107",
-        "contentHash": "1ncKiILhT+X6vZtuL9en37ARjD6k/EtSXdwZl1doItDu1n8Xzz2tRX2l9bTdLZV6R4pZp3wm2Krue6+mBtWxdA=="
+        "resolved": "10.0.0-rc.2.25502.107",
+        "contentHash": "lMSe2AtG4/58En2r8Iz7zrIff/wevTDns7dCakivIrBU1gvlnuLiyYTiEalv0TMCVirg9CYIpSUcOuf58lpz8g=="
       },
       "Microsoft.NET.StringTools": {
         "type": "Transitive",
@@ -236,17 +224,17 @@
       },
       "Npgsql": {
         "type": "Transitive",
-        "resolved": "9.0.3",
-        "contentHash": "tPvY61CxOAWxNsKLEBg+oR646X4Bc8UmyQ/tJszL/7mEmIXQnnBhVJZrZEEUv0Bstu0mEsHZD5At3EO8zQRAYw=="
+        "resolved": "10.0.0-rc.1",
+        "contentHash": "kORndN04os9mv9l1MtEBoXydufX2TINDR5wgcmh7vsn+0x7AwfrCgOKana3Sz/WlRQ9KsaWHWPnFQ7ZKF+ck7Q=="
       },
       "Npgsql.EntityFrameworkCore.PostgreSQL": {
         "type": "Transitive",
-        "resolved": "10.0.0-rc.1",
-        "contentHash": "On+EO2L7c1+IPeJB5UL4DtKz8Sw8QGTBrKldEsW25SEG9heDQiBt2DDPmCvnmZasFS5WNgEW3loNhahRz1eyGA==",
+        "resolved": "10.0.0-rc.2",
+        "contentHash": "2GE99lO5bNeFd66B6HUvMCNDpCV9Dyw4pt1GlQYA9MqnsVd/s0poFL6v3x4osV8znwevZhxjg5itVpmVirW7QQ==",
         "dependencies": {
-          "Microsoft.EntityFrameworkCore": "[10.0.0-rc.1.25451.107]",
-          "Microsoft.EntityFrameworkCore.Relational": "[10.0.0-rc.1.25451.107]",
-          "Npgsql": "9.0.3"
+          "Microsoft.EntityFrameworkCore": "[10.0.0-rc.2.25502.107]",
+          "Microsoft.EntityFrameworkCore.Relational": "[10.0.0-rc.2.25502.107]",
+          "Npgsql": "10.0.0-rc.1"
         }
       },
       "System.CodeDom": {
@@ -363,9 +351,9 @@
       "reezer.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "FFMpegCore": "[5.2.0, )",
-          "Microsoft.EntityFrameworkCore.Design": "[10.0.0-rc.1.25451.107, )",
-          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0-rc.1, )",
+          "FFMpegCore": "[5.3.0, )",
+          "Microsoft.EntityFrameworkCore.Design": "[10.0.0-rc.2.25502.107, )",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0-rc.2, )",
           "Reezer.Application": "[1.0.0, )",
           "Reezer.Domain": "[1.0.0, )"
         }
