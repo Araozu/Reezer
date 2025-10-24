@@ -5,6 +5,7 @@ namespace Reezer.Api.Hubs;
 public class MusicHub : Hub
 {
     private static IHubContext<MusicHub>? _hubContext;
+    private static PlayerState playerState = new(null);
 
     public MusicHub(IHubContext<MusicHub> hubContext)
     {
@@ -26,6 +27,13 @@ public class MusicHub : Hub
 
         return new SyncResponse(serverReceiveTime, serverSendTime);
     }
+
+    public async Task<PlayerState> GetPlayerState()
+    {
+        return playerState;
+    }
 }
 
 public record SyncResponse(long ServerReceiveTime, long ServerSendTime);
+
+public record PlayerState(Guid? CurrentSongId);

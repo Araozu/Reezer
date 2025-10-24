@@ -1,28 +1,19 @@
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import * as SignalR from "@microsoft/signalr";
 import { BACKEND_URL } from "~/env";
-
-export interface SyncResult {
-  roundTripTime: number; // in milliseconds
-  clockOffset: number; // in milliseconds (positive = client is ahead)
-  serverTime: number; // synchronized server time in milliseconds
-  accuracy: "high" | "medium" | "low";
-}
+import { CalculateVariance, type SyncResult } from "./sync-utils";
 
 export interface SyncResponse {
   serverReceiveTime: number;
   serverSendTime: number;
 }
 
-class TimeSynchronizer
+export class MusicHub
 {
 	private connection: SignalR.HubConnection | null = null;
-	private readonly hubUrl: string;
 
-	constructor(hubUrl = `${BACKEND_URL}/api/hubs/music`)
-	{
-		this.hubUrl = hubUrl;
-	}
+	constructor(private readonly hubUrl = `${BACKEND_URL}/api/hubs/music`)
+	{}
 
 	async connect(): Promise<void>
 	{
@@ -99,8 +90,8 @@ class TimeSynchronizer
 		const latestMeasurement = measurements[measurements.length - 1];
 
 		// Determine accuracy based on round-trip time and consistency
-		const rttVariance = this.calculateVariance(bestSamples.map((m) => m.roundTripTime));
-		const offsetVariance = this.calculateVariance(bestSamples.map((m) => m.clockOffset));
+		const rttVariance = CalculateVariance(bestSamples.map((m) => m.roundTripTime));
+		const offsetVariance = CalculateVariance(bestSamples.map((m) => m.clockOffset));
 
 		let accuracy: "high" | "medium" | "low" = "low";
 		if (avgRoundTrip < 50 && rttVariance < 10 && offsetVariance < 5)
@@ -156,43 +147,5 @@ class TimeSynchronizer
 		};
 	}
 
-	private calculateVariance(values: number[]): number
-	{
-		const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-		const squaredDiffs = values.map((val) => Math.pow(val - mean, 2));
-		return squaredDiffs.reduce((sum, sq) => sum + sq, 0) / values.length;
-	}
-
-	/**
-   * Gets the current synchronized time
-   * @param syncResult Previous sync result to base calculation on
-   * @returns Current synchronized server time
-   */
-	getSynchronizedTime(syncResult?: SyncResult): number
-	{
-		if (syncResult)
-		{
-			// Extrapolate from last sync
-			const timeSinceSync = Date.now() - (syncResult.serverTime - syncResult.clockOffset);
-			return syncResult.serverTime + timeSinceSync;
-		}
-		// Fallback to local time if no sync result
-		return Date.now();
-	}
-
-	/**
-   * Checks if synchronization is still valid
-   * @param lastSyncTime When the last sync was performed
-   * @param maxAge Maximum age in milliseconds (default: 5 minutes)
-   */
-	isSyncValid(lastSyncTime: number, maxAge = 5 * 60 * 1000): boolean
-	{
-		return Date.now() - lastSyncTime < maxAge;
-	}
 }
 
-// Export singleton instance
-export const timeSynchronizer = new TimeSynchronizer();
-
-// Export types and utilities
-export { TimeSynchronizer };
