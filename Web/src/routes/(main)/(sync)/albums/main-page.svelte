@@ -7,6 +7,7 @@
 	import { Skeleton } from "$lib/components/ui/skeleton";
 	import { Input } from "$lib/components/ui/input";
 	import { page } from "$app/state";
+	import AlbumCover from "~/components/album-cover.svelte";
 
 	type Album = components["schemas"]["AlbumDto"];
 
@@ -27,15 +28,18 @@
 	const totalCount = $derived(($albumsQuery.data?.totalCount as number) ?? 1);
 	const pageSize = $derived(($albumsQuery.data?.pageSize as number) ?? 20);
 
-	function handleSearchInput(event: Event) {
+	function handleSearchInput(event: Event)
+	{
 		const target = event.target as HTMLInputElement;
 		searchTerm = target.value;
-		
-		if (debounceTimeout) {
+
+		if (debounceTimeout)
+		{
 			clearTimeout(debounceTimeout);
 		}
-		
-		debounceTimeout = setTimeout(() => {
+
+		debounceTimeout = setTimeout(() =>
+		{
 			debouncedSearchTerm = searchTerm;
 			requestPage = 1;
 		}, 300);
@@ -73,11 +77,7 @@
 			class="w-full hover:border-primary transition-colors"
 		>
 			<Card.Content>
-				<img
-					class="rounded-md w-full aspect-square object-cover"
-					src={`/api/Albums/${album.id}/cover`}
-					alt=""
-				/>
+				<AlbumCover albumId={album.id} albumName={album.name} />
 			</Card.Content>
 			<Card.Header>
 				<Card.Title class="font-display truncate">
