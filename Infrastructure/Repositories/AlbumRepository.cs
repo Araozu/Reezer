@@ -129,7 +129,8 @@ public class AlbumRepository(ReezerDbContext dbContext, IOptions<StorageOptions>
         var totalCount = await query.CountAsync(cancellationToken);
 
         var albums = await query
-            .OrderBy(a => a.Name)
+            .OrderBy(a => EF.Functions.Collate(a.Name, "default"))
+            .ThenBy(a => a.Id)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
