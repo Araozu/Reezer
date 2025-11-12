@@ -19,13 +19,14 @@ export function useSongs()
 export function useAlbums(
 	$page: Readable<number>,
 	$pageSize: Readable<number>,
+	$search: Readable<string | undefined>,
 )
 {
-	return createQuery(derived([$page, $pageSize], ([page, pageSize]) => ({
-		queryKey: ["albums", page, pageSize],
+	return createQuery(derived([$page, $pageSize, $search], ([page, pageSize, search]) => ({
+		queryKey: ["albums", page, pageSize, search],
 		queryFn: sv(() => api.GET("/api/Albums", {
 			params: {
-				query: { page, pageSize },
+				query: { page, pageSize, search },
 			},
 		})),
 		staleTime: 5 * 60 * 1000,

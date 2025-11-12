@@ -165,7 +165,10 @@ public class SongRepository(ReezerDbContext dbContext, IOptions<StorageOptions> 
 
         if (!string.IsNullOrWhiteSpace(search))
         {
-            query = query.Where(a => a.Name.Contains(search) || a.Artist.Name.Contains(search));
+            query = query.Where(a =>
+                EF.Functions.ILike(a.Name, $"%{search}%")
+                || EF.Functions.ILike(a.Artist.Name, $"%{search}%")
+            );
         }
 
         var totalCount = await query.CountAsync(cancellationToken);
