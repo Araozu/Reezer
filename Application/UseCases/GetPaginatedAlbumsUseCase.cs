@@ -8,12 +8,14 @@ public class GetPaginatedAlbumsUseCase(ISongRepository songRepository)
     public async Task<PaginatedResult<AlbumDto>> GetPaginatedAlbumsAsync(
         int page = 1,
         int pageSize = 20,
+        string? search = null,
         CancellationToken cancellationToken = default
     )
     {
         var (albums, totalCount) = await songRepository.GetPaginatedAlbumsAsync(
             page,
             pageSize,
+            search,
             cancellationToken
         );
 

@@ -13,7 +13,7 @@ export function CreatePlayerContext(
 	duration: Readable<number>,
 )
 {
-	const player = new HeadlessMusicPlayer(hub, paused, volume, currentTime, duration,);
+	const player = new HeadlessMusicPlayer(hub, paused, volume, currentTime, duration);
 	setContext(playerKey, player);
 	return player;
 }

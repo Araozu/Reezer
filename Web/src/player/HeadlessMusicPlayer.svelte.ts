@@ -109,29 +109,6 @@ export class HeadlessMusicPlayer
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
-	public async PlaySongById(songId: string)
-	{
-		const response = await api.GET("/api/Songs");
-
-		if (response.data)
-		{
-			const songData = response.data.find((s) => s.id === songId);
-			if (songData)
-			{
-				const song: ISong = {
-					id: songData.id,
-					name: songData.name,
-					artist: songData.artist,
-					album: songData.album,
-					artistId: songData.artistId,
-					albumId: songData.albumId,
-				};
-
-				this.PlaySong(song);
-			}
-		}
-	}
-
 	public PlaySongs(songs: ISong[])
 	{
 		if (songs.length === 0) return;
