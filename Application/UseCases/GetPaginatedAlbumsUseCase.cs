@@ -3,7 +3,7 @@ using Reezer.Domain.Repositories;
 
 namespace Reezer.Application.UseCases;
 
-public class GetPaginatedAlbumsUseCase(ISongRepository songRepository)
+public class GetPaginatedAlbumsUseCase(IAlbumRepository albumRepository)
 {
     public async Task<PaginatedResult<AlbumDto>> GetPaginatedAlbumsAsync(
         int page = 1,
@@ -12,7 +12,7 @@ public class GetPaginatedAlbumsUseCase(ISongRepository songRepository)
         CancellationToken cancellationToken = default
     )
     {
-        var (albums, totalCount) = await songRepository.GetPaginatedAlbumsAsync(
+        var (albums, totalCount) = await albumRepository.GetPaginatedAlbumsAsync(
             page,
             pageSize,
             search,

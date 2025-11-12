@@ -34,6 +34,7 @@ public static class ServiceCollectionExtensions
 
         // Register repositories
         services.AddScoped<ISongRepository, SongRepository>();
+        services.AddScoped<IAlbumRepository, AlbumRepository>();
         services.AddScoped<IArtistRepository, ArtistRepository>();
 
         // Register services

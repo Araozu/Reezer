@@ -3,14 +3,14 @@ using Reezer.Domain.Repositories;
 
 namespace Reezer.Application.UseCases;
 
-public class GetAlbumWithTracklistUseCase(ISongRepository songRepository)
+public class GetAlbumWithTracklistUseCase(IAlbumRepository albumRepository)
 {
     public async Task<AlbumWithTracklistDto> GetAlbumWithTracklistAsync(
         Guid albumId,
         CancellationToken cancellationToken = default
     )
     {
-        var album = await songRepository.GetAlbumWithSongsAsync(albumId, cancellationToken);
+        var album = await albumRepository.GetAlbumWithSongsAsync(albumId, cancellationToken);
 
         var songDtos = album
             .Songs.OrderBy(song => song.TrackNumber)
