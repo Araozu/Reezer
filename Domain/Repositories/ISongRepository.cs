@@ -1,4 +1,3 @@
-using Reezer.Domain.Entities;
 using Reezer.Domain.Entities.Songs;
 
 namespace Reezer.Domain.Repositories;
@@ -11,15 +10,4 @@ public interface ISongRepository
         Guid songId,
         CancellationToken cancellationToken = default
     );
-    Task<(Stream Stream, string ContentType)> GetAlbumCoverStreamAsync(
-        Guid albumId,
-        CancellationToken cancellationToken = default
-    );
-    Task<(IEnumerable<Album> Albums, int TotalCount)> GetPaginatedAlbumsAsync(
-        int page,
-        int pageSize,
-        string? search = null,
-        CancellationToken cancellationToken = default
-    );
-    Task<Album> GetAlbumWithSongsAsync(Guid albumId, CancellationToken cancellationToken = default);
 }

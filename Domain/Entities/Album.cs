@@ -8,6 +8,7 @@ public class Album
     public Guid Id { get; init; }
     public string Name { get; private set; }
     public string? CoverPath { get; private set; } = null;
+    public string? TranscodedCoverPath { get; private set; } = null;
 
     // Navigation properties
     public Artist Artist { get; private set; }
@@ -26,6 +27,11 @@ public class Album
     public void SetCoverPath(string? coverPath)
     {
         CoverPath = coverPath;
+    }
+
+    public void SetTranscodedCoverPath(string? transcodedCoverPath)
+    {
+        TranscodedCoverPath = transcodedCoverPath;
     }
 
     // Private EF constructor

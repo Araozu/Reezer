@@ -21,6 +21,7 @@ pkgs.mkShellNoCC {
 
     # Backend development
     dotnetCorePackages.sdk_10_0-bin
+    libwebp
 
     # DevOps & Infrastructure
     ansible
