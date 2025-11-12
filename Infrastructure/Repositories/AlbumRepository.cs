@@ -63,7 +63,7 @@ public class AlbumRepository(ReezerDbContext dbContext, IOptions<StorageOptions>
                 var startInfo = new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = "cwebp",
-                    Arguments = $"-q 70 \"{album.CoverPath}\" -o \"{webpPath}\"",
+                    Arguments = $"-q 70 -resize 600 0 \"{album.CoverPath}\" -o \"{webpPath}\"",
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
