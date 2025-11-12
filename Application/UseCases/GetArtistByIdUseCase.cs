@@ -18,7 +18,7 @@ public class GetArtistByIdUseCase(IArtistRepository artistRepository)
         var albumDtos = artist.Albums.Select(album => new AlbumDto(
             album.Id,
             album.Name,
-            artist.Id,
+            album.ArtistId,
             artist.Name,
             album.CoverPath
         ));

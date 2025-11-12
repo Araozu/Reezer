@@ -11,8 +11,8 @@ const config = {
 			fallback: "index.html",
 		}),
 		alias: {
-			"~": "src"
-		}
+			"~": "src",
+		},
 	},
 };
 

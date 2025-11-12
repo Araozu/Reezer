@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { useAlbums } from "../queries";
 	import * as Card from "$lib/components/ui/card/index.js";
-	import type { components } from "../../../api";
+	import type { components } from "~/api";
 	import { toStore } from "svelte/store";
 	import AlbumPagination from "./album_pagination.svelte";
 	import { Skeleton } from "$lib/components/ui/skeleton";
@@ -55,9 +55,13 @@
 				<Card.Title class="font-display truncate">
 					{album.name}
 				</Card.Title>
-				<Card.Description class="truncate">
-					<span>{album.artistName}</span>
-				</Card.Description>
+				<a
+					href={`/artists/${album.artistId}`}
+				>
+					<Card.Description class="truncate underline hover:text-primary transition-colors">
+						<span>{album.artistName}</span>
+					</Card.Description>
+				</a>
 			</Card.Header>
 		</Card.Root>
 	</a>

@@ -7,8 +7,8 @@
 
     const tyme_sync = new MusicHub();
     const sync_promise = tyme_sync
-        .connect()
-        .then(() => tyme_sync.synchronize());
+    	.connect()
+    	.then(() => tyme_sync.synchronize());
 
     setContext("musicHub", tyme_sync);
 

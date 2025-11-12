@@ -167,6 +167,7 @@ export interface paths {
                 query?: {
                     page?: number | string;
                     pageSize?: number | string;
+                    search?: string;
                 };
                 header?: never;
                 path?: never;
