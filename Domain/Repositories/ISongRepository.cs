@@ -18,6 +18,7 @@ public interface ISongRepository
     Task<(IEnumerable<Album> Albums, int TotalCount)> GetPaginatedAlbumsAsync(
         int page,
         int pageSize,
+        string? search = null,
         CancellationToken cancellationToken = default
     );
     Task<Album> GetAlbumWithSongsAsync(Guid albumId, CancellationToken cancellationToken = default);

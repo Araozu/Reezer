@@ -17,6 +17,7 @@ public class AlbumsController(
     public async Task<ActionResult<PaginatedResult<AlbumDto>>> GetAlbums(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
+        [FromQuery] string? search = null,
         CancellationToken cancellationToken = default
     )
     {
@@ -33,6 +34,7 @@ public class AlbumsController(
         var result = await getPaginatedAlbumsUseCase.GetPaginatedAlbumsAsync(
             page,
             pageSize,
+            search,
             cancellationToken
         );
 

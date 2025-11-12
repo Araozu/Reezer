@@ -157,10 +157,16 @@ public class SongRepository(ReezerDbContext dbContext, IOptions<StorageOptions> 
     public async Task<(IEnumerable<Album> Albums, int TotalCount)> GetPaginatedAlbumsAsync(
         int page,
         int pageSize,
+        string? search = null,
         CancellationToken cancellationToken = default
     )
     {
         var query = dbContext.Albums.Include(a => a.Artist).AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(a => a.Name.Contains(search) || a.Artist.Name.Contains(search));
+        }
 
         var totalCount = await query.CountAsync(cancellationToken);
 
