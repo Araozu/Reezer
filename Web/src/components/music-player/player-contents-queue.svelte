@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { GetCurrentPlayer } from "../../player/index.svelte";
+	import { X } from "lucide-svelte";
 
 	let player = GetCurrentPlayer();
 	let queue = $derived(player.queue);
@@ -8,22 +9,36 @@
 
 <div class="space-y-1 max-h-[calc(100vh-8rem)] overflow-scroll">
 	{#each queue as song, index (song.id + index)}
-		<button
+		<div
 			class={[
-				"w-full text-left p-3 border rounded-lg cursor-pointer transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900",
+				"w-full flex items-center gap-2 p-3 border rounded-lg transition-colors",
 				index === currentSongIdx && "bg-primary/10 border-primary",
 			]}
-			onclick={() => player.PlaySongAtIndex(index)}
 		>
-			<p class="font-medium">
-				{song.name}
-			</p>
-			<p class="text-sm text-foreground/80">
-				<span class="underline">{song.artist}</span>
-				•
-				{song.album}
-			</p>
-		</button>
+			<button
+				class="flex-1 text-left cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded p-2 -m-2"
+				onclick={() => player.PlaySongAtIndex(index)}
+			>
+				<p class="font-medium">
+					{song.name}
+				</p>
+				<p class="text-sm text-foreground/80">
+					<span class="underline">{song.artist}</span>
+					•
+					{song.album}
+				</p>
+			</button>
+			<button
+				class="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded transition-colors"
+				onclick={(e) => {
+					e.stopPropagation();
+					player.RemoveSongFromQueue(index);
+				}}
+				aria-label="Remove song from queue"
+			>
+				<X size={18} class="text-foreground/60" />
+			</button>
+		</div>
 	{/each}
 	{#if queue.length === 0}
 		<p class="text-center text-foreground/60 py-8">No songs in queue</p>

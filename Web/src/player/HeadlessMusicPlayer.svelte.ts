@@ -194,6 +194,22 @@ export class HeadlessMusicPlayer
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
+	public RemoveSongFromQueue(index: number)
+	{
+		if (index < 0 || index >= this.queue.length) return;
+
+		if (index === this.currentSongIdx)
+		{
+			this.Next();
+		}
+		else if (index < this.currentSongIdx)
+		{
+			this.currentSongIdx -= 1;
+		}
+
+		this.queue.splice(index, 1);
+	}
+
 	public TogglePlayPause()
 	{
 		if (this.audioTag.paused)
