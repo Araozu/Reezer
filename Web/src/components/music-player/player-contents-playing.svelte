@@ -8,6 +8,7 @@
 		SkipBack,
 		Volume2,
 		Volume1,
+		Loader2,
 	} from "lucide-svelte";
     import VolumeSlider from "./volume-slider.svelte";
     import PositionSlider from "./position-slider.svelte";
@@ -22,6 +23,7 @@ let {
 
 	let player = GetCurrentPlayer();
 	let isPaused = player.isPaused;
+	let isBuffering = $derived(player.isBuffering);
 </script>
 
 <img
@@ -72,7 +74,9 @@ let {
 		class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-full cursor-pointer transition-colors"
 		onclick={() => player.TogglePlayPause()}
 	>
-		{#if $isPaused}
+		{#if isBuffering}
+			<Loader2 class="m-2 animate-spin" size={32} />
+		{:else if $isPaused}
 			<Play class="m-2" size={32} />
 		{:else}
 			<Pause class="m-2" size={32} />
