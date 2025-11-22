@@ -7,6 +7,7 @@ export class HeadlessMusicPlayer
 {
 	private audioTag = new Audio("/_.opus");
 	public audioReady = $state(false);
+	public isBuffering = $state(false);
 	public currentSongIdx = $state(0);
 	public queue = $state<Array<ISong>>([]);
 	public readonly currentSong = $derived(this.queue[this.currentSongIdx] ?? null);
@@ -60,6 +61,26 @@ export class HeadlessMusicPlayer
 		this.audioTag.addEventListener("ended", () =>
 		{
 			this.Next();
+		});
+
+		this.audioTag.addEventListener("waiting", () =>
+		{
+			this.isBuffering = true;
+		});
+
+		this.audioTag.addEventListener("canplay", () =>
+		{
+			this.isBuffering = false;
+		});
+
+		this.audioTag.addEventListener("playing", () =>
+		{
+			this.isBuffering = false;
+		});
+
+		this.audioTag.addEventListener("loadstart", () =>
+		{
+			this.isBuffering = true;
 		});
 	}
 
