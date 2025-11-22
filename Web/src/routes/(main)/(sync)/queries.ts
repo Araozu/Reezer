@@ -33,3 +33,17 @@ export function useAlbums(
 		refetchOnWindowFocus: false,
 	})));
 }
+
+export function useRecentAlbums(limit: number = 6)
+{
+	return createQuery({
+		queryKey: ["albums", 1, limit],
+		queryFn: sv(() => api.GET("/api/Albums", {
+			params: {
+				query: { page: 1, pageSize: limit },
+			},
+		})),
+		staleTime: 5 * 60 * 1000,
+		refetchOnWindowFocus: false,
+	});
+}

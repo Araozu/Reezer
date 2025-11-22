@@ -14,8 +14,7 @@
 
 	// Given a number from 0-100, it sets the volume of the audio
 	// to a mapped value of it
-	function UpdateRawVolume(sliderNumber: number)
-	{
+	function UpdateRawVolume(sliderNumber: number) {
 		let value = sliderToVolume[Math.round(sliderNumber)] ?? 0;
 
 		player.SetVolume(value);
