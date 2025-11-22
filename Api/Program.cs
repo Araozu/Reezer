@@ -59,6 +59,17 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
+// Configure Google OAuth
+builder
+    .Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? throw new InvalidOperationException("Google ClientId not found");
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? throw new InvalidOperationException("Google ClientSecret not found");
+        options.CallbackPath = "/api/auth/google-callback";
+        options.SaveTokens = true;
+    });
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(

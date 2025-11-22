@@ -26,6 +26,31 @@ public class AuthController(IAuthService authService) : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("google")]
+    [EndpointSummary("Initiate Google OAuth login")]
+    public async Task<ActionResult> GoogleLogin(
+        [FromQuery] string? returnUrl = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        await authService.GoogleLoginAsync(returnUrl ?? "/", cancellationToken);
+        return new EmptyResult();
+    }
+
+    [HttpGet("google-callback")]
+    [EndpointSummary("Handle Google OAuth callback")]
+    public async Task<ActionResult> GoogleCallback(CancellationToken cancellationToken = default)
+    {
+        var result = await authService.HandleGoogleCallbackAsync(cancellationToken);
+
+        if (!result.Success)
+        {
+            return Redirect($"/?error={Uri.EscapeDataString(result.ErrorMessage ?? "Authentication failed")}");
+        }
+
+        return Redirect("/");
+    }
+
     [Authorize]
     [HttpPost("logout")]
     [EndpointSummary("Logout current user")]

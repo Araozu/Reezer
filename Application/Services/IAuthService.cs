@@ -8,5 +8,7 @@ public interface IAuthService
         LoginCommand command,
         CancellationToken cancellationToken = default
     );
+    Task<LoginResult> GoogleLoginAsync(string returnUrl, CancellationToken cancellationToken = default);
+    Task<LoginResult> HandleGoogleCallbackAsync(CancellationToken cancellationToken = default);
     Task LogoutAsync(CancellationToken cancellationToken = default);
 }

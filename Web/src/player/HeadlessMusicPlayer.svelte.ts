@@ -140,8 +140,8 @@ export class HeadlessMusicPlayer
 			artwork: [
 				{
 					src: `/api/Albums/${song.albumId}/cover`,
-					sizes: "512x512",
-					type: "image/jpeg",
+					sizes: "600x600",
+					type: "image/webp",
 				},
 			],
 		});
