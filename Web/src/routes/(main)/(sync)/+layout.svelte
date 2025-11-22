@@ -2,6 +2,7 @@
 	import { getContext, onMount } from "svelte";
 	import { toStore } from "svelte/store";
 	import MusicPlayer from "~/components/music-player/index.svelte";
+	import MobilePlayer from "~/components/music-player/mobile-player.svelte";
 	import { CreatePlayerContext } from "../../../player/index.svelte";
 	import type { MusicHub } from "~/lib/MusicHub.svelte";
 	import ClickTrap from "./click-trap.svelte";
@@ -60,13 +61,13 @@
 
 <div
 	class={[
-		"grid",
+		"flex flex-col md:grid",
 		playerCollapsed
-			? "grid-cols-[auto_6rem]"
-			: "grid-cols-[auto_30rem]",
+			? "md:grid-cols-[auto_6rem]"
+			: "md:grid-cols-[auto_6rem] lg:grid-cols-[auto_30rem]",
 	]}
 >
-	<div>
+	<div class="flex-1 pb-20 md:pb-0">
 		{#if audioTagSetup}
 			{@render children()}
 		{:else}
@@ -83,6 +84,13 @@
 	>
 	</audio>
 	{#if audioTagSetup}
-		<MusicPlayer bind:collapsed={playerCollapsed} />
+		<!-- Desktop player (hidden on mobile) -->
+		<div class="hidden md:block">
+			<MusicPlayer bind:collapsed={playerCollapsed} />
+		</div>
+		<!-- Mobile player (shown only on mobile) -->
+		<div class="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+			<MobilePlayer />
+		</div>
 	{/if}
 </div>
