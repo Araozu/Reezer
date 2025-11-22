@@ -82,6 +82,69 @@ export class HeadlessMusicPlayer
 		{
 			this.isBuffering = true;
 		});
+
+		this.setupMediaSession();
+	}
+
+	private setupMediaSession()
+	{
+		if (!("mediaSession" in navigator)) return;
+
+		navigator.mediaSession.setActionHandler("play", () =>
+		{
+			this.audioTag.play();
+		});
+
+		navigator.mediaSession.setActionHandler("pause", () =>
+		{
+			this.audioTag.pause();
+		});
+
+		navigator.mediaSession.setActionHandler("previoustrack", () =>
+		{
+			this.Previous();
+		});
+
+		navigator.mediaSession.setActionHandler("nexttrack", () =>
+		{
+			this.Next();
+		});
+
+		navigator.mediaSession.setActionHandler("seekbackward", () =>
+		{
+			this.audioTag.currentTime = Math.max(0, this.audioTag.currentTime - 10);
+		});
+
+		navigator.mediaSession.setActionHandler("seekforward", () =>
+		{
+			this.audioTag.currentTime = Math.min(this.audioTag.duration, this.audioTag.currentTime + 10);
+		});
+
+		navigator.mediaSession.setActionHandler("seekto", (details) =>
+		{
+			if (details.seekTime !== undefined)
+			{
+				this.audioTag.currentTime = details.seekTime;
+			}
+		});
+	}
+
+	private updateMediaSessionMetadata(song: ISong)
+	{
+		if (!("mediaSession" in navigator)) return;
+
+		navigator.mediaSession.metadata = new MediaMetadata({
+			title: song.name,
+			artist: song.artist,
+			album: song.album,
+			artwork: [
+				{
+					src: `/api/Albums/${song.albumId}/cover`,
+					sizes: "512x512",
+					type: "image/jpeg",
+				},
+			],
+		});
 	}
 
 	public OverrideTag(el: HTMLAudioElement)
@@ -127,6 +190,7 @@ export class HeadlessMusicPlayer
 		this.queue.push(song);
 		this.currentSongIdx = this.queue.length - 1;
 		this.audioTag.src = `/api/Songs/${song.id}/stream`;
+		this.updateMediaSessionMetadata(song);
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
@@ -138,6 +202,7 @@ export class HeadlessMusicPlayer
 		this.queue = songs;
 		this.currentSongIdx = 0;
 		this.audioTag.src = `/api/Songs/${songs[0].id}/stream`;
+		this.updateMediaSessionMetadata(songs[0]);
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
@@ -150,6 +215,7 @@ export class HeadlessMusicPlayer
 		{
 			this.currentSongIdx = 0;
 			this.audioTag.src = `/api/Songs/${song.id}/stream`;
+			this.updateMediaSessionMetadata(song);
 			this.audioTag.play().catch((e) => console.error(e));
 		}
 	}
@@ -165,6 +231,7 @@ export class HeadlessMusicPlayer
 		{
 			this.currentSongIdx = 0;
 			this.audioTag.src = `/api/Songs/${songs[0].id}/stream`;
+			this.updateMediaSessionMetadata(songs[0]);
 			this.audioTag.play().catch((e) => console.error(e));
 		}
 	}
@@ -179,6 +246,7 @@ export class HeadlessMusicPlayer
 		{
 			this.currentSongIdx = 0;
 			this.audioTag.src = `/api/Songs/${song.id}/stream`;
+			this.updateMediaSessionMetadata(song);
 			this.audioTag.play().catch((e) => console.error(e));
 		}
 	}
@@ -191,6 +259,7 @@ export class HeadlessMusicPlayer
 		this.currentSongIdx += 1;
 		const nextSong = this.currentSong;
 		this.audioTag.src = `/api/Songs/${nextSong.id}/stream`;
+		this.updateMediaSessionMetadata(nextSong);
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
@@ -202,6 +271,7 @@ export class HeadlessMusicPlayer
 		this.currentSongIdx -= 1;
 		const previousSong = this.currentSong;
 		this.audioTag.src = `/api/Songs/${previousSong.id}/stream`;
+		this.updateMediaSessionMetadata(previousSong);
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
@@ -212,6 +282,7 @@ export class HeadlessMusicPlayer
 		this.currentSongIdx = index;
 		const song = this.queue[index];
 		this.audioTag.src = `/api/Songs/${song.id}/stream`;
+		this.updateMediaSessionMetadata(song);
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
