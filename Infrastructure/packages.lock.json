@@ -140,6 +140,12 @@
           "Npgsql": "10.0.0"
         }
       },
+      "OneOf": {
+        "type": "Direct",
+        "requested": "[3.0.271, )",
+        "resolved": "3.0.271",
+        "contentHash": "pqpqeK8xQGggExhr4tesVgJkjdn+9HQAO0QgrYV2hFjE3y90okzk1kQMntMiUOGfV7FrCUfKPaVvPBD4IANqKg=="
+      },
       "Humanizer.Core": {
         "type": "Transitive",
         "resolved": "2.14.1",
@@ -875,11 +881,15 @@
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.0, )",
           "Microsoft.Extensions.Hosting": "[10.0.0, )",
           "Microsoft.Extensions.Logging.Abstractions": "[10.0.0, )",
+          "OneOf": "[3.0.271, )",
           "Reezer.Domain": "[1.0.0, )"
         }
       },
       "reezer.domain": {
-        "type": "Project"
+        "type": "Project",
+        "dependencies": {
+          "OneOf": "[3.0.271, )"
+        }
       }
     }
   }
