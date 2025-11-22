@@ -57,7 +57,7 @@
 		/>
 	</div>
 	<AlbumPagination {totalCount} {pageSize} bind:requestPage />
-	<div class="grid grid-cols-5 gap-2">
+	<div class="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-3 gap-2">
 		{#if $albumsQuery.data}
 			{#each $albumsQuery.data.items as album (album.id)}
 				{@render AlbumCard(album)}

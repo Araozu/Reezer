@@ -12,7 +12,8 @@
 		<div
 			class={[
 				"w-full flex items-center gap-2 p-3 border rounded-lg transition-colors",
-				index === currentSongIdx && "bg-primary/10 border-primary",
+				index === currentSongIdx &&
+					"bg-primary/10 border-primary",
 			]}
 		>
 			<button
@@ -23,14 +24,17 @@
 					{song.name}
 				</p>
 				<p class="text-sm text-foreground/80">
-					<span class="underline">{song.artist}</span>
+					<span class="underline"
+						>{song.artist}</span
+					>
 					•
 					{song.album}
 				</p>
 			</button>
 			<button
 				class="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded transition-colors"
-				onclick={(e) => {
+				onclick={(e) =>
+				{
 					e.stopPropagation();
 					player.RemoveSongFromQueue(index);
 				}}
@@ -41,6 +45,8 @@
 		</div>
 	{/each}
 	{#if queue.length === 0}
-		<p class="text-center text-foreground/60 py-8">No songs in queue</p>
+		<p class="text-center text-foreground/60 py-8">
+			No songs in queue
+		</p>
 	{/if}
 </div>

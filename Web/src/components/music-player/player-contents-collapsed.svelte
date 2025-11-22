@@ -1,22 +1,22 @@
 <script lang="ts">
-    import { GetCurrentPlayer } from "../../player/index.svelte";
-    import type { ISong } from "../../providers";
+	import { GetCurrentPlayer } from "../../player/index.svelte";
+	import type { ISong } from "../../providers";
 	import {
 		Play,
 		Pause,
 		SkipForward,
 		SkipBack,
-		Loader2,
+		LoaderCircle,
 	} from "lucide-svelte";
-    import VolumeSlider from "./volume-slider.svelte";
+	import VolumeSlider from "./volume-slider.svelte";
 
-let {
-	coverUrl = $bindable(),
-	song = $bindable(),
-}: {
-	coverUrl: string,
-	song: ISong,
-} = $props();
+	let {
+		coverUrl = $bindable(),
+		song = $bindable(),
+	}: {
+		coverUrl: string;
+		song: ISong | undefined;
+	} = $props();
 
 	let player = GetCurrentPlayer();
 	let isPaused = player.isPaused;
@@ -24,20 +24,12 @@ let {
 </script>
 
 <img
-	class={[
-		"shadow aspect-square object-cover",
-		"rounded",
-	]}
+	class={["shadow aspect-square object-cover", "rounded"]}
 	src={coverUrl}
 	alt="Album portrait"
 />
 
-<div
-	class={[
-		"flex items-center gap-1 my-8",
-		"flex-col",
-	]}
->
+<div class={["flex items-center gap-1 my-8", "flex-col"]}>
 	<button
 		class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors"
 		onclick={() => player.Previous()}
@@ -49,7 +41,7 @@ let {
 		onclick={() => player.TogglePlayPause()}
 	>
 		{#if isBuffering}
-			<Loader2 class="m-2 animate-spin" size={32} />
+			<LoaderCircle class="m-2 animate-spin" size={32} />
 		{:else if $isPaused}
 			<Play class="m-2" size={32} />
 		{:else}
@@ -63,9 +55,6 @@ let {
 		<SkipForward class="m-2" size={16} />
 	</button>
 </div>
-<div
->
-	<div>
-		<VolumeSlider collapsed={true} />
-	</div>
+<div>
+	<VolumeSlider collapsed={true} />
 </div>

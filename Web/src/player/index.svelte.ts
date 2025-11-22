@@ -11,7 +11,7 @@ export function CreatePlayerContext(
 	volume: Writable<number>,
 	currentTime: Writable<number>,
 	duration: Readable<number>,
-)
+): HeadlessMusicPlayer
 {
 	const player = new HeadlessMusicPlayer(hub, paused, volume, currentTime, duration);
 	setContext(playerKey, player);
