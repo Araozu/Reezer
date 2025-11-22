@@ -39,6 +39,7 @@ public static class ServiceCollectionExtensions
 
         // Register services
         services.AddScoped<ILibraryInitializationService, LibraryInitializationService>();
+        services.AddScoped<IAuthService, AuthService>();
         services.AddHostedService<LibraryInitializationHostedService>();
 
         return services;
