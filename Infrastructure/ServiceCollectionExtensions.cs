@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +33,9 @@ public static class ServiceCollectionExtensions
         // Register options
         services.Configure<StorageOptions>(configuration.GetSection("Storage"));
 
+        // Register HttpContextAccessor for authentication
+        services.AddHttpContextAccessor();
+
         // Register repositories
         services.AddScoped<ISongRepository, SongRepository>();
         services.AddScoped<IAlbumRepository, AlbumRepository>();
@@ -39,6 +43,7 @@ public static class ServiceCollectionExtensions
 
         // Register services
         services.AddScoped<ILibraryInitializationService, LibraryInitializationService>();
+        services.AddScoped<IAuthService, AuthService>();
         services.AddHostedService<LibraryInitializationHostedService>();
 
         return services;

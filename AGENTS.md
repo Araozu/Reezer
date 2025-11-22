@@ -11,7 +11,6 @@
 ### Backend (.NET)
 - **Build solution**: `dotnet build`
 - **Run API**: `cd Api && dotnet run`
-- **Test** (if test projects exist): `dotnet test`
 
 ## Code Style Guidelines
 
@@ -26,7 +25,7 @@
 - **Version**: Svelte 5 with runes syntax
 - **Props**: Use `$props()` for component props
 - **Bindings**: Use `$bindable()` for two-way bindings
-- **Events**: Use `on:event` syntax
+- **Events**: Use `onevent` syntax
 - **Styling**: Tailwind CSS with custom variants using tailwind-variants
 
 ### C#
@@ -37,6 +36,13 @@
 - **Naming**: PascalCase for classes/methods/properties, camelCase for local variables
 - **Features**: Always use primary constructor, file namespaces, records for DTOs
 - **EF**: When writing Fluent configuration, NEVER use the Fluent API for things that convention-based entities already cover
+
+- Use `record` classes for DTOs
+- Use primary constructors
+- Error handling uses the `OneOf` library and the types defined at `Domain/Utils/ErrorTypes.cs`
+- Non 2XX API responses **MUST** use `ProblemDetails` with at least `Details`
+- If an operation cannot fail, just return the data, without wrapping it in `OneOf`
+
 
 ### General
 - **No comments**: Avoid adding comments unless explicitly requested

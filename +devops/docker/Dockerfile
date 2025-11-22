@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0.100-rc.2-alpine3.22 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine3.22 AS build-env
 WORKDIR /app
 
 COPY *.sln ./
@@ -37,7 +37,7 @@ RUN dotnet ef migrations bundle --project Api \
     -o /app/out/efbundle
 
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0.0-rc.2-alpine3.22 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine3.22 AS runtime
 WORKDIR /app
 
 # Install minimal runtime dependencies

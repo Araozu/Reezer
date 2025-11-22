@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Identity;
 using Reezer.Api.Hubs;
 using Reezer.Application;
 using Reezer.Infrastructure;
+using Reezer.Infrastructure.Data;
+using Reezer.Infrastructure.Identity;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +16,71 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplicationServices();
 builder.Services.AddSignalR();
 builder.Services.AddOpenApi();
+
+// Configure ASP.NET Core Identity
+builder
+    .Services.AddIdentity<User, IdentityRole>(options =>
+    {
+        // Password settings
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireNonAlphanumeric = true;
+        options.Password.RequiredLength = 8;
+
+        // Lockout settings
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.AllowedForNewUsers = true;
+
+        // User settings
+        options.User.RequireUniqueEmail = true;
+    })
+    .AddEntityFrameworkStores<ReezerDbContext>()
+    .AddDefaultTokenProviders();
+
+// Configure cookie authentication
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = "access_token";
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+        ? CookieSecurePolicy.SameAsRequest
+        : CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.ExpireTimeSpan = TimeSpan.FromDays(30);
+    options.SlidingExpiration = true;
+    options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        return Task.CompletedTask;
+    };
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+        return Task.CompletedTask;
+    };
+});
+
+// Configure Google OAuth
+builder
+    .Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId =
+            builder.Configuration["Authentication:Google:ClientId"]
+            ?? throw new InvalidOperationException("Google ClientId not found");
+        options.ClientSecret =
+            builder.Configuration["Authentication:Google:ClientSecret"]
+            ?? throw new InvalidOperationException("Google ClientSecret not found");
+        options.CallbackPath = "/api/Auth/google-callback";
+        options.SaveTokens = true;
+
+        options.CorrelationCookie.SameSite = SameSiteMode.Lax;
+        options.CorrelationCookie.SecurePolicy = builder.Environment.IsDevelopment()
+            ? CookieSecurePolicy.SameAsRequest
+            : CookieSecurePolicy.Always;
+    });
 
 builder.Services.AddCors(options =>
 {
@@ -39,6 +107,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("Allow Frontend");
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Hubs
 app.MapHub<MusicHub>("api/hubs/music");
