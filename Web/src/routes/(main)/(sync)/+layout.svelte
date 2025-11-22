@@ -62,8 +62,8 @@
 	class={[
 		"grid",
 		playerCollapsed
-			? "grid-cols-[auto_6rem]"
-			: "grid-cols-[auto_30rem]",
+			? "md:grid-cols-[auto_6rem]"
+			: "md:grid-cols-[auto_30rem]",
 	]}
 >
 	<div>
@@ -73,6 +73,9 @@
 			<ClickTrap />
 		{/if}
 	</div>
+	{#if audioTagSetup}
+		<MusicPlayer bind:collapsed={playerCollapsed} />
+	{/if}
 	<audio
 		src="/_.opus"
 		bind:this={audioTag}
@@ -82,7 +85,4 @@
 		bind:duration={aDuration}
 	>
 	</audio>
-	{#if audioTagSetup}
-		<MusicPlayer bind:collapsed={playerCollapsed} />
-	{/if}
 </div>
