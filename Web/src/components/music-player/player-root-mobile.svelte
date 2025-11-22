@@ -20,7 +20,7 @@
 
 <div class="p-1 fixed bottom-0 w-screen">
 	<div class="h-full border border-primary py-0 rounded bg-background">
-		<div class={collapsed ? "px-2" : ""}>
+		<div class={collapsed ? "p-1" : ""}>
 			{#if collapsed}
 				<PlayerContentsCollapsedMobile
 					bind:coverUrl

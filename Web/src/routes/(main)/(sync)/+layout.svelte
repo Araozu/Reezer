@@ -35,21 +35,17 @@
 	);
 	let audioTagSetup = $derived(player.audioReady);
 
-	onMount(() =>
-	{
+	onMount(() => {
 		player.OverrideTag(audioTag!);
 	});
 
-	$effect(() =>
-	{
+	$effect(() => {
 		if (audioTag === null) return;
 		if (!audioTagSetup) return;
 		if (!musicHub.connected) return;
 
-		musicHub.getPlayerState().then((state) =>
-		{
-			if (state.currentSongId)
-			{
+		musicHub.getPlayerState().then((state) => {
+			if (state.currentSongId) {
 				player.PlaySongById(state.currentSongId);
 			}
 		});
@@ -66,7 +62,7 @@
 			: "md:grid-cols-[auto_30rem]",
 	]}
 >
-	<div>
+	<div class="pb-12">
 		{#if audioTagSetup}
 			{@render children()}
 		{:else}
