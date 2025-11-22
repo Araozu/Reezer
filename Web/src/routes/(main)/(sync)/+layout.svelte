@@ -64,7 +64,7 @@
 		"flex flex-col md:grid",
 		playerCollapsed
 			? "md:grid-cols-[auto_6rem]"
-			: "md:grid-cols-[auto_6rem] lg:grid-cols-[auto_30rem]",
+			: "md:grid-cols-[auto_30rem]",
 	]}
 >
 	<div class="flex-1 pb-20 md:pb-0">

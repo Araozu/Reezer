@@ -21,7 +21,8 @@
 	<Drawer.Portal>
 		<Drawer.Overlay class="fixed inset-0 bg-black/40" />
 		<Drawer.Content
-			class="bg-card flex flex-col rounded-t-[10px] h-[90%] mt-24 fixed bottom-0 left-0 right-0"
+			class="bg-card flex flex-col rounded-t-[10px] h-[90%] fixed bottom-0 left-0 right-0"
+			style="margin-top: 10vh;"
 		>
 			<div class="p-4 bg-card rounded-t-[10px] flex-1 overflow-y-auto">
 				<div class="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-muted mb-6"></div>

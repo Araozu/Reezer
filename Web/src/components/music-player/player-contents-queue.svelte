@@ -30,7 +30,8 @@
 			</button>
 			<button
 				class="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded transition-colors"
-				onclick={(e) => {
+				onclick={(e) =>
+				{
 					e.stopPropagation();
 					player.RemoveSongFromQueue(index);
 				}}
