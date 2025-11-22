@@ -16,9 +16,7 @@
 	let song = $derived(player.currentSong);
 	let currentTab = $state<"playing" | "queue">("playing");
 
-	let coverUrl = $derived(
-		song ? `/api/Albums/${song.albumId}/cover` : "/vinyl.jpg",
-	);
+	let coverUrl = $derived(song ? `/api/Albums/${song.albumId}/cover` : "/vinyl.jpg");
 </script>
 
 <div
@@ -64,7 +62,8 @@
 							"hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors px-1",
 							!collapsed && "mr-1",
 						]}
-						onclick={() => {
+						onclick={() =>
+						{
 							collapsed = !collapsed;
 						}}
 					>
