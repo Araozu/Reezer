@@ -8,7 +8,7 @@
 		SkipBack,
 		Volume2,
 		Volume1,
-		Loader2,
+		LoaderCircle,
 	} from "lucide-svelte";
 	import VolumeSlider from "./volume-slider.svelte";
 	import PositionSlider from "./position-slider.svelte";
@@ -26,11 +26,17 @@
 	let isBuffering = $derived(player.isBuffering);
 </script>
 
-<img
-	class={["shadow aspect-square object-cover", "rounded-xl"]}
-	src={coverUrl}
-	alt="Album portrait"
-/>
+<div class="flex justify-center">
+	<img
+		class={[
+			"shadow aspect-square object-cover",
+			"rounded-xl h-full w-full",
+			"max-h-60 max-w-60 md:max-w-[30rem] md:max-h-[30rem]",
+		]}
+		src={coverUrl}
+		alt="Album portrait"
+	/>
+</div>
 <div class="py-2">
 	<p class="font-bold font-display text-xl">
 		{song?.name ?? "-"}
@@ -58,7 +64,7 @@
 		onclick={() => player.TogglePlayPause()}
 	>
 		{#if isBuffering}
-			<Loader2 class="m-2 animate-spin" size={32} />
+			<LoaderCircle class="m-2 animate-spin" size={32} />
 		{:else if $isPaused}
 			<Play class="m-2" size={32} />
 		{:else}
