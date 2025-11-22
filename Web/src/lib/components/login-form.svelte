@@ -16,6 +16,11 @@
 		$props();
 
 	const id = $props.id();
+
+	function handleGoogleLogin() {
+		const returnUrl = encodeURIComponent(window.location.origin + '/');
+		window.location.href = `/api/auth/google?returnUrl=${returnUrl}`;
+	}
 </script>
 
 <div class={cn("flex flex-col gap-6", className)} {...restProps}>
@@ -33,6 +38,7 @@
 						<Button
 							variant="outline"
 							type="button"
+							onclick={handleGoogleLogin}
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"

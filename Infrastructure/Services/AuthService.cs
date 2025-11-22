@@ -51,19 +51,22 @@ public class AuthService(
         CancellationToken cancellationToken = default
     )
     {
-        var properties = new AuthenticationProperties
-        {
-            RedirectUri = returnUrl ?? "/",
-            Items = { { "scheme", GoogleDefaults.AuthenticationScheme } },
-        };
-
         var httpContext = httpContextAccessor.HttpContext;
         if (httpContext == null)
         {
             return new LoginResult(false, "HTTP context not available");
         }
 
-        await httpContext.ChallengeAsync(GoogleDefaults.AuthenticationScheme, properties);
+        // encode returnUrl
+        var encodedReturnUrl = Uri.EscapeDataString(returnUrl);
+
+        await httpContext.ChallengeAsync(
+            GoogleDefaults.AuthenticationScheme,
+            new()
+            {
+                RedirectUri = $"/api/auth/google-internal-callback?returnUrl={encodedReturnUrl}",
+            }
+        );
         return new LoginResult(true);
     }
 
