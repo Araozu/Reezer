@@ -14,7 +14,7 @@
 
 {#snippet Fallback()}
 	<ChevronLeftIcon class="size-4" />
-	<span>Previous</span>
+	<span>Prev<span class="hidden md:inline">ious</span></span>
 {/snippet}
 
 <PaginationPrimitive.PrevButton
