@@ -18,17 +18,14 @@ jobs:
     permissions:
       contents: read
     steps:
-    # Install pnpm (must be done before setup-node to use pnpm caching if desired)
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: 9
-
+    # Setup Node.js and enable pnpm cache. Point cache to the lockfile inside Web/
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '24'
         cache: 'pnpm'
+        cache-dependency-path: Web/pnpm-lock.yaml
+
     - name: Checkout code
       uses: actions/checkout@v5
     - name: Setup .NET Core SDK
@@ -36,4 +33,3 @@ jobs:
       with:
         dotnet-version: '10.0.x'
     - run: dotnet restore
-    
