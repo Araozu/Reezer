@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Reezer.Domain.Entities;
 using Reezer.Domain.Entities.Songs;
+using Reezer.Infrastructure.Identity;
 
 namespace Reezer.Infrastructure.Data;
 
 public class ReezerDbContext(DbContextOptions<ReezerDbContext> options)
-    : IdentityDbContext<IdentityUser>(options)
+    : IdentityDbContext<User>(options)
 {
     public DbSet<Song> Songs { get; set; }
     public DbSet<Artist> Artists { get; set; }

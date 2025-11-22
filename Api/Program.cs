@@ -3,6 +3,7 @@ using Reezer.Api.Hubs;
 using Reezer.Application;
 using Reezer.Infrastructure;
 using Reezer.Infrastructure.Data;
+using Reezer.Infrastructure.Identity;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +19,7 @@ builder.Services.AddOpenApi();
 
 // Configure ASP.NET Core Identity
 builder
-    .Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+    .Services.AddIdentity<User, IdentityRole>(options =>
     {
         // Password settings
         options.Password.RequireDigit = true;
@@ -64,8 +65,12 @@ builder
     .Services.AddAuthentication()
     .AddGoogle(options =>
     {
-        options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? throw new InvalidOperationException("Google ClientId not found");
-        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? throw new InvalidOperationException("Google ClientSecret not found");
+        options.ClientId =
+            builder.Configuration["Authentication:Google:ClientId"]
+            ?? throw new InvalidOperationException("Google ClientId not found");
+        options.ClientSecret =
+            builder.Configuration["Authentication:Google:ClientSecret"]
+            ?? throw new InvalidOperationException("Google ClientSecret not found");
         options.CallbackPath = "/api/auth/google-callback";
         options.SaveTokens = true;
     });

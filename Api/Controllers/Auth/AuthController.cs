@@ -45,7 +45,9 @@ public class AuthController(IAuthService authService) : ControllerBase
 
         if (!result.Success)
         {
-            return Redirect($"/?error={Uri.EscapeDataString(result.ErrorMessage ?? "Authentication failed")}");
+            return Redirect(
+                $"/?error={Uri.EscapeDataString(result.ErrorMessage ?? "Authentication failed")}"
+            );
         }
 
         return Redirect("/");

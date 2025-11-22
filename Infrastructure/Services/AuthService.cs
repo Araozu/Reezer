@@ -5,12 +5,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Reezer.Application.DTOs.Auth;
 using Reezer.Application.Services;
+using Reezer.Infrastructure.Identity;
 
 namespace Reezer.Infrastructure.Services;
 
 public class AuthService(
-    SignInManager<IdentityUser> signInManager,
-    UserManager<IdentityUser> userManager,
+    SignInManager<User> signInManager,
+    UserManager<User> userManager,
     IHttpContextAccessor httpContextAccessor
 ) : IAuthService
 {
@@ -45,12 +46,15 @@ public class AuthService(
         return new LoginResult(false, "Invalid email or password");
     }
 
-    public async Task<LoginResult> GoogleLoginAsync(string returnUrl, CancellationToken cancellationToken = default)
+    public async Task<LoginResult> GoogleLoginAsync(
+        string returnUrl,
+        CancellationToken cancellationToken = default
+    )
     {
         var properties = new AuthenticationProperties
         {
             RedirectUri = returnUrl ?? "/",
-            Items = { { "scheme", GoogleDefaults.AuthenticationScheme } }
+            Items = { { "scheme", GoogleDefaults.AuthenticationScheme } },
         };
 
         var httpContext = httpContextAccessor.HttpContext;
@@ -63,7 +67,9 @@ public class AuthService(
         return new LoginResult(true);
     }
 
-    public async Task<LoginResult> HandleGoogleCallbackAsync(CancellationToken cancellationToken = default)
+    public async Task<LoginResult> HandleGoogleCallbackAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         var httpContext = httpContextAccessor.HttpContext;
         if (httpContext == null)
@@ -71,7 +77,9 @@ public class AuthService(
             return new LoginResult(false, "HTTP context not available");
         }
 
-        var authenticateResult = await httpContext.AuthenticateAsync(IdentityConstants.ExternalScheme);
+        var authenticateResult = await httpContext.AuthenticateAsync(
+            IdentityConstants.ExternalScheme
+        );
         if (!authenticateResult.Succeeded)
         {
             return new LoginResult(false, "External authentication failed");
@@ -92,11 +100,14 @@ public class AuthService(
         var user = await userManager.FindByEmailAsync(email);
         if (user == null)
         {
-            user = new IdentityUser
+            var name = externalUser.FindFirstValue(ClaimTypes.Name);
+
+            user = new User
             {
                 UserName = email,
                 Email = email,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                Name = name,
             };
 
             var createResult = await userManager.CreateAsync(user);
