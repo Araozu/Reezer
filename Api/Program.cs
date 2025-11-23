@@ -25,6 +25,14 @@ builder.Services.AddApplicationServices();
 builder.Services.AddSignalR();
 builder.Services.AddOpenApi();
 
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+    cfg.RegisterServicesFromAssembly(
+        typeof(Reezer.Application.ServiceCollectionExtensions).Assembly
+    );
+});
+
 // Configure ASP.NET Core Identity
 builder
     .Services.AddIdentity<User, IdentityRole>(options =>

@@ -9,27 +9,27 @@ public record MusicRoomDto(string RoomCode, int ConnectedUsers);
 [Route("api/[controller]")]
 public class MusicRoomsController : ControllerBase
 {
-    [EndpointSummary("Get list of all active music rooms")]
-    [HttpGet]
-    public ActionResult<List<MusicRoomDto>> GetRooms()
-    {
-        var rooms = MusicRoomHub
-            .GetRooms()
-            .Select(r => new MusicRoomDto(r.RoomCode, r.ConnectedUsers.Count))
-            .ToList();
+    // [EndpointSummary("Get list of all active music rooms")]
+    // [HttpGet]
+    // public ActionResult<List<MusicRoomDto>> GetRooms()
+    // {
+    //     var rooms = MusicRoomHub
+    //         .GetRooms()
+    //         .Select(r => new MusicRoomDto(r.RoomCode, r.ConnectedUsers.Count))
+    //         .ToList();
+    //
+    //     return Ok(rooms);
+    // }
 
-        return Ok(rooms);
-    }
-
-    [EndpointSummary("Create a new music room")]
-    [HttpPost]
-    public ActionResult<MusicRoomDto> CreateRoom()
-    {
-        var roomCode = GenerateRoomCode();
-        var room = MusicRoomHub.CreateRoom(roomCode);
-
-        return Ok(new MusicRoomDto(room.RoomCode, 0));
-    }
+    // [EndpointSummary("Create a new music room")]
+    // [HttpPost]
+    // public ActionResult<MusicRoomDto> CreateRoom()
+    // {
+    //     var roomCode = GenerateRoomCode();
+    //     var room = MusicRoomHub.CreateRoom(roomCode);
+    //
+    //     return Ok(new MusicRoomDto(room.RoomCode, 0));
+    // }
 
     private static string GenerateRoomCode()
     {

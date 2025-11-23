@@ -1,33 +1,18 @@
 <script lang="ts">
-    import { onDestroy, setContext } from "svelte";
-    import { MusicRoomHub } from "~/lib/MusicRoomHub.svelte";
+    import * as SignalR from "@microsoft/signalr";
+    import { onDestroy, onMount, setContext } from "svelte";
     import SyncData from "./sync-data.svelte";
     import { goto } from "$app/navigation";
     import { useCurrentUser } from "../queries";
-    import { page } from "$app/stores";
+    import { page } from "$app/state";
 
     let { children } = $props();
 
     const userQuery = useCurrentUser();
-    const roomId = $derived($page.params.roomId ?? "default");
+    const roomId = $derived(page.params.roomId ?? "default");
     const username = $derived(
         $userQuery.data?.userName ?? $userQuery.data?.name ?? "User",
     );
-
-    const tyme_sync = new MusicRoomHub();
-    let sync_promise = $state<Promise<any> | null>(null);
-
-    $effect(() => {
-        if ($userQuery.isSuccess && roomId && username) {
-            sync_promise = tyme_sync
-                .connect(roomId, username)
-                .then(() => tyme_sync.synchronize());
-        }
-    });
-
-    setContext("musicHub", tyme_sync);
-
-    onDestroy(() => tyme_sync.disconnect());
 
     $effect(() => {
         if (
@@ -36,6 +21,16 @@
         ) {
             goto("/login");
         }
+    });
+
+    onMount(async () => {
+        const connection = new SignalR.HubConnectionBuilder()
+            .withUrl(import.meta.env.VITE_PUBLIC_BACKEND_URL + "/hub/MusicRoom")
+            .withAutomaticReconnect()
+            .build();
+
+        await connection.start();
+        connection.send("Hello", "Pablito");
     });
 </script>
 
@@ -47,17 +42,11 @@
             Loading user...
         </div>
     {:else if $userQuery.isSuccess}
-        {#await sync_promise}
-            <div
-                class="fixed top-0 w-screen bg-orange-600/50 text-white text-xs text-center"
-            >
-                Syncronizing...
-            </div>
-        {:then syncResult}
-            <div class="fixed top-0 w-screen text-xs">
-                <SyncData {syncResult} />
-            </div>
-        {/await}
+        <div
+            class="fixed top-0 w-screen bg-orange-600/50 text-white text-xs text-center"
+        >
+            Syncronizing...
+        </div>
 
         {@render children()}
     {:else if $userQuery.isError}
