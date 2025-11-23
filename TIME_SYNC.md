@@ -129,6 +129,25 @@ const serverTime = musicHub.getCurrentServerTime();
 const serverTime = GetSynchronizedTime(syncResult);
 ```
 
+### Synchronize All Clients for Music Playback
+
+When starting a song on all clients, use the synchronized server time:
+
+```typescript
+// Get when the song should start (e.g., 500ms from now)
+const startTime = musicHub.getCurrentServerTime() + 500;
+
+// Send to all clients via SignalR
+await connection.invoke("PlaySongAtTime", songId, startTime);
+
+// On each client, wait until the exact start time
+const now = musicHub.getCurrentServerTime();
+const delay = Math.max(0, startTime - now);
+setTimeout(() => audioPlayer.play(), delay);
+```
+
+This ensures all clients start playback within <30ms of each other on good networks.
+
 ### Check Sync Validity
 
 ```typescript
@@ -155,6 +174,29 @@ Enable console logs to see sync details:
 [TimeSync] Performing periodic sync...
 [TimeSync] Background sync complete: RTT=27.12ms, Offset=11.98ms
 ```
+
+## Configuration
+
+All synchronization parameters are configurable via constants in `MusicHub.svelte.ts`:
+
+```typescript
+// Sync behavior
+const INITIAL_SYNC_SAMPLES = 20;          // Initial sync sample count
+const BACKGROUND_SYNC_SAMPLES = 5;        // Periodic sync sample count
+const SYNC_SAMPLE_DELAY_MS = 500;         // Delay between samples
+const PERIODIC_SYNC_INTERVAL_MS = 30000;  // Background re-sync interval
+const BEST_SAMPLES_PERCENTAGE = 0.5;      // Use best 50% of samples
+
+// Accuracy thresholds
+const HIGH_ACCURACY_RTT_THRESHOLD = 30;   // High accuracy RTT threshold (ms)
+const HIGH_ACCURACY_RTT_STDDEV = 5;       // High accuracy RTT std dev (ms)
+const HIGH_ACCURACY_OFFSET_STDDEV = 3;    // High accuracy offset std dev (ms)
+const MEDIUM_ACCURACY_RTT_THRESHOLD = 100; // Medium accuracy RTT threshold (ms)
+const MEDIUM_ACCURACY_RTT_STDDEV = 20;    // Medium accuracy RTT std dev (ms)
+const MEDIUM_ACCURACY_OFFSET_STDDEV = 10; // Medium accuracy offset std dev (ms)
+```
+
+Adjust these values based on your network conditions and accuracy requirements.
 
 ## Future Enhancements
 
