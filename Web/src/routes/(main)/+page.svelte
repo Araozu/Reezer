@@ -2,6 +2,7 @@
 	import LoginForm from "$lib/components/onboarding/login-form.svelte";
 	import { Disc3 } from "lucide-svelte";
 	import RoomPicker from "~/lib/components/onboarding/room-picker.svelte";
+	import LavaBackground from "$lib/components/lava-background.svelte";
 	import { useCurrentUser } from "./queries";
 
 	const currentUser = useCurrentUser();
@@ -14,8 +15,10 @@
 	<title>Reezer</title>
 </svelte:head>
 
+<LavaBackground />
+
 <div
-	class="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10"
+	class="flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10"
 >
 	<div class="flex w-full flex-col justify-center items-center gap-6">
 		<div class="flex items-center gap-2 self-center font-medium">
