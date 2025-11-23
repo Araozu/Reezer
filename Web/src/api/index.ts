@@ -57,11 +57,13 @@ export type WithProblemDetails<T> = T extends CreateQueryResult<
  * @returns The Response object if successful (2xx status)
  * @throws {ProblemDetails} Always throws ProblemDetails-shaped objects on error
  */
-const enhancedFetch = async (
+const enhancedFetch = async(
 	input: RequestInfo | URL,
 	init?: RequestInit,
-): Promise<Response> => {
-	if (process.env.NODE_ENV === "development") {
+): Promise<Response> =>
+{
+	if (process.env.NODE_ENV === "development")
+	{
 		await new Promise((resolve) => setTimeout(resolve, 500));
 	}
 
@@ -70,15 +72,18 @@ const enhancedFetch = async (
 		credentials: "include",
 	});
 
-	if (!response.ok) {
+	if (!response.ok)
+	{
 		// Try to parse as C# ProblemDetails
 		const contentType = response.headers.get("content-type");
 
-		if (contentType?.includes("application/json")) {
+		if (contentType?.includes("application/json"))
+		{
 			const problem = await response.json();
 
 			// Basic validation that it's actually ProblemDetails
-			if (problem && (problem.title || problem.detail || problem.status)) {
+			if (problem && (problem.title || problem.detail || problem.status))
+			{
 				const problemDetails: ProblemDetails = {
 					type: problem.type ?? "about:blank",
 					title: problem.title ?? "Error del sistema",
@@ -89,7 +94,9 @@ const enhancedFetch = async (
 				};
 				throw problemDetails;
 			}
-		} else if (contentType?.includes("text/plain")) {
+		}
+		else if (contentType?.includes("text/plain"))
+		{
 			const problemDetails: ProblemDetails = {
 				type: "about:blank",
 				title: "Error del sistema",
@@ -130,11 +137,10 @@ type FetchResult<A, B> = {
 	response: Response;
 };
 
-
 export const sv =
 	<Data, Error>(fn: () => Promise<FetchResult<Data, Error>>) => async(): Promise<Data> =>
 	{
 		const data = await fn();
-		if (data.response.ok) return data.data!
+		if (data.response.ok) return data.data!;
 		else throw data.error;
 	};

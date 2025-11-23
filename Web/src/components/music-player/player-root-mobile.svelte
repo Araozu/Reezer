@@ -11,9 +11,7 @@
 	let song = $derived(player.currentSong);
 	let currentTab = $state<"playing" | "queue">("playing");
 
-	let coverUrl = $derived(
-		song ? `/api/Albums/${song.albumId}/cover` : "/vinyl.jpg",
-	);
+	let coverUrl = $derived(song ? `/api/Albums/${song.albumId}/cover` : "/vinyl.jpg");
 
 	let open = $state(false);
 </script>

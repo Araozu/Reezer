@@ -11,21 +11,23 @@
 
     const tyme_sync = new MusicHub();
     const sync_promise = tyme_sync
-        .connect()
-        .then(() => tyme_sync.synchronize());
+    	.connect()
+    	.then(() => tyme_sync.synchronize());
 
     setContext("musicHub", tyme_sync);
 
     onDestroy(() => tyme_sync.disconnect());
 
     $inspect($userQuery.error);
-    $effect(() => {
-        if (
-            $userQuery.error?.status === 401 ||
+    $effect(() =>
+    {
+    	if (
+    		$userQuery.error?.status === 401 ||
             $userQuery.error?.status === 403
-        ) {
-            goto("/login");
-        }
+    	)
+    	{
+    		goto("/login");
+    	}
     });
 </script>
 

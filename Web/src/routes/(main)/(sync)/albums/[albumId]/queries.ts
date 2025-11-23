@@ -9,7 +9,7 @@ export function useAlbumByIdQuery(
 	$placeholderData: Readable<AlbumWithTracklistDto>,
 )
 {
-	let query = createQuery(derived([$albumId, $placeholderData], ([albumId, placeholderData]) => ({
+	const query = createQuery(derived([$albumId, $placeholderData], ([albumId, placeholderData]) => ({
 		queryKey: ["albums", albumId],
 		queryFn: sv(() => api.GET("/api/Albums/{albumId}", {
 			params: {
