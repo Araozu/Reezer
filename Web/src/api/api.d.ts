@@ -152,6 +152,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/MusicRooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get list of all active music rooms */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MusicRoomDto"][];
+                        "application/json": components["schemas"]["MusicRoomDto"][];
+                        "text/json": components["schemas"]["MusicRoomDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Create a new music room */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MusicRoomDto"];
+                        "application/json": components["schemas"]["MusicRoomDto"];
+                        "text/json": components["schemas"]["MusicRoomDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/Auth/login": {
         parameters: {
             query?: never;
@@ -496,6 +556,11 @@ export interface components {
         LoginResult: {
             success: boolean;
             errorMessage?: null | string;
+        };
+        MusicRoomDto: {
+            roomCode: string;
+            /** Format: int32 */
+            connectedUsers: number | string;
         };
         PaginatedResultOfAlbumDto: {
             items: components["schemas"]["AlbumDto"][];

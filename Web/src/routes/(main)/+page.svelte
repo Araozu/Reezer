@@ -17,7 +17,7 @@
 <div
 	class="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10"
 >
-	<div class="flex w-full flex-col gap-6">
+	<div class="flex w-full flex-col justify-center items-center gap-6">
 		<div class="flex items-center gap-2 self-center font-medium">
 			<div
 				class="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md"
@@ -26,15 +26,10 @@
 			</div>
 			Reezer
 		</div>
-		<div class="flex flex-row justify-center gap-4">
-			{#if user}
-				<RoomPicker />
-			{:else}
-				<LoginForm
-					loading={userLoading}
-					loggedIn={!!user}
-				/>
-			{/if}
-		</div>
+		{#if user}
+			<RoomPicker />
+		{:else}
+			<LoginForm loading={userLoading} loggedIn={!!user} />
+		{/if}
 	</div>
 </div>

@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-    options.KnownNetworks.Clear();
+    options.KnownIPNetworks.Clear();
     options.KnownProxies.Clear();
 });
 
@@ -123,6 +123,7 @@ app.UseAuthorization();
 
 // Hubs
 app.MapHub<MusicHub>(MusicHub.Route);
+app.MapHub<MusicRoomHub>(MusicRoomHub.Route);
 
 // Serve static files from wwwroot (frontend assets)
 app.UseStaticFiles();

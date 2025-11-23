@@ -4,7 +4,7 @@ namespace Reezer.Api.Hubs;
 
 public class MusicHub : Hub
 {
-    public const string Route = "/api/hubs/music";
+    public const string Route = "/api/Hubs/music";
     private static IHubContext<MusicHub>? _hubContext;
     private static readonly PlayerState playerState = new() { Queue = [], CurrentSongIndex = 0 };
     private static readonly IReadOnlyList<AvailableHub> availableHubs =
