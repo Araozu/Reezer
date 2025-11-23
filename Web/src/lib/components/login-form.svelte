@@ -17,10 +17,9 @@
 
 	const id = $props.id();
 
-	function handleGoogleLogin() {
-		const returnUrl = encodeURIComponent(
-			`${window.location.origin}/`,
-		);
+	function handleGoogleLogin()
+	{
+		const returnUrl = encodeURIComponent(`${window.location.origin}/`);
 		window.location.href = `/api/auth/google?returnUrl=${returnUrl}`;
 	}
 </script>

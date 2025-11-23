@@ -35,17 +35,21 @@
 	);
 	let audioTagSetup = $derived(player.audioReady);
 
-	onMount(() => {
+	onMount(() =>
+	{
 		player.OverrideTag(audioTag!);
 	});
 
-	$effect(() => {
+	$effect(() =>
+	{
 		if (audioTag === null) return;
 		if (!audioTagSetup) return;
 		if (!musicHub.connected) return;
 
-		musicHub.getPlayerState().then((state) => {
-			if (state.currentSongId) {
+		musicHub.getPlayerState().then((state) =>
+		{
+			if (state.currentSongId)
+			{
 				player.PlaySongById(state.currentSongId);
 			}
 		});
