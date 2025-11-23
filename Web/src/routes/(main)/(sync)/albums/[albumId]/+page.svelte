@@ -21,29 +21,34 @@
 
 	let albumName = $derived($albumQuery.data?.name ?? "");
 
-	function PlayNow(song: ISong) {
+	function PlayNow(song: ISong)
+	{
 		player.PlaySong(song);
 		toast.success("Playing now");
 	}
 
-	function PlayAllNow() {
+	function PlayAllNow()
+	{
 		const songs = $albumQuery.data?.songs ?? [];
 		player.PlaySongs(songs);
 		toast.success("Playing all now");
 	}
 
-	function PlayAllLast() {
+	function PlayAllLast()
+	{
 		const songs = $albumQuery.data?.songs ?? [];
 		player.AddSongsToQueue(songs);
 		toast.success("Will play all last");
 	}
 
-	function PlayLast(song: ISong) {
+	function PlayLast(song: ISong)
+	{
 		player.AddSongToQueue(song);
 		toast.success("Will play last");
 	}
 
-	function PlayNext(song: ISong) {
+	function PlayNext(song: ISong)
+	{
 		player.PlaySongNext(song);
 		toast.success("Will play next");
 	}

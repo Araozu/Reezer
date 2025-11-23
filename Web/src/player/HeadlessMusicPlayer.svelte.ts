@@ -13,6 +13,7 @@ export class HeadlessMusicPlayer
 	public readonly currentSong = $derived(this.queue[this.currentSongIdx] ?? null);
 
 	private lastPreloadId = "";
+	private lastPositionUpdateTime = 0;
 
 	constructor(
 		public hub: MusicHub | null,
@@ -76,11 +77,30 @@ export class HeadlessMusicPlayer
 		this.audioTag.addEventListener("playing", () =>
 		{
 			this.isBuffering = false;
+			this.updateMediaSessionPlaybackState("playing");
+		});
+
+		this.audioTag.addEventListener("pause", () =>
+		{
+			this.updateMediaSessionPlaybackState("paused");
 		});
 
 		this.audioTag.addEventListener("loadstart", () =>
 		{
 			this.isBuffering = true;
+		});
+
+		this.audioTag.addEventListener("timeupdate", () =>
+		{
+			const now = Date.now();
+			if (now - this.lastPositionUpdateTime < 1000) return;
+			this.lastPositionUpdateTime = now;
+			this.updateMediaSessionPositionState();
+		});
+
+		this.audioTag.addEventListener("durationchange", () =>
+		{
+			this.updateMediaSessionPositionState();
 		});
 
 		this.setupMediaSession();
@@ -113,11 +133,13 @@ export class HeadlessMusicPlayer
 		navigator.mediaSession.setActionHandler("seekbackward", () =>
 		{
 			this.audioTag.currentTime = Math.max(0, this.audioTag.currentTime - 10);
+			this.updateMediaSessionPositionState();
 		});
 
 		navigator.mediaSession.setActionHandler("seekforward", () =>
 		{
 			this.audioTag.currentTime = Math.min(this.audioTag.duration, this.audioTag.currentTime + 10);
+			this.updateMediaSessionPositionState();
 		});
 
 		navigator.mediaSession.setActionHandler("seekto", (details) =>
@@ -125,6 +147,7 @@ export class HeadlessMusicPlayer
 			if (details.seekTime !== undefined)
 			{
 				this.audioTag.currentTime = details.seekTime;
+				this.updateMediaSessionPositionState();
 			}
 		});
 	}
@@ -145,6 +168,30 @@ export class HeadlessMusicPlayer
 				},
 			],
 		});
+	}
+
+	private updateMediaSessionPositionState()
+	{
+		if (!("mediaSession" in navigator)) return;
+		if (!("setPositionState" in navigator.mediaSession)) return;
+
+		const duration = this.audioTag.duration;
+		const position = this.audioTag.currentTime;
+
+		if (isNaN(duration) || isNaN(position) || duration <= 0) return;
+
+		navigator.mediaSession.setPositionState({
+			duration,
+			playbackRate: this.audioTag.playbackRate,
+			position,
+		});
+	}
+
+	private updateMediaSessionPlaybackState(state: "none" | "paused" | "playing")
+	{
+		if (!("mediaSession" in navigator)) return;
+
+		navigator.mediaSession.playbackState = state;
 	}
 
 	public OverrideTag(el: HTMLAudioElement)
@@ -191,6 +238,7 @@ export class HeadlessMusicPlayer
 		this.currentSongIdx = this.queue.length - 1;
 		this.audioTag.src = `/api/Songs/${song.id}/stream`;
 		this.updateMediaSessionMetadata(song);
+		this.updateMediaSessionPositionState();
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
@@ -203,6 +251,7 @@ export class HeadlessMusicPlayer
 		this.currentSongIdx = 0;
 		this.audioTag.src = `/api/Songs/${songs[0].id}/stream`;
 		this.updateMediaSessionMetadata(songs[0]);
+		this.updateMediaSessionPositionState();
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
@@ -216,6 +265,7 @@ export class HeadlessMusicPlayer
 			this.currentSongIdx = 0;
 			this.audioTag.src = `/api/Songs/${song.id}/stream`;
 			this.updateMediaSessionMetadata(song);
+			this.updateMediaSessionPositionState();
 			this.audioTag.play().catch((e) => console.error(e));
 		}
 	}
@@ -232,6 +282,7 @@ export class HeadlessMusicPlayer
 			this.currentSongIdx = 0;
 			this.audioTag.src = `/api/Songs/${songs[0].id}/stream`;
 			this.updateMediaSessionMetadata(songs[0]);
+			this.updateMediaSessionPositionState();
 			this.audioTag.play().catch((e) => console.error(e));
 		}
 	}
@@ -247,6 +298,7 @@ export class HeadlessMusicPlayer
 			this.currentSongIdx = 0;
 			this.audioTag.src = `/api/Songs/${song.id}/stream`;
 			this.updateMediaSessionMetadata(song);
+			this.updateMediaSessionPositionState();
 			this.audioTag.play().catch((e) => console.error(e));
 		}
 	}
@@ -260,6 +312,7 @@ export class HeadlessMusicPlayer
 		const nextSong = this.currentSong;
 		this.audioTag.src = `/api/Songs/${nextSong.id}/stream`;
 		this.updateMediaSessionMetadata(nextSong);
+		this.updateMediaSessionPositionState();
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
@@ -272,6 +325,7 @@ export class HeadlessMusicPlayer
 		const previousSong = this.currentSong;
 		this.audioTag.src = `/api/Songs/${previousSong.id}/stream`;
 		this.updateMediaSessionMetadata(previousSong);
+		this.updateMediaSessionPositionState();
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
@@ -283,6 +337,7 @@ export class HeadlessMusicPlayer
 		const song = this.queue[index];
 		this.audioTag.src = `/api/Songs/${song.id}/stream`;
 		this.updateMediaSessionMetadata(song);
+		this.updateMediaSessionPositionState();
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
