@@ -13,6 +13,7 @@ export class HeadlessMusicPlayer
 	public readonly currentSong = $derived(this.queue[this.currentSongIdx] ?? null);
 
 	private lastPreloadId = "";
+	private lastPositionUpdateTime = 0;
 
 	constructor(
 		public hub: MusicHub | null,
@@ -91,6 +92,9 @@ export class HeadlessMusicPlayer
 
 		this.audioTag.addEventListener("timeupdate", () =>
 		{
+			const now = Date.now();
+			if (now - this.lastPositionUpdateTime < 1000) return;
+			this.lastPositionUpdateTime = now;
 			this.updateMediaSessionPositionState();
 		});
 
@@ -174,7 +178,7 @@ export class HeadlessMusicPlayer
 		const duration = this.audioTag.duration;
 		const position = this.audioTag.currentTime;
 
-		if (isNaN(duration) || isNaN(position) || duration === 0) return;
+		if (isNaN(duration) || isNaN(position) || duration <= 0) return;
 
 		navigator.mediaSession.setPositionState({
 			duration,
