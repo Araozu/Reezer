@@ -29,6 +29,11 @@
             .withAutomaticReconnect()
             .build();
 
+        connection.on("MessageReceived", (user, message) => {
+            console.log("Received from SignalR:");
+            console.log(`${JSON.stringify(user)}: ${message}`);
+        });
+
         await connection.start();
         connection.send("Hello", "Pablito");
     });

@@ -2,7 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Reezer.Application.Commands;
 
-namespace Reezer.Api.Hubs;
+namespace Reezer.Api.Hubs.Music;
 
 public class MusicRoomHub(ILogger<MusicRoomHub> logger, ISender mediator) : Hub
 {

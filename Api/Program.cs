@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
-using Reezer.Api.Hubs;
+using Reezer.Api.Hubs.Music;
 using Reezer.Application;
 using Reezer.Infrastructure;
 using Reezer.Infrastructure.Data;
