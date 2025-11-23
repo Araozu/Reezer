@@ -39,8 +39,6 @@
 		player.OverrideTag(audioTag!);
 	});
 
-
-
 	let playerCollapsed = $state(true);
 </script>
 

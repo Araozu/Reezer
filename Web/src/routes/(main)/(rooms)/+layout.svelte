@@ -10,7 +10,9 @@
 
     const userQuery = useCurrentUser();
     const roomId = $derived($page.params.roomId ?? "default");
-    const username = $derived($userQuery.data?.userName ?? $userQuery.data?.name ?? "User");
+    const username = $derived(
+        $userQuery.data?.userName ?? $userQuery.data?.name ?? "User",
+    );
 
     const tyme_sync = new MusicRoomHub();
     let sync_promise = $state<Promise<any> | null>(null);

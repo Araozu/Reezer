@@ -3,7 +3,6 @@
 	import * as Card from "$lib/components/ui/card/index.js";
 	import { Disc3, User } from "lucide-svelte";
 	import AlbumCover from "~/components/album-cover.svelte";
-	import type { components } from "~/api";
 
 	const albumsQuery = useRecentAlbums(6);
 

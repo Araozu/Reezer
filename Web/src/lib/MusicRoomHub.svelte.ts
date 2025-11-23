@@ -110,7 +110,7 @@ export class MusicRoomHub
 				// Small delay between samples to avoid overwhelming the server
 				if (i < samples - 1)
 				{
-					await new Promise((resolve) => setTimeout(resolve, 250));
+					await new Promise((resolve) => setTimeout(resolve, 500));
 				}
 			}
 			catch (error)
