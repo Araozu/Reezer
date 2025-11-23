@@ -1,13 +1,16 @@
-using System.Security.Cryptography.X509Certificates;
-using Microsoft.AspNetCore.Components.HtmlRendering.Infrastructure;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Reezer.Api.Hubs;
 
 public class MusicHub : Hub
 {
+    public const string Route = "/api/hubs/music";
     private static IHubContext<MusicHub>? _hubContext;
     private static readonly PlayerState playerState = new() { Queue = [], CurrentSongIndex = 0 };
+    private static readonly IReadOnlyList<AvailableHub> availableHubs =
+    [
+        new("music", "Music", Route),
+    ];
 
     public MusicHub(IHubContext<MusicHub> hubContext)
     {
@@ -40,6 +43,11 @@ public class MusicHub : Hub
         return Task.FromResult(playerState);
     }
 
+    public Task<IReadOnlyList<AvailableHub>> GetAvailableHubs()
+    {
+        return Task.FromResult(availableHubs);
+    }
+
     public Task PlaySong(Guid clientId, ISong songState)
     {
         playerState.Queue.Add(songState);
@@ -51,6 +59,8 @@ public class MusicHub : Hub
 }
 
 public record SyncResponse(long ServerReceiveTime, long ServerSendTime);
+
+public record AvailableHub(string Id, string Name, string Route);
 
 public class PlayerState
 {

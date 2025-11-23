@@ -38,13 +38,33 @@
   	switch (accuracy)
   	{
   	case "high":
-  		return { color: "text-green-600 dark:text-green-400", icon: CheckCircle, bg: "bg-green-50 dark:bg-green-900", border: "border-green-200 dark:border-green-800" };
+  		return {
+  			color: "text-green-600 dark:text-green-400",
+  			icon: CheckCircle,
+  			bg: "bg-green-50 dark:bg-green-900",
+  			border: "border-green-200 dark:border-green-800",
+  		};
   	case "medium":
-  		return { color: "text-yellow-600 dark:text-yellow-400", icon: AlertTriangle, bg: "bg-yellow-50 dark:bg-yellow-900", border: "border-yellow-200 dark:border-yellow-800" };
+  		return {
+  			color: "text-yellow-600 dark:text-yellow-400",
+  			icon: AlertTriangle,
+  			bg: "bg-yellow-50 dark:bg-yellow-900",
+  			border: "border-yellow-200 dark:border-yellow-800",
+  		};
   	case "low":
-  		return { color: "text-red-600 dark:text-red-400", icon: AlertTriangle, bg: "bg-red-50 dark:bg-red-900", border: "border-red-200 dark:border-red-800" };
+  		return {
+  			color: "text-red-600 dark:text-red-400",
+  			icon: AlertTriangle,
+  			bg: "bg-red-50 dark:bg-red-900",
+  			border: "border-red-200 dark:border-red-800",
+  		};
   	default:
-  		return { color: "text-gray-600 dark:text-gray-400", icon: AlertTriangle, bg: "bg-gray-50 dark:bg-gray-900", border: "border-gray-200 dark:border-gray-800" };
+  		return {
+  			color: "text-gray-600 dark:text-gray-400",
+  			icon: AlertTriangle,
+  			bg: "bg-gray-50 dark:bg-gray-900",
+  			border: "border-gray-200 dark:border-gray-800",
+  		};
   	}
   }
 
@@ -61,7 +81,11 @@
   	}
   	else
   	{
-  		return { icon: TrendingDown, color: "text-orange-600", text: "Client behind" };
+  		return {
+  			icon: TrendingDown,
+  			color: "text-orange-600",
+  			text: "Client behind",
+  		};
   	}
   }
 
@@ -99,9 +123,7 @@
 
 <Dialog.Root>
   <Dialog.Trigger>
-    <button>
-      Synchronized
-    </button>
+    <button> Synchronized </button>
   </Dialog.Trigger>
   <Dialog.Content class="max-w-2xl">
     <Dialog.Header>
@@ -206,7 +228,6 @@
           </p>
         </Card.Content>
       </Card.Root>
-
     </div>
   </Dialog.Content>
 </Dialog.Root>

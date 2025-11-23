@@ -11,3 +11,4 @@ export function useCurrentUser()
 	});
 	return query as WithProblemDetails<typeof query>;
 }
+

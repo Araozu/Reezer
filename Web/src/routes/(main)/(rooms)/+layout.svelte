@@ -2,7 +2,6 @@
     import { onDestroy, setContext } from "svelte";
     import { MusicHub } from "~/lib/MusicHub.svelte";
     import SyncData from "./sync-data.svelte";
-    import { useCurrentUser } from "./queries";
     import { goto } from "$app/navigation";
 
     let { children } = $props();
@@ -18,7 +17,6 @@
 
     onDestroy(() => tyme_sync.disconnect());
 
-    $inspect($userQuery.error);
     $effect(() =>
     {
     	if (
