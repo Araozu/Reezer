@@ -18,12 +18,17 @@ public class AuthController(IAuthService authService) : ControllerBase
     {
         var result = await authService.LoginAsync(command, cancellationToken);
 
-        if (!result.Success)
-        {
-            return Unauthorized(result);
-        }
-
-        return Ok(result);
+        return result.Match<ActionResult<LoginResult>>(
+            success => Ok(success),
+            unauthorized =>
+                Unauthorized(
+                    new ProblemDetails
+                    {
+                        Detail = unauthorized.Reason,
+                        Status = StatusCodes.Status401Unauthorized,
+                    }
+                )
+        );
     }
 
     [HttpGet("google")]
@@ -46,13 +51,11 @@ public class AuthController(IAuthService authService) : ControllerBase
     {
         var result = await authService.HandleGoogleCallbackAsync(cancellationToken);
 
-        if (!result.Success)
-        {
-            return Redirect(
-                $"/?error={Uri.EscapeDataString(result.ErrorMessage ?? "Authentication failed")}"
-            );
-        }
-        return Redirect(returnUrl);
+        return result.Match<ActionResult>(
+            success => Redirect(returnUrl),
+            unauthorized => Redirect($"/?error={Uri.EscapeDataString(unauthorized.Reason)}"),
+            internalError => Redirect($"/?error={Uri.EscapeDataString(internalError.Reason)}")
+        );
     }
 
     [Authorize]

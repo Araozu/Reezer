@@ -1,8 +1,10 @@
 using System.Security.Claims;
+using Acide.Perucontrol.Domain.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using OneOf;
 using Reezer.Application.DTOs.Auth;
 using Reezer.Application.Services;
 using Reezer.Infrastructure.Identity;
@@ -15,7 +17,7 @@ public class AuthService(
     IHttpContextAccessor httpContextAccessor
 ) : IAuthService
 {
-    public async Task<LoginResult> LoginAsync(
+    public async Task<OneOf<LoginResult, Unauthorized>> LoginAsync(
         LoginCommand command,
         CancellationToken cancellationToken = default
     )
@@ -23,7 +25,7 @@ public class AuthService(
         var user = await userManager.FindByEmailAsync(command.Email);
         if (user == null)
         {
-            return new LoginResult(false, "Invalid email or password");
+            return new Unauthorized("Invalid email or password");
         }
 
         var result = await signInManager.PasswordSignInAsync(
@@ -40,10 +42,10 @@ public class AuthService(
 
         if (result.IsLockedOut)
         {
-            return new LoginResult(false, "Account is locked out");
+            return new Unauthorized("Account is locked out");
         }
 
-        return new LoginResult(false, "Invalid email or password");
+        return new Unauthorized("Invalid email or password");
     }
 
     public async Task<LoginResult> GoogleLoginAsync(
@@ -57,7 +59,6 @@ public class AuthService(
             return new LoginResult(false, "HTTP context not available");
         }
 
-        // encode returnUrl
         var encodedReturnUrl = Uri.EscapeDataString(returnUrl);
 
         await httpContext.ChallengeAsync(
@@ -70,14 +71,14 @@ public class AuthService(
         return new LoginResult(true);
     }
 
-    public async Task<LoginResult> HandleGoogleCallbackAsync(
+    public async Task<OneOf<LoginResult, Unauthorized, InternalError>> HandleGoogleCallbackAsync(
         CancellationToken cancellationToken = default
     )
     {
         var httpContext = httpContextAccessor.HttpContext;
         if (httpContext == null)
         {
-            return new LoginResult(false, "HTTP context not available");
+            return new InternalError("HTTP context not available");
         }
 
         var authenticateResult = await httpContext.AuthenticateAsync(
@@ -85,19 +86,19 @@ public class AuthService(
         );
         if (!authenticateResult.Succeeded)
         {
-            return new LoginResult(false, "External authentication failed");
+            return new Unauthorized("External authentication failed");
         }
 
         var externalUser = authenticateResult.Principal;
         if (externalUser == null)
         {
-            return new LoginResult(false, "External user information not found");
+            return new Unauthorized("External user information not found");
         }
 
         var email = externalUser.FindFirstValue(ClaimTypes.Email);
         if (string.IsNullOrEmpty(email))
         {
-            return new LoginResult(false, "Email not provided by Google");
+            return new Unauthorized("Email not provided by Google");
         }
 
         var user = await userManager.FindByEmailAsync(email);
@@ -116,7 +117,7 @@ public class AuthService(
             var createResult = await userManager.CreateAsync(user);
             if (!createResult.Succeeded)
             {
-                return new LoginResult(false, "Failed to create user account");
+                return new InternalError("Failed to create user account");
             }
         }
 
