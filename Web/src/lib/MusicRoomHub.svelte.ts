@@ -14,14 +14,15 @@ export interface PlayerState {
   currentSongId: string | null;
 }
 
-export class MusicHub
+export class MusicRoomHub
 {
 	private connection: SignalR.HubConnection | null = null;
 	public connected = $state(false);
 	private musicPlayer: HeadlessMusicPlayer | null = null;
 	public clientId: string | null = null;
+	public roomCode: string | null = null;
 
-	constructor(private readonly hubUrl = `${BACKEND_URL}/api/hubs/music`)
+	constructor(private readonly hubUrl = `${BACKEND_URL}/hubs/MusicRoom`)
 	{}
 
 	public setPlayer(p: HeadlessMusicPlayer)
@@ -29,7 +30,7 @@ export class MusicHub
 		this.musicPlayer = p;
 	}
 
-	async connect(): Promise<void>
+	async connect(roomCode: string, username = "User"): Promise<void>
 	{
 		if (this.connection?.state === "Connected")
 		{
@@ -44,6 +45,7 @@ export class MusicHub
 
 		await this.connection.start();
 		this.clientId = await this.connection.invoke<string>("GeneratePlayerId");
+		this.roomCode = await this.connection.invoke<string>("JoinRoom", roomCode, username);
 		this.connection.on("PlaySong", this.ReceivePlaySong.bind(this));
 		this.connected = true;
 	}
@@ -54,22 +56,27 @@ export class MusicHub
 		{
 			await this.connection.stop();
 			this.connection = null;
+			this.roomCode = null;
 		}
 	}
 
 	async getPlayerState(): Promise<PlayerState>
 	{
-		if (!this.connection || this.connection.state !== "Connected")
+		if (!this.connection || this.connection.state !== "Connected" || !this.roomCode)
 		{
-			await this.connect();
+			throw new Error("Not connected to a room");
 		}
 
-		return await this.connection!.invoke("GetPlayerState");
+		return await this.connection.invoke("GetPlayerState", this.roomCode);
 	}
 
 	async playSong(song: ISong)
 	{
-		await this.connection!.invoke("PlaySong", this.clientId, song);
+		if (!this.roomCode)
+		{
+			throw new Error("Not connected to a room");
+		}
+		await this.connection!.invoke("PlaySong", this.roomCode, this.clientId, song);
 	}
 
 	async ReceivePlaySong(clientId: string, song: ISong)
@@ -88,7 +95,7 @@ export class MusicHub
 	{
 		if (!this.connection || this.connection.state !== "Connected")
 		{
-			await this.connect();
+			throw new Error("Not connected to hub");
 		}
 
 		const measurements: SyncResult[] = [];

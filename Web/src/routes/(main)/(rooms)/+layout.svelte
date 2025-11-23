@@ -1,18 +1,27 @@
 <script lang="ts">
     import { onDestroy, setContext } from "svelte";
-    import { MusicHub } from "~/lib/MusicHub.svelte";
+    import { MusicRoomHub } from "~/lib/MusicRoomHub.svelte";
     import SyncData from "./sync-data.svelte";
     import { goto } from "$app/navigation";
     import { useCurrentUser } from "../queries";
+    import { page } from "$app/stores";
 
     let { children } = $props();
 
     const userQuery = useCurrentUser();
+    const roomId = $derived($page.params.roomId ?? "default");
+    const username = $derived($userQuery.data?.userName ?? $userQuery.data?.name ?? "User");
 
-    const tyme_sync = new MusicHub();
-    const sync_promise = tyme_sync
-        .connect()
-        .then(() => tyme_sync.synchronize());
+    const tyme_sync = new MusicRoomHub();
+    let sync_promise = $state<Promise<any> | null>(null);
+
+    $effect(() => {
+        if ($userQuery.isSuccess && roomId && username) {
+            sync_promise = tyme_sync
+                .connect(roomId, username)
+                .then(() => tyme_sync.synchronize());
+        }
+    });
 
     setContext("musicHub", tyme_sync);
 

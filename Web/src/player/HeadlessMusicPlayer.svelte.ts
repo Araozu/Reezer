@@ -1,7 +1,7 @@
 import { type Readable,type  Writable, get } from "svelte/store";
 import type { ISong } from "../providers";
 import { api } from "../api";
-import type { MusicHub } from "~/lib/MusicHub.svelte";
+import type { MusicRoomHub } from "~/lib/MusicRoomHub.svelte";
 
 export class HeadlessMusicPlayer
 {
@@ -16,7 +16,7 @@ export class HeadlessMusicPlayer
 	private lastPositionUpdateTime = 0;
 
 	constructor(
-		public hub: MusicHub | null,
+		public hub: MusicRoomHub | null,
 		public isPaused: Writable<boolean>,
 		public volume: Writable<number>,
 		public currentTime: Writable<number>,

@@ -122,7 +122,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Hubs
-app.MapHub<MusicHub>(MusicHub.Route);
 app.MapHub<MusicRoomHub>(MusicRoomHub.Route);
 
 // Serve static files from wwwroot (frontend assets)
