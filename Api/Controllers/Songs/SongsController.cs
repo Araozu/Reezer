@@ -28,15 +28,57 @@ public class SongsController(
     {
         var result = await streamSongUseCase.StreamSongAsync(songId, cancellationToken);
 
-        Response.Headers.CacheControl = "public, max-age=2592000"; // 30 days
-        return File(result.Stream, result.ContentType, enableRangeProcessing: true);
+        return result.Match<IActionResult>(
+            success =>
+            {
+                Response.Headers.CacheControl = "public, max-age=2592000";
+                return File(success.Stream, success.ContentType, enableRangeProcessing: true);
+            },
+            notFound =>
+                NotFound(
+                    new ProblemDetails
+                    {
+                        Detail = notFound.Reason,
+                        Status = StatusCodes.Status404NotFound,
+                    }
+                ),
+            internalError =>
+                StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new ProblemDetails
+                    {
+                        Detail = internalError.Reason,
+                        Status = StatusCodes.Status500InternalServerError,
+                    }
+                )
+        );
     }
 
     [EndpointSummary("Prepare a song for streaming by transcoding it in the background")]
     [HttpPost("{songId}/prepare")]
     public async Task<IActionResult> PrepareSong(Guid songId)
     {
-        await prepareSongUseCase.PrepareSongAsync(songId);
-        return Ok();
+        var result = await prepareSongUseCase.PrepareSongAsync(songId);
+
+        return result.Match<IActionResult>(
+            success => Ok(),
+            notFound =>
+                NotFound(
+                    new ProblemDetails
+                    {
+                        Detail = notFound.Reason,
+                        Status = StatusCodes.Status404NotFound,
+                    }
+                ),
+            internalError =>
+                StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new ProblemDetails
+                    {
+                        Detail = internalError.Reason,
+                        Status = StatusCodes.Status500InternalServerError,
+                    }
+                )
+        );
     }
 }
