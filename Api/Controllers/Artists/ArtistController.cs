@@ -16,7 +16,14 @@ public class ArtistsController(GetArtistByIdUseCase getArtistByIdUseCase) : Cont
     )
     {
         var result = await getArtistByIdUseCase.GetArtistByIdAsync(artistId, cancellationToken);
-        Response.Headers.CacheControl = "public, max-age=1800";
-        return Ok(result);
+
+        return result.Match<ActionResult<ArtistDto>>(
+            artist =>
+            {
+                Response.Headers.CacheControl = "public, max-age=1800";
+                return Ok(artist);
+            },
+            notFound => NotFound(new ProblemDetails { Detail = notFound.Reason })
+        );
     }
 }
