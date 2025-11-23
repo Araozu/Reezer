@@ -7,5 +7,5 @@
 		<Card.Title>Join a room</Card.Title>
 		<Card.Description>Select a room from the list</Card.Description>
 	</Card.Header>
-	<Card.Content>Rooms:</Card.Content>
+	<Card.Content>Rooms: !</Card.Content>
 </Card.Root>

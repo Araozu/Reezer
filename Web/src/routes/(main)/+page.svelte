@@ -2,6 +2,12 @@
 	import LoginForm from "$lib/components/onboarding/login-form.svelte";
 	import { Disc3 } from "lucide-svelte";
 	import RoomPicker from "~/lib/components/onboarding/room-picker.svelte";
+	import { useCurrentUser } from "./queries";
+
+	const currentUser = useCurrentUser();
+
+	const userLoading = $derived($currentUser.isLoading);
+	const user = $derived($currentUser.data ?? null);
 </script>
 
 <svelte:head>
@@ -21,8 +27,14 @@
 			Reezer
 		</div>
 		<div class="flex flex-row justify-center gap-4">
-			<LoginForm />
-			<RoomPicker />
+			{#if user}
+				<RoomPicker />
+			{:else}
+				<LoginForm
+					loading={userLoading}
+					loggedIn={!!user}
+				/>
+			{/if}
 		</div>
 	</div>
 </div>
