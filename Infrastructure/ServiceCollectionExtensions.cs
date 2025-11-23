@@ -4,9 +4,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Reezer.Application.Services;
 using Reezer.Domain.Repositories;
+using Reezer.Domain.Repositories.Room;
 using Reezer.Infrastructure.Data;
 using Reezer.Infrastructure.Options;
 using Reezer.Infrastructure.Repositories;
+using Reezer.Infrastructure.Repositories.Room;
 using Reezer.Infrastructure.Services;
 
 namespace Reezer.Infrastructure;
@@ -40,6 +42,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISongRepository, SongRepository>();
         services.AddScoped<IAlbumRepository, AlbumRepository>();
         services.AddScoped<IArtistRepository, ArtistRepository>();
+        services.AddScoped<IMusicRoomRepository, MusicRoomRepository>();
 
         // Register services
         services.AddScoped<ILibraryInitializationService, LibraryInitializationService>();
