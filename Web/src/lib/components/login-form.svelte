@@ -18,7 +18,9 @@
 	const id = $props.id();
 
 	function handleGoogleLogin() {
-		const returnUrl = encodeURIComponent(window.location.origin + '/');
+		const returnUrl = encodeURIComponent(
+			`${window.location.origin}/`,
+		);
 		window.location.href = `/api/auth/google?returnUrl=${returnUrl}`;
 	}
 </script>
@@ -27,9 +29,6 @@
 	<Card.Root>
 		<Card.Header class="text-center">
 			<Card.Title class="text-xl">Welcome back</Card.Title>
-			<Card.Description
-				>Login with your Apple or Google account</Card.Description
-			>
 		</Card.Header>
 		<Card.Content>
 			<form>
@@ -58,22 +57,24 @@
 						Or continue with
 					</FieldSeparator>
 					<Field>
-						<FieldLabel for="email-{id}"
-							>Email</FieldLabel
-						>
+						<FieldLabel for="email-{id}">
+							Email
+						</FieldLabel>
 						<Input
 							id="email-{id}"
 							type="email"
 							placeholder="m@example.com"
 							required
+							disabled
 						/>
 					</Field>
 					<Field>
 						<div class="flex items-center">
 							<FieldLabel
 								for="password-{id}"
-								>Password</FieldLabel
 							>
+								Password
+							</FieldLabel>
 							<a
 								href="##"
 								class="ms-auto text-sm underline-offset-4 hover:underline"
@@ -86,19 +87,20 @@
 							id="password-{id}"
 							type="password"
 							required
+							disabled
 						/>
 					</Field>
 					<Field>
-						<Button type="submit"
-							>Login</Button
-						>
+						<Button type="submit">
+							Login
+						</Button>
 						<FieldDescription
 							class="text-center"
 						>
-							Don't have an account? <a
-								href="##"
-								>Sign up</a
-							>
+							Don't have an account?
+							<a href="##">
+								Sign up
+							</a>
 						</FieldDescription>
 					</Field>
 				</FieldGroup>
@@ -106,9 +108,8 @@
 		</Card.Content>
 	</Card.Root>
 	<FieldDescription class="px-6 text-center">
-		By clicking continue, you agree to our <a href="##"
-			>Terms of Service</a
-		>
+		By clicking continue, you agree to our
+		<a href="##"> Terms of Service </a>
 		and <a href="##">Privacy Policy</a>.
 	</FieldDescription>
 </div>
