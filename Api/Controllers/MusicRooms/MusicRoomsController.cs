@@ -1,42 +1,40 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Reezer.Api.Hubs;
+using Reezer.Application.DTOs;
+using Reezer.Application.UseCases;
 
 namespace Reezer.Api.Controllers.MusicRooms;
 
-public record MusicRoomDto(string RoomCode, int ConnectedUsers);
-
 [ApiController]
 [Route("api/[controller]")]
-public class MusicRoomsController : ControllerBase
+public class MusicRoomsController(
+    GetAllMusicRoomsUseCase getAllMusicRoomsUseCase,
+    CreateMusicRoomUseCase createMusicRoomUseCase
+) : ControllerBase
 {
-    // [EndpointSummary("Get list of all active music rooms")]
-    // [HttpGet]
-    // public ActionResult<List<MusicRoomDto>> GetRooms()
-    // {
-    //     var rooms = MusicRoomHub
-    //         .GetRooms()
-    //         .Select(r => new MusicRoomDto(r.RoomCode, r.ConnectedUsers.Count))
-    //         .ToList();
-    //
-    //     return Ok(rooms);
-    // }
-
-    // [EndpointSummary("Create a new music room")]
-    // [HttpPost]
-    // public ActionResult<MusicRoomDto> CreateRoom()
-    // {
-    //     var roomCode = GenerateRoomCode();
-    //     var room = MusicRoomHub.CreateRoom(roomCode);
-    //
-    //     return Ok(new MusicRoomDto(room.RoomCode, 0));
-    // }
-
-    private static string GenerateRoomCode()
+    [EndpointSummary("Get list of all active music rooms")]
+    [HttpGet]
+    public async Task<ActionResult<List<MusicRoomDto>>> GetRooms(
+        CancellationToken cancellationToken
+    )
     {
-        var random = new Random();
-        var chars = "0123456789ABCDEF";
-        return new string(
-            Enumerable.Range(0, 6).Select(_ => chars[random.Next(chars.Length)]).ToArray()
-        );
+        var rooms = await getAllMusicRoomsUseCase.ExecuteAsync(cancellationToken);
+        return Ok(rooms);
+    }
+
+    [EndpointSummary("Create a new music room")]
+    [HttpPost]
+    [Authorize]
+    public async Task<ActionResult<MusicRoomDto>> CreateRoom(CancellationToken cancellationToken)
+    {
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdString, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var room = await createMusicRoomUseCase.ExecuteAsync(userId, cancellationToken);
+        return Ok(room);
     }
 }

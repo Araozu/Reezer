@@ -11,6 +11,7 @@ public interface IMusicRoomRepository
         Guid id,
         CancellationToken cancellationToken = default
     );
+    Task AddAsync(MusicRoom room, CancellationToken cancellationToken = default);
     Task<OneOf<Success, NotFound>> RemoveAsync(
         Guid id,
         CancellationToken cancellationToken = default

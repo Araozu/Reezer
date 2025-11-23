@@ -30,6 +30,12 @@ public class MusicRoomRepository : IMusicRoomRepository
         );
     }
 
+    public Task AddAsync(MusicRoom room, CancellationToken cancellationToken = default)
+    {
+        _rooms.TryAdd(room.Id, room);
+        return Task.CompletedTask;
+    }
+
     public Task<OneOf<Success, NotFound>> RemoveAsync(
         Guid id,
         CancellationToken cancellationToken = default
