@@ -5,6 +5,22 @@ import { CalculateVariance, CalculateMedian, CalculateStandardDeviation, type Sy
 import type { HeadlessMusicPlayer } from "~/player/HeadlessMusicPlayer.svelte";
 import type { ISong } from "~/providers";
 
+// Time synchronization constants
+const INITIAL_SYNC_SAMPLES = 20;
+const BACKGROUND_SYNC_SAMPLES = 5;
+const SYNC_SAMPLE_DELAY_MS = 500;
+const PERIODIC_SYNC_INTERVAL_MS = 30000; // 30 seconds
+const BEST_SAMPLES_PERCENTAGE = 0.5; // Use best 50% of samples
+const MIN_SAMPLE_COUNT = 3;
+
+// Accuracy thresholds
+const HIGH_ACCURACY_RTT_THRESHOLD = 30; // ms
+const HIGH_ACCURACY_RTT_STDDEV = 5; // ms
+const HIGH_ACCURACY_OFFSET_STDDEV = 3; // ms
+const MEDIUM_ACCURACY_RTT_THRESHOLD = 100; // ms
+const MEDIUM_ACCURACY_RTT_STDDEV = 20; // ms
+const MEDIUM_ACCURACY_OFFSET_STDDEV = 10; // ms
+
 export interface SyncResponse {
   serverReceiveTime: number;
   serverSendTime: number;
@@ -92,7 +108,7 @@ export class MusicHub
 	  * @param startPeriodicSync Whether to start background periodic sync after initial sync
 	  * @returns Synchronization result with round-trip time and clock offset
 	  */
-	async synchronize(samples = 20, startPeriodicSync = true): Promise<SyncResult>
+	async synchronize(samples = INITIAL_SYNC_SAMPLES, startPeriodicSync = true): Promise<SyncResult>
 	{
 		if (!this.connection || this.connection.state !== "Connected")
 		{
@@ -112,7 +128,7 @@ export class MusicHub
 				// Longer delay between samples to capture network variance
 				if (i < samples - 1)
 				{
-					await new Promise((resolve) => setTimeout(resolve, 500));
+					await new Promise((resolve) => setTimeout(resolve, SYNC_SAMPLE_DELAY_MS));
 				}
 			}
 			catch (error)
@@ -129,8 +145,8 @@ export class MusicHub
 		// Sort by round-trip time
 		measurements.sort((a, b) => a.roundTripTime - b.roundTripTime);
 		
-		// Use only the best 50% of samples for tighter accuracy
-		const bestSamples = measurements.slice(0, Math.max(3, Math.floor(measurements.length * 0.5)));
+		// Use only the best samples for tighter accuracy
+		const bestSamples = measurements.slice(0, Math.max(MIN_SAMPLE_COUNT, Math.floor(measurements.length * BEST_SAMPLES_PERCENTAGE)));
 
 		// Use median instead of mean for better outlier rejection
 		const medianRoundTrip = CalculateMedian(bestSamples.map((m) => m.roundTripTime));
@@ -145,11 +161,11 @@ export class MusicHub
 
 		// Determine accuracy based on median RTT and consistency (std dev)
 		let accuracy: "high" | "medium" | "low" = "low";
-		if (medianRoundTrip < 30 && rttStdDev < 5 && offsetStdDev < 3)
+		if (medianRoundTrip < HIGH_ACCURACY_RTT_THRESHOLD && rttStdDev < HIGH_ACCURACY_RTT_STDDEV && offsetStdDev < HIGH_ACCURACY_OFFSET_STDDEV)
 		{
 			accuracy = "high";
 		}
-		else if (medianRoundTrip < 100 && rttStdDev < 20 && offsetStdDev < 10)
+		else if (medianRoundTrip < MEDIUM_ACCURACY_RTT_THRESHOLD && rttStdDev < MEDIUM_ACCURACY_RTT_STDDEV && offsetStdDev < MEDIUM_ACCURACY_OFFSET_STDDEV)
 		{
 			accuracy = "medium";
 		}
@@ -223,13 +239,13 @@ export class MusicHub
 			clearInterval(this.syncIntervalId);
 		}
 
-		// Perform lightweight sync every 30 seconds
+		// Perform lightweight sync at regular intervals
 		this.syncIntervalId = window.setInterval(async () =>
 		{
 			try
 			{
 				console.log("[TimeSync] Performing periodic sync...");
-				const syncResult = await this.synchronize(5, false); // Use fewer samples for background sync
+				const syncResult = await this.synchronize(BACKGROUND_SYNC_SAMPLES, false);
 				this.currentSyncResult = syncResult;
 				console.log(`[TimeSync] Background sync complete: RTT=${syncResult.roundTripTime.toFixed(2)}ms, Offset=${syncResult.clockOffset.toFixed(2)}ms`);
 			}
@@ -237,7 +253,7 @@ export class MusicHub
 			{
 				console.warn("[TimeSync] Periodic sync failed:", error);
 			}
-		}, 30000); // 30 seconds
+		}, PERIODIC_SYNC_INTERVAL_MS);
 	}
 
 	/**

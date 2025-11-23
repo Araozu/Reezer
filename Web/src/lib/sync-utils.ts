@@ -1,3 +1,6 @@
+// Time synchronization constants
+export const SYNC_VALIDITY_THRESHOLD_MS = 30000; // 30 seconds - matches periodic sync interval
+
 export interface SyncResult {
   roundTripTime: number; // in milliseconds
   clockOffset: number; // in milliseconds (positive = client is ahead)
@@ -51,9 +54,9 @@ export function GetSynchronizedTime(syncResult?: SyncResult): number
 /**
    * Checks if synchronization is still valid
    * @param syncResult The sync result to check
-   * @param maxAge Maximum age in milliseconds (default: 30 seconds for tight sync)
+   * @param maxAge Maximum age in milliseconds (default: 30 seconds, matching periodic sync interval)
    */
-export function IsSyncValid(syncResult?: SyncResult, maxAge = 30 * 1000): boolean
+export function IsSyncValid(syncResult?: SyncResult, maxAge = SYNC_VALIDITY_THRESHOLD_MS): boolean
 {
 	if (!syncResult || !syncResult.syncTimestamp)
 	{
