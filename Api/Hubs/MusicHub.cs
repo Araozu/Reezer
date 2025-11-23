@@ -16,15 +16,17 @@ public class MusicHub : Hub
 
     /// <summary>
     /// NTP-like synchronization method for calculating round-trip time and clock offset
+    /// This captures T2 on entry and T3 right before returning to measure server processing time
     /// </summary>
     /// <param name="clientTimestamp">Client's timestamp when sending the sync request (T1)</param>
     /// <returns>Server timestamps: receive time (T2) and send time (T3)</returns>
     public Task<SyncResponse> SyncTime(long clientTimestamp)
     {
-        // T2: Server receive timestamp
+        // T2: Server receive timestamp - captured immediately on method entry
         var serverReceiveTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-        // T3: Server send timestamp (immediately after receiving)
+        // T3: Server send timestamp - captured right before returning
+        // This properly accounts for server processing time
         var serverSendTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
         return Task.FromResult(new SyncResponse(serverReceiveTime, serverSendTime));

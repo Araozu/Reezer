@@ -71,16 +71,15 @@
   // Live server clock
   let currentServerTime = $state(new Date(syncResult.serverTime));
 
-  // Update server time every second based on offset
+  // Update server time every 100ms for smooth display
   $effect(() =>
   {
   	const interval = setInterval(() =>
   	{
-  		// Calculate current server time by adding elapsed time since sync
-  		const now = Date.now();
-  		const elapsed = now - (syncResult.serverTime - syncResult.clockOffset);
-  		currentServerTime = new Date(syncResult.serverTime + elapsed);
-  	}, 1000);
+  		// Calculate current server time using the clock offset
+  		const serverTime = Date.now() + syncResult.clockOffset;
+  		currentServerTime = new Date(serverTime);
+  	}, 100);
 
   	return () => clearInterval(interval);
   });
@@ -93,8 +92,32 @@
   		hour: "2-digit",
   		minute: "2-digit",
   		second: "2-digit",
+  		fractionalSecondDigits: 3,
   	});
   }
+
+  // Calculate time since last sync
+  function getTimeSinceSync(): string
+  {
+  	if (!syncResult.syncTimestamp) return "Unknown";
+  	const elapsed = Date.now() - syncResult.syncTimestamp;
+  	if (elapsed < 1000) return `${elapsed}ms ago`;
+  	if (elapsed < 60000) return `${Math.floor(elapsed / 1000)}s ago`;
+  	return `${Math.floor(elapsed / 60000)}m ago`;
+  }
+
+  let timeSinceSync = $state(getTimeSinceSync());
+
+  // Update time since sync every second
+  $effect(() =>
+  {
+  	const interval = setInterval(() =>
+  	{
+  		timeSinceSync = getTimeSinceSync();
+  	}, 1000);
+
+  	return () => clearInterval(interval);
+  });
 </script>
 
 <Dialog.Root>
@@ -184,7 +207,7 @@
             {formatServerTime(syncResult.serverTime)}
           </div>
           <p class="text-sm text-muted-foreground mt-1">
-            Current server time adjusted for network delay
+            Last synced: {timeSinceSync}
           </p>
         </Card.Content>
       </Card.Root>

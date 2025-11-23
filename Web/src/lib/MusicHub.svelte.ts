@@ -1,7 +1,7 @@
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import * as SignalR from "@microsoft/signalr";
 import { BACKEND_URL } from "~/env";
-import { CalculateVariance, type SyncResult } from "./sync-utils";
+import { CalculateVariance, CalculateMedian, CalculateStandardDeviation, type SyncResult, type SyncMeasurement } from "./sync-utils";
 import type { HeadlessMusicPlayer } from "~/player/HeadlessMusicPlayer.svelte";
 import type { ISong } from "~/providers";
 
@@ -20,6 +20,8 @@ export class MusicHub
 	public connected = $state(false);
 	private musicPlayer: HeadlessMusicPlayer | null = null;
 	public clientId: string | null = null;
+	private syncIntervalId: number | null = null;
+	private currentSyncResult: SyncResult | null = null;
 
 	constructor(private readonly hubUrl = `${BACKEND_URL}/api/hubs/music`)
 	{}
@@ -50,6 +52,11 @@ export class MusicHub
 
 	async disconnect(): Promise<void>
 	{
+		if (this.syncIntervalId !== null)
+		{
+			clearInterval(this.syncIntervalId);
+			this.syncIntervalId = null;
+		}
 		if (this.connection)
 		{
 			await this.connection.stop();
@@ -80,19 +87,21 @@ export class MusicHub
 	}
 
 	/**
-	  * Performs NTP-like synchronization with the server
-	  * @param samples Number of round-trip measurements to take
+	  * Performs NTP-like synchronization with the server using improved algorithms
+	  * @param samples Number of round-trip measurements to take (default: 20)
+	  * @param startPeriodicSync Whether to start background periodic sync after initial sync
 	  * @returns Synchronization result with round-trip time and clock offset
 	  */
-	async synchronize(samples = 10): Promise<SyncResult>
+	async synchronize(samples = 20, startPeriodicSync = true): Promise<SyncResult>
 	{
 		if (!this.connection || this.connection.state !== "Connected")
 		{
 			await this.connect();
 		}
 
-		const measurements: SyncResult[] = [];
+		const measurements: SyncMeasurement[] = [];
 
+		// Take multiple samples with longer delays for better network variance capture
 		for (let i = 0; i < samples; i += 1)
 		{
 			try
@@ -100,10 +109,10 @@ export class MusicHub
 				const result = await this.performSingleSync();
 				measurements.push(result);
 
-				// Small delay between samples to avoid overwhelming the server
+				// Longer delay between samples to capture network variance
 				if (i < samples - 1)
 				{
-					await new Promise((resolve) => setTimeout(resolve, 250));
+					await new Promise((resolve) => setTimeout(resolve, 500));
 				}
 			}
 			catch (error)
@@ -117,40 +126,56 @@ export class MusicHub
 			throw new Error("All synchronization attempts failed");
 		}
 
-		// Sort by round-trip time and take the best samples
+		// Sort by round-trip time
 		measurements.sort((a, b) => a.roundTripTime - b.roundTripTime);
-		const bestSamples = measurements.slice(0, Math.max(1, Math.floor(measurements.length * 0.75)));
+		
+		// Use only the best 50% of samples for tighter accuracy
+		const bestSamples = measurements.slice(0, Math.max(3, Math.floor(measurements.length * 0.5)));
 
-		// Calculate averages from best samples
-		const avgRoundTrip = bestSamples.reduce((sum, m) => sum + m.roundTripTime, 0) / bestSamples.length;
-		const avgOffset = bestSamples.reduce((sum, m) => sum + m.clockOffset, 0) / bestSamples.length;
+		// Use median instead of mean for better outlier rejection
+		const medianRoundTrip = CalculateMedian(bestSamples.map((m) => m.roundTripTime));
+		const medianOffset = CalculateMedian(bestSamples.map((m) => m.clockOffset));
+		
+		// Calculate standard deviation for accuracy assessment
+		const rttStdDev = CalculateStandardDeviation(bestSamples.map((m) => m.roundTripTime));
+		const offsetStdDev = CalculateStandardDeviation(bestSamples.map((m) => m.clockOffset));
 
 		// Use the most recent measurement for server time
 		const latestMeasurement = measurements[measurements.length - 1];
 
-		// Determine accuracy based on round-trip time and consistency
-		const rttVariance = CalculateVariance(bestSamples.map((m) => m.roundTripTime));
-		const offsetVariance = CalculateVariance(bestSamples.map((m) => m.clockOffset));
-
+		// Determine accuracy based on median RTT and consistency (std dev)
 		let accuracy: "high" | "medium" | "low" = "low";
-		if (avgRoundTrip < 50 && rttVariance < 10 && offsetVariance < 5)
+		if (medianRoundTrip < 30 && rttStdDev < 5 && offsetStdDev < 3)
 		{
 			accuracy = "high";
 		}
-		else if (avgRoundTrip < 150 && rttVariance < 50)
+		else if (medianRoundTrip < 100 && rttStdDev < 20 && offsetStdDev < 10)
 		{
 			accuracy = "medium";
 		}
 
-		return {
-			roundTripTime: avgRoundTrip,
-			clockOffset: avgOffset,
+		const syncResult: SyncResult = {
+			roundTripTime: medianRoundTrip,
+			clockOffset: medianOffset,
 			serverTime: latestMeasurement.serverTime,
 			accuracy,
+			syncTimestamp: Date.now(),
 		};
+
+		this.currentSyncResult = syncResult;
+
+		// Start periodic background sync for continuous time accuracy
+		if (startPeriodicSync && this.syncIntervalId === null)
+		{
+			this.startPeriodicSync();
+		}
+
+		console.log(`[TimeSync] Initial sync complete: RTT=${medianRoundTrip.toFixed(2)}ms, Offset=${medianOffset.toFixed(2)}ms, Accuracy=${accuracy}`);
+
+		return syncResult;
 	}
 
-	private async performSingleSync(): Promise<SyncResult>
+	private async performSingleSync(): Promise<SyncMeasurement>
 	{
 		if (!this.connection)
 		{
@@ -182,7 +207,58 @@ export class MusicHub
 			roundTripTime: Math.max(0, roundTripTime), // Ensure non-negative
 			clockOffset,
 			serverTime,
-			accuracy: "low", // Will be determined by aggregate
+			clientTime: clientReceiveTime,
 		};
+	}
+
+	/**
+	 * Starts periodic background synchronization to maintain accuracy
+	 * Re-syncs every 30 seconds with fewer samples for efficiency
+	 */
+	private startPeriodicSync(): void
+	{
+		// Clear any existing interval
+		if (this.syncIntervalId !== null)
+		{
+			clearInterval(this.syncIntervalId);
+		}
+
+		// Perform lightweight sync every 30 seconds
+		this.syncIntervalId = window.setInterval(async () =>
+		{
+			try
+			{
+				console.log("[TimeSync] Performing periodic sync...");
+				const syncResult = await this.synchronize(5, false); // Use fewer samples for background sync
+				this.currentSyncResult = syncResult;
+				console.log(`[TimeSync] Background sync complete: RTT=${syncResult.roundTripTime.toFixed(2)}ms, Offset=${syncResult.clockOffset.toFixed(2)}ms`);
+			}
+			catch (error)
+			{
+				console.warn("[TimeSync] Periodic sync failed:", error);
+			}
+		}, 30000); // 30 seconds
+	}
+
+	/**
+	 * Gets the current synchronized server time
+	 * @returns Current server time in milliseconds
+	 */
+	public getCurrentServerTime(): number
+	{
+		if (this.currentSyncResult)
+		{
+			return Date.now() + this.currentSyncResult.clockOffset;
+		}
+		return Date.now();
+	}
+
+	/**
+	 * Gets the current sync result
+	 * @returns Current sync result or null if not synced
+	 */
+	public getCurrentSyncResult(): SyncResult | null
+	{
+		return this.currentSyncResult;
 	}
 }
