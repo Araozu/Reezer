@@ -1,5 +1,5 @@
 import { createQuery } from "@tanstack/svelte-query";
-import { api, sv, type components } from "../../../../../api";
+import { api, sv, type components, type WithProblemDetails } from "../../../../../api";
 import { derived, type Readable } from "svelte/store";
 
 type AlbumWithTracklistDto = components["schemas"]["AlbumWithTracklistDto"]
@@ -9,7 +9,7 @@ export function useAlbumByIdQuery(
 	$placeholderData: Readable<AlbumWithTracklistDto>,
 )
 {
-	return createQuery(derived([$albumId, $placeholderData], ([albumId, placeholderData]) => ({
+	let query = createQuery(derived([$albumId, $placeholderData], ([albumId, placeholderData]) => ({
 		queryKey: ["albums", albumId],
 		queryFn: sv(() => api.GET("/api/Albums/{albumId}", {
 			params: {
@@ -20,5 +20,6 @@ export function useAlbumByIdQuery(
 		placeholderData,
 		refetchOnWindowFocus: false,
 	})));
+	return query as WithProblemDetails<typeof query>;
 }
 

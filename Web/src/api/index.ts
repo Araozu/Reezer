@@ -1,20 +1,127 @@
 import type { paths } from "./api";
-export type { components } from "./api";
 import createClient from "openapi-fetch";
+import type { CreateMutationResult, CreateQueryResult } from "@tanstack/svelte-query";
 
-export const api = createClient<paths>({
-	credentials: "include", // Include cookies in requests
-	...(import.meta.env.DEV
-		? {
-			// Add latency on dev
-			fetch: async(req) =>
-			{
-				await new Promise((res) => setTimeout(res, 500));
+export type { components } from "./api.d.ts";
 
-				return fetch(req);
-			},
+/**
+ * ASP.NET Core ProblemDetails type (RFC 7807)
+ *
+ * This is the standard error response format from our .NET backend.
+ * See: https://datatracker.ietf.org/doc/html/rfc7807
+ *
+ * @property type - A URI reference identifying the problem type (defaults to "about:blank")
+ * @property title - A short, human-readable summary of the problem
+ * @property status - The HTTP status code
+ * @property detail - A human-readable explanation specific to this occurrence
+ * @property instance - A URI reference identifying the specific occurrence
+ * @property [key: string] - Extension members (additional properties specific to the problem)
+ */
+export type ProblemDetails = {
+	type: string;
+	title: string;
+	status: number;
+	detail: string;
+	instance: string | null;
+	[key: string]: unknown; // Extension members
+};
+
+/**
+ * Utility type to transform Tanstack Query results to have ProblemDetails as the error type.
+ * Works with UseQueryResult, UseMutationResult, and UseInfiniteQueryResult.
+ */
+export type WithProblemDetails<T> = T extends CreateQueryResult<
+	infer ResultType,
+	unknown
+>
+	? CreateQueryResult<ResultType, ProblemDetails>
+	: T extends CreateMutationResult<infer ResutType, unknown, infer FetchOptionsType>
+		? CreateMutationResult<ResutType, ProblemDetails, FetchOptionsType>
+		: T;
+
+/**
+ * Custom fetch implementation that includes credentials and handles errors.
+ *
+ * This wrapper transforms ASP.NET Core's ProblemDetails error responses (RFC 7807)
+ * into consistently typed error objects that can be caught and handled by the frontend.
+ *
+ * The backend returns errors in three possible formats:
+ * 1. JSON ProblemDetails object (application/json)
+ * 2. Plain text error message (text/plain)
+ * 3. Generic HTTP error (fallback)
+ *
+ * All errors are normalized to the ProblemDetails type for consistent handling.
+ *
+ * @param input - The fetch request URL or RequestInfo
+ * @param init - Optional fetch request configuration
+ * @returns The Response object if successful (2xx status)
+ * @throws {ProblemDetails} Always throws ProblemDetails-shaped objects on error
+ */
+const enhancedFetch = async (
+	input: RequestInfo | URL,
+	init?: RequestInit,
+): Promise<Response> => {
+	if (process.env.NODE_ENV === "development") {
+		await new Promise((resolve) => setTimeout(resolve, 500));
+	}
+
+	const response: Response = await fetch(input, {
+		...init,
+		credentials: "include",
+	});
+
+	if (!response.ok) {
+		// Try to parse as C# ProblemDetails
+		const contentType = response.headers.get("content-type");
+
+		if (contentType?.includes("application/json")) {
+			const problem = await response.json();
+
+			// Basic validation that it's actually ProblemDetails
+			if (problem && (problem.title || problem.detail || problem.status)) {
+				const problemDetails: ProblemDetails = {
+					type: problem.type ?? "about:blank",
+					title: problem.title ?? "Error del sistema",
+					status: problem.status ?? response.status,
+					detail: problem.detail ?? "Error del sistema",
+					instance: problem.instance ?? null,
+					...problem, // Include any extensions
+				};
+				throw problemDetails;
+			}
+		} else if (contentType?.includes("text/plain")) {
+			const problemDetails: ProblemDetails = {
+				type: "about:blank",
+				title: "Error del sistema",
+				status: response.status,
+				detail: await response.text(),
+				instance: null,
+			};
+			throw problemDetails;
 		}
-		: {}),
+
+		// Fallback if response isn't proper ProblemDetails
+		const problemDetails: ProblemDetails = {
+			type: "about:blank",
+			title: "Error HTTP",
+			status: response.status,
+			detail: response.statusText ?? `Error ${response.status}`,
+			instance: null,
+		};
+		throw problemDetails;
+	}
+
+	return response;
+};
+
+/**
+ * Client for connecting with the backend
+ *
+ * Uses openapi-fetch under the hood, wrapped with tanstack-query.
+ * All query/mutation errors will be typed as ProblemDetails.
+ */
+export const api = createClient<paths>({
+	fetch: enhancedFetch,
 });
 
 type FetchResult<A, B> = {
@@ -23,91 +130,11 @@ type FetchResult<A, B> = {
 	response: Response;
 };
 
-// biome-ignore lint/suspicious/noExplicitAny: needed for typing
-export type FetchError<T = any> = {
-	statusCode: number;
-	message: string;
-	error: T;
-};
 
 export const sv =
 	<Data, Error>(fn: () => Promise<FetchResult<Data, Error>>) => async(): Promise<Data> =>
 	{
-		try
-		{
-			const data = await fn();
-			if (data.response.ok)
-			{
-				// biome-ignore lint/style/noNonNullAssertion: needed for typing
-				return data.data!;
-			}
-
-			if (data.error)
-			{
-				// attempt to extract error messages from validation errors
-				if (data.response.status === 400)
-				{
-					const e = data.error as Error;
-					if (typeof e === "object" && e !== null && "errors" in e)
-					{
-						const errors = e.errors as Record<string, string>;
-						const errorsStr = Object.entries(errors)
-							.map(([, v]) => `${v}`)
-							.join(", ");
-
-						throw {
-							statusCode: data.response.status,
-							message: `${errorsStr}`,
-							error: data.error,
-						};
-					}
-				}
-
-				const e = data.error as Error;
-				if (typeof e === "object" && e !== null && "title" in e)
-				{
-					throw {
-						statusCode: data.response.status,
-						message: `${e.title}`,
-						error: data.error,
-					};
-				}
-
-				if (typeof e === "string")
-				{
-					throw {
-						statusCode: data.response.status,
-						message: e,
-						error: data.error,
-					};
-				}
-
-				throw {
-					statusCode: data.response.status,
-					message: "Error interno del servidor",
-					error: data.error,
-				};
-			}
-			else
-			{
-				throw {
-					statusCode: data.response.status,
-					message: "Error interno del servidor",
-					// biome-ignore lint/style/noNonNullAssertion: needed for typing
-					error: data.error!,
-				};
-			}
-		}
-		catch (e)
-		{
-			if (import.meta.env.DEV)
-			{
-				console.error(e);
-			}
-			throw {
-				statusCode: 503,
-				message: "Servidor no disponible",
-				error: null as Error,
-			};
-		}
+		const data = await fn();
+		if (data.response.ok) return data.data!
+		else throw data.error;
 	};
