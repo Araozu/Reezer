@@ -53,14 +53,8 @@ public class AuthController(IAuthService authService) : ControllerBase
 
         return result.Match<ActionResult>(
             success => Redirect(returnUrl),
-            unauthorized =>
-                Redirect(
-                    $"/?error={Uri.EscapeDataString(unauthorized.Reason ?? "Authentication failed")}"
-                ),
-            internalError =>
-                Redirect(
-                    $"/?error={Uri.EscapeDataString(internalError.Reason ?? "Internal error")}"
-                )
+            unauthorized => Redirect($"/?error={Uri.EscapeDataString(unauthorized.Reason)}"),
+            internalError => Redirect($"/?error={Uri.EscapeDataString(internalError.Reason)}")
         );
     }
 

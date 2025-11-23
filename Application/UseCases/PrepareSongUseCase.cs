@@ -7,14 +7,14 @@ namespace Reezer.Application.UseCases;
 
 public class PrepareSongUseCase(ISongRepository songRepository, ILogger<PrepareSongUseCase> logger)
 {
-    public async Task<OneOf<bool, NotFound, InternalError>> PrepareSongAsync(Guid songId)
+    public async Task<OneOf<Success, NotFound, InternalError>> PrepareSongAsync(Guid songId)
     {
         try
         {
             logger.LogInformation("Preparing song {SongId}", songId);
             _ = await songRepository.GetSongStreamWithContentTypeAsync(songId);
             logger.LogInformation("Song {SongId} prepared", songId);
-            return true;
+            return new Success();
         }
         catch (KeyNotFoundException ex)
         {

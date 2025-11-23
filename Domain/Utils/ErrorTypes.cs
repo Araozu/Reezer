@@ -1,5 +1,7 @@
 namespace Acide.Perucontrol.Domain.Utils;
 
+public record Success;
+
 public record BadRequest(string Reason);
 
 public record BadRequest<T>(T data)
