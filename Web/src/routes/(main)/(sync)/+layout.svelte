@@ -50,7 +50,9 @@
 		{
 			if (state.currentSongId)
 			{
-				player.PlaySongById(state.currentSongId);
+				// TODO: Implement PlaySongById method or fetch song from API
+				// player.PlaySongById(state.currentSongId);
+				console.warn("Player state sync not implemented - missing PlaySongById method");
 			}
 		});
 	});

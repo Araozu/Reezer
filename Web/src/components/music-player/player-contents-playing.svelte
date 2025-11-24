@@ -55,7 +55,7 @@
 <div class={["flex items-center gap-1 my-8"]}>
 	<button
 		class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors"
-		onclick={() => player.Previous()}
+		onclick={() => player.Prev()}
 	>
 		<SkipBack class="m-2" size={16} />
 	</button>

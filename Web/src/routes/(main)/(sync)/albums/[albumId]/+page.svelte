@@ -30,26 +30,26 @@
 	function PlayAllNow()
 	{
 		const songs = $albumQuery.data?.songs ?? [];
-		player.PlaySongs(songs);
+		player.PlaySongList(songs);
 		toast.success("Playing all now");
 	}
 
 	function PlayAllLast()
 	{
 		const songs = $albumQuery.data?.songs ?? [];
-		player.AddSongsToQueue(songs);
+		player.AddLastSongList(songs);
 		toast.success("Will play all last");
 	}
 
 	function PlayLast(song: ISong)
 	{
-		player.AddSongToQueue(song);
+		player.AddLastSong(song);
 		toast.success("Will play last");
 	}
 
 	function PlayNext(song: ISong)
 	{
-		player.PlaySongNext(song);
+		player.AddNextSong(song);
 		toast.success("Will play next");
 	}
 </script>

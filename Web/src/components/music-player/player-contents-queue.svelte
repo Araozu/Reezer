@@ -18,7 +18,7 @@
 		>
 			<button
 				class="flex-1 text-left cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded p-2 -m-2"
-				onclick={() => player.PlaySongAtIndex(index)}
+				onclick={() => player.PlayIdx(index)}
 			>
 				<p class="font-medium">
 					{song.name}
