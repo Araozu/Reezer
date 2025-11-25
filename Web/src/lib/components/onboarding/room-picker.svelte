@@ -7,7 +7,8 @@
 	const rooms = useRooms();
 	const createRoom = useCreateRoom();
 
-	const handleCreateRoom = () => {
+	const handleCreateRoom = () =>
+	{
 		$createRoom.mutate();
 	};
 </script>

@@ -35,7 +35,8 @@
 	);
 	let audioTagSetup = $derived(player.audioReady);
 
-	onMount(() => {
+	onMount(() =>
+	{
 		player.OverrideTag(audioTag!);
 	});
 

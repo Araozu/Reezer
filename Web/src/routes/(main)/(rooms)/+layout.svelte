@@ -10,32 +10,34 @@
 
     const userQuery = useCurrentUser();
     const roomId = $derived(page.params.roomId ?? "default");
-    const username = $derived(
-        $userQuery.data?.userName ?? $userQuery.data?.name ?? "User",
-    );
+    const username = $derived($userQuery.data?.userName ?? $userQuery.data?.name ?? "User");
 
-    $effect(() => {
-        if (
-            $userQuery.error?.status === 401 ||
+    $effect(() =>
+    {
+    	if (
+    		$userQuery.error?.status === 401 ||
             $userQuery.error?.status === 403
-        ) {
-            goto("/login");
-        }
+    	)
+    	{
+    		goto("/login");
+    	}
     });
 
-    onMount(async () => {
-        const connection = new SignalR.HubConnectionBuilder()
-            .withUrl(import.meta.env.VITE_PUBLIC_BACKEND_URL + "/hub/MusicRoom")
-            .withAutomaticReconnect()
-            .build();
+    onMount(async() =>
+    {
+    	const connection = new SignalR.HubConnectionBuilder()
+    		.withUrl(`${import.meta.env.VITE_PUBLIC_BACKEND_URL}/hub/MusicRoom`)
+    		.withAutomaticReconnect()
+    		.build();
 
-        connection.on("MessageReceived", (user, message) => {
-            console.log("Received from SignalR:");
-            console.log(`${JSON.stringify(user)}: ${message}`);
-        });
+    	connection.on("MessageReceived", (user, message) =>
+    	{
+    		console.log("Received from SignalR:");
+    		console.log(`${JSON.stringify(user)}: ${message}`);
+    	});
 
-        await connection.start();
-        connection.send("Hello", "Pablito");
+    	await connection.start();
+    	connection.send("Hello", "Pablito");
     });
 </script>
 

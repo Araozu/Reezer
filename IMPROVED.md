@@ -974,3 +974,74 @@ This improved architecture provides:
 - ✅ Easy testing and debugging
 
 The architecture supports the vision while maintaining flexibility for future enhancements and ensuring each component has a single, well-defined responsibility.
+
+
+### 1. The "Brain" (Controller & Facade)
+
+**`MusicPlayerController`**
+*   **What it is:** The main entry point and coordinator.
+*   **Role:** It is the "boss" that the UI (buttons, play bars) talks to. It doesn't actually play music itself; it delegates tasks to the other components.
+*   **Key Tasks:**
+    *   Receives commands like "Play" or "Next" from the UI.
+    *   Updates reactive state stores (so the UI knows the current song, time, etc.).
+    *   Decides when to switch strategies (e.g., going from playing locally to controlling a remote server).
+    *   Tells the *Prefetcher* when the song is almost over so it can grab the next one.
+
+### 2. The "Ways to Play" (Strategies)
+
+These are the interchangeable logic blocks for *how* music plays. The controller only uses one at a time.
+
+**`LocalPlaybackStrategy`**
+*   **Role:** Standard browser behavior.
+*   **Action:** It takes a song URL and feeds it directly to the browser's audio engine. It listens for "song ended" events to tell the controller to play the next track.
+
+**`RemoteSoloStrategy`**
+*   **Role:** Remote Control.
+*   **Action:** Instead of making noise on your device, it sends commands (via WebSocket/SignalR) to a server (like a Raspberry Pi or a desktop app). It asks the server "What time is it?" to keep your UI progress bar in sync with the remote audio.
+
+**`RemoteSyncStrategy`**
+*   **Role:** "Watch Party" mode.
+*   **Action:** It ensures everyone in a "Room" hears the same thing at the exact same time. It calculates network lag (ping) and schedules music to start in the future (e.g., "Everyone hit play at timestamp X") so that even if one user has slow internet, the music stays synchronized.
+
+### 3. The "Engine Room" (Backends)
+
+These components touch the actual audio APIs.
+
+**`IAudioBackend` (Interface)**
+*   **Role:** The standard plug. It ensures the Strategy doesn't care if it's talking to an HTML `<audio>` tag or a complex Web Audio API setup.
+
+**`HTML5AudioBackend`**
+*   **Role:** The basic implementation. It wraps the standard HTML5 `<audio>` element.
+
+**`GaplessAudioBackend`**
+*   **Role:** The smooth operator.
+*   **Action:** It manages *two* `<audio>` elements. While one plays, it loads the next song into the second one. When the first ends, it instantly switches to the second, eliminating that brief silence between tracks.
+
+### 4. The "Logistics" (Managers & Services)
+
+**`QueueManager`**
+*   **Role:** The Playlist Master.
+*   **Action:** It holds the list of songs (Previous, Current, Next). It handles shuffling, repeating, and moving items around (drag-and-drop reordering).
+
+**`IPrefetcher` / `PrefetchManager`**
+*   **Role:** The buffer loader.
+*   **Action:** It looks ahead in the queue. If the current song is ending, it downloads the beginning of the next song so playback starts instantly when the track changes.
+
+**`IStreamProvider`**
+*   **Role:** The URL fetcher.
+*   **Action:** It translates a generic `SongID` into a specific, playable URL (potentially handling API tokens or signed URLs).
+
+**`ISyncService` & `TimeSync`**
+*   **Role:** The Network Clock.
+*   **Action:** Used specifically for the *Remote Sync Strategy*. It handles the heavy math required to figure out the exact time difference between the client and the server to ensure millisecond-perfect synchronization.
+
+### Summary of the Flow
+
+1.  **UI** clicks "Play".
+2.  **Controller** tells the **Queue Manager** to get the current song.
+3.  **Controller** hands that song to the active **Strategy** (e.g., Local).
+4.  **Strategy** asks the **Stream Provider** for the URL.
+5.  **Strategy** hands the URL to the **Audio Backend**.
+6.  **Audio Backend** makes the noise.
+7.  While this happens, **Prefetcher** is already downloading the next song in the background.
+
