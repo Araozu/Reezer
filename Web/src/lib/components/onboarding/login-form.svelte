@@ -5,16 +5,13 @@
 		FieldGroup,
 		Field,
 		FieldLabel,
-		FieldDescription,
 		FieldSeparator,
 	} from "$lib/components/ui/field/index.js";
 	import { Input } from "$lib/components/ui/input/index.js";
-	import { cn } from "$lib/utils.js";
-	import type { HTMLAttributes } from "svelte/elements";
+	import { CircleArrowRight, LoaderCircle } from "lucide-svelte";
 
-	let { class: className, ...restProps }: HTMLAttributes<HTMLDivElement> =
+	let { loading, loggedIn }: { loading: boolean; loggedIn: boolean } =
 		$props();
-
 	const id = $props.id();
 
 	function handleGoogleLogin()
@@ -24,8 +21,29 @@
 	}
 </script>
 
-<div class={cn("flex flex-col gap-6", className)} {...restProps}>
-	<Card.Root>
+<Card.Root class="w-sm h-120">
+	{#if loading}
+		<Card.Content
+			class="flex flex-col gap-2 justify-center items-center h-full w-full"
+		>
+			<LoaderCircle class="animate-spin" />
+			<p>Loading session state</p>
+		</Card.Content>
+	{:else if loggedIn}
+		<Card.Header class="text-center">
+			<Card.Title class="text-xl">Welcome back</Card.Title>
+		</Card.Header>
+		<Card.Content
+			class="flex flex-col gap-6 justify-center items-center h-full w-full"
+		>
+			<p class="text-center">
+				You are logged in.
+				<br />
+				Use the Room form to join
+			</p>
+			<CircleArrowRight class="opacity-75" size={48} />
+		</Card.Content>
+	{:else}
 		<Card.Header class="text-center">
 			<Card.Title class="text-xl">Welcome back</Card.Title>
 		</Card.Header>
@@ -74,13 +92,6 @@
 							>
 								Password
 							</FieldLabel>
-							<a
-								href="##"
-								class="ms-auto text-sm underline-offset-4 hover:underline"
-							>
-								Forgot your
-								password?
-							</a>
 						</div>
 						<Input
 							id="password-{id}"
@@ -90,25 +101,12 @@
 						/>
 					</Field>
 					<Field>
-						<Button type="submit">
-							Login
-						</Button>
-						<FieldDescription
-							class="text-center"
+						<Button type="submit" disabled
+							>Login</Button
 						>
-							Don't have an account?
-							<a href="##">
-								Sign up
-							</a>
-						</FieldDescription>
 					</Field>
 				</FieldGroup>
 			</form>
 		</Card.Content>
-	</Card.Root>
-	<FieldDescription class="px-6 text-center">
-		By clicking continue, you agree to our
-		<a href="##"> Terms of Service </a>
-		and <a href="##">Privacy Policy</a>.
-	</FieldDescription>
-</div>
+	{/if}
+</Card.Root>

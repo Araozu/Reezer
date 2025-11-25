@@ -2,14 +2,14 @@
 	import { getContext, onMount } from "svelte";
 	import { toStore } from "svelte/store";
 	import MusicPlayer from "~/components/music-player/index.svelte";
-	import { CreatePlayerContext } from "../../../player/index.svelte";
-	import type { MusicHub } from "~/lib/MusicHub.svelte";
+	import { CreatePlayerContext } from "~/player/index.svelte";
+	import type { MusicRoomHub } from "~/lib/MusicRoomHub.svelte";
 	import ClickTrap from "./click-trap.svelte";
 
 	let { children } = $props();
 	let audioTag = $state<HTMLAudioElement | null>(null);
 
-	const musicHub = getContext<MusicHub>("musicHub");
+	const musicHub = getContext<MusicRoomHub>("musicHub");
 
 	// Audio bindings
 	let aPaused = $state(false);
@@ -35,8 +35,7 @@
 	);
 	let audioTagSetup = $derived(player.audioReady);
 
-	onMount(() =>
-	{
+	onMount(() => {
 		player.OverrideTag(audioTag!);
 	});
 

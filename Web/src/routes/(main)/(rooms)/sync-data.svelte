@@ -3,66 +3,78 @@
   import * as Card from "$lib/components/ui/card/index.js";
   import type { SyncResult } from "~/lib/sync-utils";
   import {
-  	Clock,
-  	Wifi,
-  	Target,
-  	TrendingUp,
-  	TrendingDown,
-  	Minus,
-  	AlertTriangle,
-  	CheckCircle,
-  	Clock4,
+    Clock,
+    Wifi,
+    TrendingUp,
+    TrendingDown,
+    Minus,
+    AlertTriangle,
+    CheckCircle,
+    Clock4,
   } from "lucide-svelte";
 
   let { syncResult }: { syncResult: SyncResult } = $props();
 
   // Format time values nicely
-  function formatTime(ms: number): string
-  {
-  	if (Math.abs(ms) < 1000)
-  	{
-  		return `${ms.toFixed(1)}ms`;
-  	}
-  	return `${(ms / 1000).toFixed(2)}s`;
+  function formatTime(ms: number): string {
+    if (Math.abs(ms) < 1000) {
+      return `${ms.toFixed(1)}ms`;
+    }
+    return `${(ms / 1000).toFixed(2)}s`;
   }
 
   // Format server time as readable date
-  function formatServerTime(serverTime: number): string
-  {
-  	return new Date(serverTime).toLocaleString();
+  function formatServerTime(serverTime: number): string {
+    return new Date(serverTime).toLocaleString();
   }
 
   // Get accuracy color and icon
-  function getAccuracyInfo(accuracy: string)
-  {
-  	switch (accuracy)
-  	{
-  	case "high":
-  		return { color: "text-green-600 dark:text-green-400", icon: CheckCircle, bg: "bg-green-50 dark:bg-green-900", border: "border-green-200 dark:border-green-800" };
-  	case "medium":
-  		return { color: "text-yellow-600 dark:text-yellow-400", icon: AlertTriangle, bg: "bg-yellow-50 dark:bg-yellow-900", border: "border-yellow-200 dark:border-yellow-800" };
-  	case "low":
-  		return { color: "text-red-600 dark:text-red-400", icon: AlertTriangle, bg: "bg-red-50 dark:bg-red-900", border: "border-red-200 dark:border-red-800" };
-  	default:
-  		return { color: "text-gray-600 dark:text-gray-400", icon: AlertTriangle, bg: "bg-gray-50 dark:bg-gray-900", border: "border-gray-200 dark:border-gray-800" };
-  	}
+  function getAccuracyInfo(accuracy: string) {
+    switch (accuracy) {
+      case "high":
+        return {
+          color: "text-green-600 dark:text-green-400",
+          icon: CheckCircle,
+          bg: "bg-green-50 dark:bg-green-900",
+          border: "border-green-200 dark:border-green-800",
+        };
+      case "medium":
+        return {
+          color: "text-yellow-600 dark:text-yellow-400",
+          icon: AlertTriangle,
+          bg: "bg-yellow-50 dark:bg-yellow-900",
+          border: "border-yellow-200 dark:border-yellow-800",
+        };
+      case "low":
+        return {
+          color: "text-red-600 dark:text-red-400",
+          icon: AlertTriangle,
+          bg: "bg-red-50 dark:bg-red-900",
+          border: "border-red-200 dark:border-red-800",
+        };
+      default:
+        return {
+          color: "text-gray-600 dark:text-gray-400",
+          icon: AlertTriangle,
+          bg: "bg-gray-50 dark:bg-gray-900",
+          border: "border-gray-200 dark:border-gray-800",
+        };
+    }
   }
 
   // Get offset direction and color
-  function getOffsetInfo(offset: number)
-  {
-  	if (Math.abs(offset) < 10)
-  	{
-  		return { icon: Minus, color: "text-green-600", text: "Synchronized" };
-  	}
-  	else if (offset > 0)
-  	{
-  		return { icon: TrendingUp, color: "text-blue-600", text: "Client ahead" };
-  	}
-  	else
-  	{
-  		return { icon: TrendingDown, color: "text-orange-600", text: "Client behind" };
-  	}
+  function getOffsetInfo(offset: number) {
+    if (Math.abs(offset) < 10) {
+      return { icon: Minus, color: "text-green-600", text: "Synchronized" };
+    } else if (offset > 0) {
+      return { icon: TrendingUp, color: "text-blue-600", text: "Client ahead" };
+    } else {
+      return {
+        icon: TrendingDown,
+        color: "text-orange-600",
+        text: "Client behind",
+      };
+    }
   }
 
   let accuracyInfo = $derived(getAccuracyInfo(syncResult.accuracy));
@@ -72,36 +84,31 @@
   let currentServerTime = $state(new Date(syncResult.serverTime));
 
   // Update server time every second based on offset
-  $effect(() =>
-  {
-  	const interval = setInterval(() =>
-  	{
-  		// Calculate current server time by adding elapsed time since sync
-  		const now = Date.now();
-  		const elapsed = now - (syncResult.serverTime - syncResult.clockOffset);
-  		currentServerTime = new Date(syncResult.serverTime + elapsed);
-  	}, 1000);
+  $effect(() => {
+    const interval = setInterval(() => {
+      // Calculate current server time by adding elapsed time since sync
+      const now = Date.now();
+      const elapsed = now - (syncResult.serverTime - syncResult.clockOffset);
+      currentServerTime = new Date(syncResult.serverTime + elapsed);
+    }, 1000);
 
-  	return () => clearInterval(interval);
+    return () => clearInterval(interval);
   });
 
   // Format server time as HH:MM:SS
-  function formatServerClock(time: Date): string
-  {
-  	return time.toLocaleTimeString([], {
-  		hour12: false,
-  		hour: "2-digit",
-  		minute: "2-digit",
-  		second: "2-digit",
-  	});
+  function formatServerClock(time: Date): string {
+    return time.toLocaleTimeString([], {
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
   }
 </script>
 
 <Dialog.Root>
   <Dialog.Trigger>
-    <button>
-      Synchronized
-    </button>
+    <button> Synchronized </button>
   </Dialog.Trigger>
   <Dialog.Content class="max-w-2xl">
     <Dialog.Header>
@@ -162,7 +169,9 @@
           </Card.Header>
           <Card.Content>
             <div class="text-2xl font-mono font-bold {offsetInfo.color}">
-              {syncResult.clockOffset > 0 ? "+" : ""}{formatTime(syncResult.clockOffset)}
+              {syncResult.clockOffset > 0 ? "+" : ""}{formatTime(
+                syncResult.clockOffset,
+              )}
             </div>
             <p class="text-sm text-muted-foreground mt-1">
               {offsetInfo.text}
@@ -206,7 +215,6 @@
           </p>
         </Card.Content>
       </Card.Root>
-
     </div>
   </Dialog.Content>
 </Dialog.Root>

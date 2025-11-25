@@ -4,6 +4,44 @@
  */
 
 export interface paths {
+    "/api/User/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get current user information */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["UserDto"];
+                        "application/json": components["schemas"]["UserDto"];
+                        "text/json": components["schemas"]["UserDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/Songs": {
         parameters: {
             query?: never;
@@ -114,6 +152,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/MusicRooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get list of all active music rooms */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MusicRoomDto"][];
+                        "application/json": components["schemas"]["MusicRoomDto"][];
+                        "text/json": components["schemas"]["MusicRoomDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Create a new music room */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["MusicRoomDto"];
+                        "application/json": components["schemas"]["MusicRoomDto"];
+                        "text/json": components["schemas"]["MusicRoomDto"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/Auth/login": {
         parameters: {
             query?: never;
@@ -194,7 +292,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/Auth/google-callback": {
+    "/api/Auth/google-internal-callback": {
         parameters: {
             query?: never;
             header?: never;
@@ -204,7 +302,9 @@ export interface paths {
         /** Handle Google OAuth callback */
         get: {
             parameters: {
-                query?: never;
+                query?: {
+                    returnUrl?: string;
+                };
                 header?: never;
                 path?: never;
                 cookie?: never;
@@ -457,6 +557,11 @@ export interface components {
             success: boolean;
             errorMessage?: null | string;
         };
+        MusicRoomDto: {
+            roomCode: string;
+            /** Format: int32 */
+            connectedUsers: number | string;
+        };
         PaginatedResultOfAlbumDto: {
             items: components["schemas"]["AlbumDto"][];
             /** Format: int32 */
@@ -478,6 +583,12 @@ export interface components {
             artistId: string;
             /** Format: uuid */
             albumId: string;
+        };
+        UserDto: {
+            id: string;
+            email: null | string;
+            name: null | string;
+            userName: null | string;
         };
     };
     responses: never;

@@ -1,5 +1,6 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
-using Reezer.Api.Hubs;
+using Reezer.Api.Hubs.Music;
 using Reezer.Application;
 using Reezer.Infrastructure;
 using Reezer.Infrastructure.Data;
@@ -7,6 +8,13 @@ using Reezer.Infrastructure.Identity;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownIPNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 // Add services to the container.
 
@@ -16,6 +24,14 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplicationServices();
 builder.Services.AddSignalR();
 builder.Services.AddOpenApi();
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+    cfg.RegisterServicesFromAssembly(
+        typeof(Reezer.Application.ServiceCollectionExtensions).Assembly
+    );
+});
 
 // Configure ASP.NET Core Identity
 builder
@@ -99,6 +115,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseForwardedHeaders();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -112,7 +130,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // Hubs
-app.MapHub<MusicHub>("api/hubs/music");
+app.MapHub<MusicRoomHub>(MusicRoomHub.Route);
 
 // Serve static files from wwwroot (frontend assets)
 app.UseStaticFiles();

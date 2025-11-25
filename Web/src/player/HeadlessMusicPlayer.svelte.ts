@@ -19,7 +19,7 @@ export class HeadlessMusicPlayer implements IMusicPlayer<HeadlessMusicPlayerExtr
 	private lastPositionUpdateTime = 0;
 
 	constructor(
-		public hub: MusicHub | null,
+		public hub: MusicRoomHub | null,
 		public isPaused: Writable<boolean>,
 		public volume: Writable<number>,
 		public currentTime: Writable<number>,
