@@ -1,9 +1,12 @@
 import { type Readable,type  Writable, get } from "svelte/store";
 import type { ISong } from "../providers";
 import { api } from "../api";
-import type { MusicRoomHub } from "~/lib/MusicRoomHub.svelte";
+import type { MusicHub } from "~/lib/MusicHub.svelte";
+import type { IMusicPlayer } from "./IMusicPlayer";
 
-export class HeadlessMusicPlayer
+type HeadlessMusicPlayerExtras = boolean;
+
+export class HeadlessMusicPlayer implements IMusicPlayer<HeadlessMusicPlayerExtras>
 {
 	private audioTag = new Audio("/_.opus");
 	public audioReady = $state(false);
@@ -122,7 +125,7 @@ export class HeadlessMusicPlayer
 
 		navigator.mediaSession.setActionHandler("previoustrack", () =>
 		{
-			this.Previous();
+			this.Prev();
 		});
 
 		navigator.mediaSession.setActionHandler("nexttrack", () =>
@@ -217,7 +220,7 @@ export class HeadlessMusicPlayer
 	 * Playing a single song clears the remaining queue &
 	 * plays the song.
 	 */
-	public PlaySong(song: ISong, fromServer: boolean = false)
+	public PlaySong(song: ISong, fromServer?: boolean)
 	{
 		// send to the backend
 		if (!fromServer) this.hub?.playSong(song);
@@ -242,7 +245,7 @@ export class HeadlessMusicPlayer
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
-	public PlaySongs(songs: ISong[])
+	public PlaySongList(songs: ISong[], _extra?: boolean)
 	{
 		if (songs.length === 0) return;
 
@@ -255,7 +258,7 @@ export class HeadlessMusicPlayer
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
-	public AddSongToQueue(song: ISong)
+	public AddLastSong(song: ISong, _extra?: boolean)
 	{
 		this.queue.push(song);
 
@@ -270,7 +273,7 @@ export class HeadlessMusicPlayer
 		}
 	}
 
-	public AddSongsToQueue(songs: ISong[])
+	public AddLastSongList(songs: ISong[], _extra?: boolean)
 	{
 		if (songs.length === 0) return;
 
@@ -287,7 +290,7 @@ export class HeadlessMusicPlayer
 		}
 	}
 
-	public PlaySongNext(song: ISong)
+	public AddNextSong(song: ISong, _extra?: boolean)
 	{
 		// Insert the song right after the current song
 		this.queue.splice(this.currentSongIdx + 1, 0, song);
@@ -303,7 +306,25 @@ export class HeadlessMusicPlayer
 		}
 	}
 
-	public Next()
+	public AddNextSongList(songs: ISong[], _extra?: boolean)
+	{
+		if (songs.length === 0) return;
+
+		// Insert all songs right after the current song
+		this.queue.splice(this.currentSongIdx + 1, 0, ...songs);
+
+		// If nothing is currently playing, start playing the first added song
+		if (this.currentSong === null)
+		{
+			this.currentSongIdx = 0;
+			this.audioTag.src = `/api/Songs/${songs[0].id}/stream`;
+			this.updateMediaSessionMetadata(songs[0]);
+			this.updateMediaSessionPositionState();
+			this.audioTag.play().catch((e) => console.error(e));
+		}
+	}
+
+	public Next(_extra?: boolean)
 	{
 		if (this.currentSong === null) return;
 		if (this.currentSongIdx === -1 || this.currentSongIdx === this.queue.length - 1) return;
@@ -316,7 +337,7 @@ export class HeadlessMusicPlayer
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
-	public Previous()
+	public Prev(_extra?: boolean)
 	{
 		if (this.currentSong === null) return;
 		if (this.currentSongIdx === -1 || this.currentSongIdx === 0) return;
@@ -329,7 +350,7 @@ export class HeadlessMusicPlayer
 		this.audioTag.play().catch((e) => console.error(e));
 	}
 
-	public PlaySongAtIndex(index: number)
+	public PlayIdx(index: number, _extra?: boolean)
 	{
 		if (index < 0 || index >= this.queue.length) return;
 

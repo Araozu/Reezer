@@ -39,6 +39,23 @@
 		player.OverrideTag(audioTag!);
 	});
 
+	$effect(() =>
+	{
+		if (audioTag === null) return;
+		if (!audioTagSetup) return;
+		if (!musicHub.connected) return;
+
+		musicHub.getPlayerState().then((state) =>
+		{
+			if (state.currentSongId)
+			{
+				// TODO: Implement PlaySongById method or fetch song from API
+				// player.PlaySongById(state.currentSongId);
+				console.warn("Player state sync not implemented - missing PlaySongById method");
+			}
+		});
+	});
+
 	let playerCollapsed = $state(true);
 </script>
 
