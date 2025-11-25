@@ -162,20 +162,20 @@ interface IAudioBackend {
   play(): Promise<void>;
   pause(): Promise<void>;
   seek(position: number): void;
-  
+
   // State
   getCurrentTime(): number;
   getDuration(): number;
   isPlaying(): boolean;
-  
+
   // Volume
   setVolume(level: number): void;
   getVolume(): number;
-  
+
   // Events
   on(event: AudioEvent, handler: Function): void;
   off(event: AudioEvent, handler: Function): void;
-  
+
   // Cleanup
   dispose(): void;
 }
