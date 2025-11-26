@@ -19,7 +19,7 @@ export interface IAudioBackend {
 	/**
 	 * Pauses or resumes playback.
 	 */
-	TogglePause(): void
+	TogglePlayPause(): void
 	Seek(position: number): void
 
 	Prefetch(id: string): Promise<void>

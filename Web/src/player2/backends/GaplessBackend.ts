@@ -50,7 +50,7 @@ export class GaplessBackend implements IAudioBackend
 		);
 	}
 
-	TogglePause(): void
+	TogglePlayPause(): void
 	{
 		const player = this.GetCurrentPlayer();
 		if (player.paused)
