@@ -22,23 +22,28 @@
 
 	let albumName = $derived($albumQuery.data?.name ?? "");
 
-	function PlayNow(song: ISong) {
+	function PlayNow(song: ISong)
+	{
 		player.Play(song.id);
 	}
 
-	function PlayAllNow() {
+	function PlayAllNow()
+	{
 		alert("regression");
 	}
 
-	function PlayAllLast() {
+	function PlayAllLast()
+	{
 		alert("regression");
 	}
 
-	function PlayLast(song: ISong) {
+	function PlayLast(song: ISong)
+	{
 		alert("regression");
 	}
 
-	function PlayNext(song: ISong) {
+	function PlayNext(song: ISong)
+	{
 		player.Prefetch(song.id);
 	}
 </script>

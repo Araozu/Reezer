@@ -3,9 +3,13 @@ import type { IAudioSource } from "../interfaces/IAudioSource";
 
 export class GaplessBackend implements IAudioBackend
 {
-	private _volume: number = 1.0;
+	private _volume = 1.0;
 	private player1: HTMLAudioElement = null!;
 	private player2: HTMLAudioElement = null!;
+
+	// Keeps track of which player is currently active
+	private currentPlayer: 1 | 2 = 1;
+	private hasPrefetch = false;
 
 	private readyCallbacks: Array<() => void> = [];
 
@@ -29,12 +33,15 @@ export class GaplessBackend implements IAudioBackend
 
 	async Play(id: string): Promise<void>
 	{
+		const player = this.GetCurrentPlayer();
+		player.pause();
+
 		const mediaUrlResult = await this.audioSource.GetTrack(id);
 		mediaUrlResult.match(
 			(mediaUrl) =>
 			{
-				this.player1.src = mediaUrl;
-				this.player1.play();
+				player.src = mediaUrl;
+				player.play();
 			},
 			(e) =>
 			{
@@ -45,22 +52,54 @@ export class GaplessBackend implements IAudioBackend
 
 	TogglePause(): void
 	{
-		throw new Error("Method not implemented.");
+		const player = this.GetCurrentPlayer();
+		if (player.paused)
+		{
+			player.play();
+		}
+		else
+		{
+			player.pause();
+		}
 	}
 
 	Seek(position: number): void
 	{
 		throw new Error(`Method not implemented.${position}`);
 	}
-	Prefetch(id: string): void
+
+	async Prefetch(id: string): Promise<void>
 	{
-		alert("GaplessBackend.Prefetch is not implemented yet.");
-		throw new Error(`Method not implemented.${id}`);
+		const nextPlayer = this.GetNextPlayer();
+		const mediaUrlResult = await this.audioSource.GetTrack(id);
+		mediaUrlResult.match(
+			(mediaUrl) =>
+			{
+				nextPlayer.src = mediaUrl;
+				this.hasPrefetch = true;
+			},
+			(e) =>
+			{
+				console.error("Error fetching track:", e);
+			},
+		);
 	}
+
 	ClearPrefetch(): void
 	{
-		throw new Error("Method not implemented.");
+		this.hasPrefetch = false;
 	}
+
+	autoPlayNext = () =>
+	{
+		if (this.hasPrefetch)
+		{
+			this.SwitchPlayers();
+			const currentPlayer = this.GetCurrentPlayer();
+			currentPlayer.play();
+			this.hasPrefetch = false;
+		}
+	};
 
 	/**
 	 * Initializes the backend.
@@ -75,6 +114,9 @@ export class GaplessBackend implements IAudioBackend
 		this.player1.volume = this._volume;
 		this.player2.volume = this._volume;
 
+		this.player1.addEventListener("ended", this.autoPlayNext);
+		this.player2.addEventListener("ended", this.autoPlayNext);
+
 		this.readyCallbacks.forEach((callback) => callback());
 	}
 
@@ -88,6 +130,19 @@ export class GaplessBackend implements IAudioBackend
 	 */
 	Deinit(): void
 	{
-		// noop
+		console.log("Deinitializing GaplessBackend");
+	}
+
+	private GetCurrentPlayer(): HTMLAudioElement
+	{
+		return this.currentPlayer === 1 ? this.player1 : this.player2;
+	}
+	private GetNextPlayer(): HTMLAudioElement
+	{
+		return this.currentPlayer === 1 ? this.player2 : this.player1;
+	}
+	private SwitchPlayers(): void
+	{
+		this.currentPlayer = this.currentPlayer === 1 ? 2 : 1;
 	}
 }

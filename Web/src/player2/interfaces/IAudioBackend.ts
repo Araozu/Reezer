@@ -22,7 +22,7 @@ export interface IAudioBackend {
 	TogglePause(): void
 	Seek(position: number): void
 
-	Prefetch(id: string): void;
+	Prefetch(id: string): Promise<void>
 	ClearPrefetch(): void;
 
 	/**
