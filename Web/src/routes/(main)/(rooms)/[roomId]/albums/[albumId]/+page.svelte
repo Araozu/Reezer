@@ -3,7 +3,7 @@
 	import { toStore } from "svelte/store";
 	import { useAlbumByIdQuery } from "./queries";
 	import type { ISong } from "~/providers";
-	import { GetCurrentPlayer } from "~/player/index.svelte";
+	import { GetPlayerContext } from "~/player2/context/player-store";
 	import type { PageProps } from "./$types";
 	import type { components } from "~/api";
 	import { ListEnd, ListStart, Play, Plus } from "lucide-svelte";
@@ -14,43 +14,32 @@
 
 	let { data }: PageProps = $props();
 
-	const player = GetCurrentPlayer();
+	const player = GetPlayerContext();
+
 	let albumId = toStore(() => page.params.albumId ?? "-");
 	let dataStore = toStore(() => data.albumData);
 	let albumQuery = useAlbumByIdQuery(albumId, dataStore);
 
 	let albumName = $derived($albumQuery.data?.name ?? "");
 
-	function PlayNow(song: ISong)
-	{
-		player.PlaySong(song);
-		toast.success("Playing now");
+	function PlayNow(song: ISong) {
+		player.Play(song.id);
 	}
 
-	function PlayAllNow()
-	{
-		const songs = $albumQuery.data?.songs ?? [];
-		player.PlaySongList(songs);
-		toast.success("Playing all now");
+	function PlayAllNow() {
+		alert("regression");
 	}
 
-	function PlayAllLast()
-	{
-		const songs = $albumQuery.data?.songs ?? [];
-		player.AddLastSongList(songs);
-		toast.success("Will play all last");
+	function PlayAllLast() {
+		alert("regression");
 	}
 
-	function PlayLast(song: ISong)
-	{
-		player.AddLastSong(song);
-		toast.success("Will play last");
+	function PlayLast(song: ISong) {
+		alert("regression");
 	}
 
-	function PlayNext(song: ISong)
-	{
-		player.AddNextSong(song);
-		toast.success("Will play next");
+	function PlayNext(song: ISong) {
+		player.Prefetch(song.id);
 	}
 </script>
 

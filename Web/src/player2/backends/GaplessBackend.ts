@@ -27,21 +27,34 @@ export class GaplessBackend implements IAudioBackend
 		this._volume = value;
 	}
 
-	Play(id: string): void
+	async Play(id: string): Promise<void>
 	{
-		throw new Error(`Method not implemented.${id}`);
+		const mediaUrlResult = await this.audioSource.GetTrack(id);
+		mediaUrlResult.match(
+			(mediaUrl) =>
+			{
+				this.player1.src = mediaUrl;
+				this.player1.play();
+			},
+			(e) =>
+			{
+				console.error("Error fetching track:", e);
+			},
+		);
 	}
 
-	Pause(): void
+	TogglePause(): void
 	{
 		throw new Error("Method not implemented.");
 	}
+
 	Seek(position: number): void
 	{
 		throw new Error(`Method not implemented.${position}`);
 	}
 	Prefetch(id: string): void
 	{
+		alert("GaplessBackend.Prefetch is not implemented yet.");
 		throw new Error(`Method not implemented.${id}`);
 	}
 	ClearPrefetch(): void
@@ -59,6 +72,8 @@ export class GaplessBackend implements IAudioBackend
 	{
 		this.player1 = new Audio();
 		this.player2 = new Audio();
+		this.player1.volume = this._volume;
+		this.player2.volume = this._volume;
 
 		this.readyCallbacks.forEach((callback) => callback());
 	}

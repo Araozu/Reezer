@@ -14,8 +14,12 @@ export interface IAudioBackend {
 	/**
 	 * Plays the audio track with the given id.
 	 */
-	Play(id: string): void;
-	Pause(): void
+	Play(id: string): Promise<void>
+
+	/**
+	 * Pauses or resumes playback.
+	 */
+	TogglePause(): void
 	Seek(position: number): void
 
 	Prefetch(id: string): void;
