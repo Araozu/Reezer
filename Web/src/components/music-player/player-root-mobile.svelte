@@ -1,13 +1,14 @@
 <script lang="ts">
 	import * as Drawer from "$lib/components/ui/drawer/index.js";
-	import { GetCurrentPlayer } from "../../player/index.svelte";
+	import { GetPlayerStore } from "~/player2/stores/player-store";
 	import PlayerContentsCollapsedMobile from "./player-contents-collapsed-mobile.svelte";
 	import PlayerContentsPlaying from "./player-contents-playing.svelte";
 	import PlayerContentsQueue from "./player-contents-queue.svelte";
 
 	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
-	let player = GetCurrentPlayer();
+	let player = GetPlayerStore();
+
 	let song = $derived(player.currentSong);
 	let currentTab = $state<"playing" | "queue">("playing");
 

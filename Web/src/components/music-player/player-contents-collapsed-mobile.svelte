@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { GetCurrentPlayer } from "../../player/index.svelte";
+	import { GetPlayerStore } from "~/player2/stores/player-store";
 	import type { ISong } from "../../providers";
 	import { Play, Pause, LoaderCircle } from "lucide-svelte";
 
@@ -13,7 +13,8 @@
 		expand: () => void;
 	} = $props();
 
-	let player = GetCurrentPlayer();
+	let player = GetPlayerStore();
+
 	let isPaused = player.isPaused;
 	let isBuffering = $derived(player.isBuffering);
 </script>

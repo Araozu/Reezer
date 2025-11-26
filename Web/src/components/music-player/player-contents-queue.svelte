@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { GetCurrentPlayer } from "../../player/index.svelte";
+	import { GetPlayerStore } from "~/player2/stores/player-store";
 	import { X } from "lucide-svelte";
 
-	let player = GetCurrentPlayer();
+	let player = GetPlayerStore();
+
 	let queue = $derived(player.queue);
 	let currentSongIdx = $derived(player.currentSongIdx);
 </script>

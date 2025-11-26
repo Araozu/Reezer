@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { Slider } from "$lib/components/ui/slider";
-	import { GetCurrentPlayer } from "../../player/index.svelte";
+	import { GetPlayerStore } from "~/player2/stores/player-store";
 	import { sliderToVolume, volumeToSlider } from "./volume-constants";
 
 	let { collapsed }: { collapsed: boolean } = $props();
 
-	let player = GetCurrentPlayer();
+	let player = GetPlayerStore();
 	let rawVolume = player.volume;
 
 	// Map between the slider values & the actual

@@ -2,14 +2,15 @@
 	import * as Card from "$lib/components/ui/card/index.js";
 	import * as Tabs from "$lib/components/ui/tabs/index.js";
 	import { ChevronsRight, ChevronsLeft } from "lucide-svelte";
-	import { GetCurrentPlayer } from "../../player/index.svelte";
 	import PlayerContentsCollapsed from "./player-contents-collapsed.svelte";
 	import PlayerContentsPlaying from "./player-contents-playing.svelte";
 	import PlayerContentsQueue from "./player-contents-queue.svelte";
+	import { GetPlayerStore } from "~/player2/stores/player-store";
 
 	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
-	let player = GetCurrentPlayer();
+	let player = GetPlayerStore();
+
 	let song = $derived(player.currentSong);
 	let currentTab = $state<"playing" | "queue">("playing");
 

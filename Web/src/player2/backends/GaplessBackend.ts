@@ -57,7 +57,6 @@ export class GaplessBackend implements IAudioBackend
 	 */
 	Init(): void
 	{
-		alert("GaplessBackend initialized");
 		this.player1 = new Audio();
 		this.player2 = new Audio();
 

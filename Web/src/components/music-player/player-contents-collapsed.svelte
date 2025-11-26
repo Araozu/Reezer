@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { GetCurrentPlayer } from "../../player/index.svelte";
 	import type { ISong } from "../../providers";
 	import {
 		Play,
@@ -9,6 +8,7 @@
 		LoaderCircle,
 	} from "lucide-svelte";
 	import VolumeSlider from "./volume-slider.svelte";
+	import { GetPlayerStore } from "~/player2/stores/player-store";
 
 	let {
 		coverUrl = $bindable(),
@@ -18,7 +18,8 @@
 		song: ISong | undefined;
 	} = $props();
 
-	let player = GetCurrentPlayer();
+	let player = GetPlayerStore();
+
 	let isPaused = player.isPaused;
 	let isBuffering = $derived(player.isBuffering);
 </script>
