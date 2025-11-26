@@ -8,7 +8,6 @@
 	import type { components } from "~/api";
 	import { ListEnd, ListStart, Play, Plus } from "lucide-svelte";
 	import Button from "$lib/components/ui/button/button.svelte";
-	import { toast } from "svelte-sonner";
 
 	type SongDto = components["schemas"]["SongDto"];
 

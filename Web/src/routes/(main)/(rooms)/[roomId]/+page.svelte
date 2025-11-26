@@ -2,8 +2,10 @@
 	import { useRecentAlbums } from "./queries";
 	import * as Card from "$lib/components/ui/card/index.js";
 	import { Disc3, User } from "lucide-svelte";
-	import AlbumCover from "~/components/album-cover.svelte";
+	import {page} from "$app/state";
+	import AlbumCard from "~/components/album-card.svelte";
 
+	const roomId = page.params.roomId;
 	const albumsQuery = useRecentAlbums(6);
 
 	const recentAlbums = $derived($albumsQuery.data?.items ?? []);
@@ -22,7 +24,7 @@
 		</div>
 
 		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-			<a href="/albums">
+			<a href={`/${roomId}/albums`}>
 				<Card.Root
 					class="hover:border-primary transition-colors cursor-pointer group"
 				>
@@ -39,18 +41,18 @@
 						<div>
 							<Card.Title
 								class="text-lg"
-								>Albums</Card.Title
 							>
-							<Card.Description
-								>Browse your
-								collection</Card.Description
-							>
+								Albums
+							</Card.Title >
+							<Card.Description>
+								Browse your collection
+							</Card.Description>
 						</div>
 					</Card.Content>
 				</Card.Root>
 			</a>
 
-			<a href="/artists">
+			<a href={`/${roomId}/artists`}>
 				<Card.Root
 					class="hover:border-primary transition-colors cursor-pointer group"
 				>
@@ -67,8 +69,9 @@
 						<div>
 							<Card.Title
 								class="text-lg"
-								>Artists</Card.Title
 							>
+								Artists
+							</Card.Title>
 							<Card.Description
 								>Discover by
 								artist</Card.Description
@@ -106,32 +109,7 @@
 				class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
 			>
 				{#each recentAlbums as album (album.id)}
-					<a href={`/albums/${album.id}`}>
-						<Card.Root
-							class="hover:border-primary transition-colors group"
-						>
-							<Card.Content
-								class="p-3"
-							>
-								<AlbumCover
-									albumId={album.id}
-									albumName={album.name}
-								/>
-							</Card.Content>
-							<Card.Header
-								class="p-3 pt-0"
-							>
-								<Card.Title
-									class="text-sm truncate"
-									>{album.name}</Card.Title
-								>
-								<Card.Description
-									class="text-xs truncate"
-									>{album.artistName}</Card.Description
-								>
-							</Card.Header>
-						</Card.Root>
-					</a>
+					<AlbumCard {album} />
 				{/each}
 			</div>
 		</section>

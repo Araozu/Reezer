@@ -1,16 +1,12 @@
 <script lang="ts">
     import * as SignalR from "@microsoft/signalr";
-    import { onDestroy, onMount, setContext } from "svelte";
-    import SyncData from "./sync-data.svelte";
+    import { onMount } from "svelte";
     import { goto } from "$app/navigation";
     import { useCurrentUser } from "../queries";
-    import { page } from "$app/state";
 
     let { children } = $props();
 
     const userQuery = useCurrentUser();
-    const roomId = $derived(page.params.roomId ?? "default");
-    const username = $derived($userQuery.data?.userName ?? $userQuery.data?.name ?? "User");
 
     $effect(() =>
     {
