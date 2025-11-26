@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { GetPlayerStore } from "~/player2/stores/player-store";
 	import { X } from "lucide-svelte";
+	import { GetPlayerContext } from "~/player2/context/player-store";
 
-	let player = GetPlayerStore();
+	let player = GetPlayerContext();
 
 	let queue = $derived(player.queue);
 	let currentSongIdx = $derived(player.currentSongIdx);

@@ -4,13 +4,13 @@
 	import { UrlAudioSource } from "~/player2/audio-sources/UrlAudioSource";
 	import { GaplessBackend } from "~/player2/backends/GaplessBackend";
 	import type { IAudioBackend } from "~/player2/interfaces/IAudioBackend";
-	import { SetPlayerStore } from "~/player2/stores/player-store";
+	import { SetPlayerContext } from "~/player2/context/player-store";
 
 	let { children } = $props();
 
 	// Setup music player
 	const audioBackend: IAudioBackend = new GaplessBackend(new UrlAudioSource());
-	SetPlayerStore(audioBackend);
+	SetPlayerContext(audioBackend);
 
 	let audioTagSetup = $state(false);
 	let playerCollapsed = $state(true);

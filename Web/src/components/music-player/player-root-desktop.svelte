@@ -5,11 +5,11 @@
 	import PlayerContentsCollapsed from "./player-contents-collapsed.svelte";
 	import PlayerContentsPlaying from "./player-contents-playing.svelte";
 	import PlayerContentsQueue from "./player-contents-queue.svelte";
-	import { GetPlayerStore } from "~/player2/stores/player-store";
+	import { GetPlayerContext } from "~/player2/context/player-store";
 
 	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
-	let player = GetPlayerStore();
+	let player = GetPlayerContext();
 
 	let song = $derived(player.currentSong);
 	let currentTab = $state<"playing" | "queue">("playing");

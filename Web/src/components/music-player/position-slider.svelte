@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Slider } from "$lib/components/ui/slider";
-	import { GetPlayerStore } from "~/player2/stores/player-store";
+	import { GetPlayerContext } from "~/player2/context/player-store";
 
-	let player = GetPlayerStore();
+	let player = GetPlayerContext();
 
 	let duration = player.duration;
 	let currentTime = player.currentTime;

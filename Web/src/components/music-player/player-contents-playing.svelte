@@ -11,7 +11,7 @@
 	} from "lucide-svelte";
 	import VolumeSlider from "./volume-slider.svelte";
 	import PositionSlider from "./position-slider.svelte";
-	import { GetPlayerStore } from "~/player2/stores/player-store";
+	import { GetPlayerContext } from "~/player2/context/player-store";
 
 	let {
 		coverUrl = $bindable(),
@@ -21,7 +21,7 @@
 		song: ISong;
 	} = $props();
 
-	let player = GetPlayerStore();
+	let player = GetPlayerContext();
 
 	let isPaused = player.isPaused;
 	let isBuffering = $derived(player.isBuffering);

@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { Slider } from "$lib/components/ui/slider";
-	import { GetPlayerStore } from "~/player2/stores/player-store";
 	import { sliderToVolume, volumeToSlider } from "./volume-constants";
+	import { GetPlayerContext } from "~/player2/context/player-store";
 
 	let { collapsed }: { collapsed: boolean } = $props();
 
-	let player = GetPlayerStore();
+	let player = GetPlayerContext();
 	let rawVolume = player.volume;
 
 	// Map between the slider values & the actual
 	// volume level: Math.pow(volume / 100, 2);
-	let sliderVolume = $derived(volumeToSlider($rawVolume));
+	let sliderVolume = $derived(volumeToSlider(rawVolume));
 
 	// Given a number from 0-100, it sets the volume of the audio
 	// to a mapped value of it
@@ -18,7 +18,7 @@
 	{
 		let value = sliderToVolume[Math.round(sliderNumber)] ?? 0;
 
-		player.SetVolume(value);
+		player.volume = value;
 	}
 </script>
 

@@ -3,12 +3,12 @@ import type { IAudioBackend } from "../interfaces/IAudioBackend";
 
 const AUDIO_CONTEXT_KEY = "audio";
 
-export function SetPlayerStore(audioBackend: IAudioBackend)
+export function SetPlayerContext(audioBackend: IAudioBackend)
 {
 	setContext(AUDIO_CONTEXT_KEY, audioBackend);
 }
 
-export function GetPlayerStore(): IAudioBackend
+export function GetPlayerContext(): IAudioBackend
 {
 	return getContext<IAudioBackend>(AUDIO_CONTEXT_KEY);
 }

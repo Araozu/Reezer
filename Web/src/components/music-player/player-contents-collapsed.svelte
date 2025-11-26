@@ -8,7 +8,8 @@
 		LoaderCircle,
 	} from "lucide-svelte";
 	import VolumeSlider from "./volume-slider.svelte";
-	import { GetPlayerStore } from "~/player2/stores/player-store";
+	import { toStore } from "svelte/store";
+	import { GetPlayerContext } from "~/player2/context/player-store";
 
 	let {
 		coverUrl = $bindable(),
@@ -18,10 +19,11 @@
 		song: ISong | undefined;
 	} = $props();
 
-	let player = GetPlayerStore();
+	let player = GetPlayerContext();
 
-	let isPaused = player.isPaused;
-	let isBuffering = $derived(player.isBuffering);
+	// FIXME: regression
+	let isPaused = toStore(() => false);
+	let isBuffering = toStore(() => false);
 </script>
 
 <img
@@ -41,7 +43,7 @@
 		class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-full cursor-pointer transition-colors"
 		onclick={() => player.TogglePlayPause()}
 	>
-		{#if isBuffering}
+		{#if $isBuffering}
 			<LoaderCircle class="m-2 animate-spin" size={32} />
 		{:else if $isPaused}
 			<Play class="m-2" size={32} />
