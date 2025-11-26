@@ -62,7 +62,7 @@ The contract requires it to implement some mechanism for preloading.
 /// - The backend stores the next track, and will play it immediately after the current track ends.
 /// - The next track is set via the `Prefetch` method.
 /// - The caller may clear the prefetched track via `ClearPrefetch`, to prevent it from playing next.
-public interface IAudioBackend
+public interface IAudioBackend(IAudioSource source)
 {
     /// Raw volume between 0.0 and 1.0.
     /// The caller is responsible for mapping this to a logarithmic scale if needed.
@@ -71,7 +71,7 @@ public interface IAudioBackend
     /// Immediately starts playing, and clears any prefetched track.
     /// The `id` parameter identifies the audio track, and `data` contains the audio source.
     /// Implementors should coordinate with the `Prefetch` method to minimize playback delay.
-    void Play(Guid id, IAudioSource source);
+    void Play(Guid id);
 
     void Pause();
 
@@ -79,7 +79,7 @@ public interface IAudioBackend
     void Seek(float position);
 
     /// Sets the next track to be played after the current one ends.
-    void Prefetch(Guid id, IAudioSource source);
+    void Prefetch(Guid id);
 
     /// Clears any prefetched data.
     void ClearPrefetch();
@@ -88,6 +88,7 @@ public interface IAudioBackend
 }
 
 /// Goes fetch the actual audio data.
+/// Examples: plain URLs, DASH manifests, local files, etc.
 public interface IAudioSource
 {
     // Open a stream to the audio data
