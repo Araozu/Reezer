@@ -7,6 +7,8 @@ export class GaplessBackend implements IAudioBackend
 	private player1: HTMLAudioElement = null!;
 	private player2: HTMLAudioElement = null!;
 
+	private readyCallbacks: Array<() => void> = [];
+
 	constructor(private audioSource: IAudioSource)
 	{}
 
@@ -27,7 +29,7 @@ export class GaplessBackend implements IAudioBackend
 
 	Play(id: string): void
 	{
-		//
+		throw new Error(`Method not implemented.${id}`);
 	}
 
 	Pause(): void
@@ -36,11 +38,11 @@ export class GaplessBackend implements IAudioBackend
 	}
 	Seek(position: number): void
 	{
-		throw new Error("Method not implemented.");
+		throw new Error(`Method not implemented.${position}`);
 	}
 	Prefetch(id: string): void
 	{
-		throw new Error("Method not implemented.");
+		throw new Error(`Method not implemented.${id}`);
 	}
 	ClearPrefetch(): void
 	{
@@ -55,8 +57,16 @@ export class GaplessBackend implements IAudioBackend
 	 */
 	Init(): void
 	{
+		alert("GaplessBackend initialized");
 		this.player1 = new Audio();
 		this.player2 = new Audio();
+
+		this.readyCallbacks.forEach((callback) => callback());
+	}
+
+	OnReady(callback: () => void): void
+	{
+		this.readyCallbacks.push(callback);
 	}
 
 	/**

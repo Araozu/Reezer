@@ -21,7 +21,22 @@ export interface IAudioBackend {
 	Prefetch(id: string): void;
 	ClearPrefetch(): void;
 
+	/**
+	 * Initializes the audio backend.
+	 *
+	 * This method **MUST** be called by a organic click event,
+	 * to allow audio playback in browsers.
+	 */
 	Init(): void;
+
+	/**
+	 * Registers a callback to be called when the backend is ready to play audio.
+	 */
+	OnReady(callback: () => void): void;
+
+	/**
+	 * Deinitializes the audio backend, releasing any resources held.
+	 */
 	Deinit(): void;
 }
 
