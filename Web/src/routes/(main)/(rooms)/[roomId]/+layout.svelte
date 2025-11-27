@@ -1,62 +1,21 @@
 <script lang="ts">
-	import { getContext, onMount } from "svelte";
-	import { toStore } from "svelte/store";
 	import MusicPlayer from "~/components/music-player/index.svelte";
-	import { CreatePlayerContext } from "~/player/index.svelte";
-	import type { MusicRoomHub } from "~/lib/MusicRoomHub.svelte";
 	import ClickTrap from "./click-trap.svelte";
+	import { UrlAudioSource } from "~/player2/audio-sources/UrlAudioSource";
+	import { GaplessBackend } from "~/player2/backends/GaplessBackend";
+	import type { IAudioBackend } from "~/player2/interfaces/IAudioBackend";
+	import { SetPlayerContext } from "~/player2/context/player-store";
 
 	let { children } = $props();
-	let audioTag = $state<HTMLAudioElement | null>(null);
 
-	const musicHub = getContext<MusicRoomHub>("musicHub");
+	// Setup music player
+	const audioBackend: IAudioBackend = new GaplessBackend(new UrlAudioSource());
+	SetPlayerContext(audioBackend);
 
-	// Audio bindings
-	let aPaused = $state(false);
-	let aVolume = $state(0.5);
-	let aCurrentTime = $state(0);
-	let aDuration = $state(0);
-
-	let player = CreatePlayerContext(
-		musicHub,
-		toStore(
-			() => aPaused,
-			(v) => (aPaused = v),
-		),
-		toStore(
-			() => aVolume,
-			(v) => (aVolume = v),
-		),
-		toStore(
-			() => aCurrentTime,
-			(v) => (aCurrentTime = v),
-		),
-		toStore(() => aDuration),
-	);
-	let audioTagSetup = $derived(player.audioReady);
-
-	onMount(() => {
-		player.OverrideTag(audioTag!);
-	});
-
-	$effect(() =>
-	{
-		if (audioTag === null) return;
-		if (!audioTagSetup) return;
-		if (!musicHub.connected) return;
-
-		musicHub.getPlayerState().then((state) =>
-		{
-			if (state.currentSongId)
-			{
-				// TODO: Implement PlaySongById method or fetch song from API
-				// player.PlaySongById(state.currentSongId);
-				console.warn("Player state sync not implemented - missing PlaySongById method");
-			}
-		});
-	});
-
+	let audioTagSetup = $state(false);
 	let playerCollapsed = $state(true);
+
+	audioBackend.OnReady(() => (audioTagSetup = true));
 </script>
 
 <div
@@ -77,13 +36,4 @@
 	{#if audioTagSetup}
 		<MusicPlayer bind:collapsed={playerCollapsed} />
 	{/if}
-	<audio
-		src="/_.opus"
-		bind:this={audioTag}
-		bind:volume={aVolume}
-		bind:paused={aPaused}
-		bind:currentTime={aCurrentTime}
-		bind:duration={aDuration}
-	>
-	</audio>
 </div>
