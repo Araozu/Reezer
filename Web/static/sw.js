@@ -9,6 +9,7 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(clients.claim());
 });
 
-self.addEventListener("fetch", () => {
-  // Let all requests pass through to the network
+self.addEventListener("fetch", (event) => {
+  // Let all requests pass through to the network without caching
+  event.respondWith(fetch(event.request));
 });
