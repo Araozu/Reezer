@@ -90,45 +90,34 @@
 </div>
 
 {#snippet Song(song: SongDto)}
-	<div class="grid grid-cols-[auto_3rem_3rem]">
+	<div class="group/row grid grid-cols-[auto_2.5rem_2.5rem] rounded-xl transition-all duration-300 hover:bg-glass-bg-hover hover:backdrop-blur-lg hover:shadow-[inset_0_1px_1px_var(--glass-highlight)]">
 		<button
-			class="cursor-pointer transition-colors inline-block w-full text-left dark:hover:bg-zinc-900 border-b border-border/50"
+			class="cursor-pointer inline-block w-full text-left px-3 py-3"
 			onclick={() => PlayNow(song)}
 		>
-			<div
-				class="grid grid-cols-[2rem_auto] gap-4 items-center group p-2"
-			>
-				<div
-					class="inline-flex items-center justify-center h-6"
-				>
-					<Play
-						class="opacity-50 group-hover:inline-block hidden"
-					/>
-					<span
-						class="group-hover:hidden inline-block"
-						>{song.trackNumber}</span
-					>
+			<div class="grid grid-cols-[2rem_auto] gap-4 items-center">
+				<div class="inline-flex items-center justify-center h-6 text-muted-foreground">
+					<Play class="size-4 hidden group-hover/row:inline-block" />
+					<span class="group-hover/row:hidden inline-block tabular-nums">{song.trackNumber}</span>
 				</div>
-				<div class="inline-block">
+				<div class="inline-block truncate">
 					{song.name}
 				</div>
 			</div>
 		</button>
 		<button
-			class="cursor-pointer transition-colors text-left dark:hover:bg-zinc-900 border-b border-border/50
-				inline-flex items-center justify-center
-			"
+			class="cursor-pointer inline-flex items-center justify-center rounded-lg text-muted-foreground opacity-0 group-hover/row:opacity-100 transition-all duration-300 hover:text-foreground hover:bg-primary/20 active:scale-95"
 			onclick={() => PlayLast(song)}
+			title="Add to queue"
 		>
-			<Plus class="h-4 w-4" />
+			<Plus class="size-4" />
 		</button>
 		<button
-			class="cursor-pointer transition-colors text-left dark:hover:bg-zinc-900 border-b border-border/50
-				inline-flex items-center justify-center
-			"
+			class="cursor-pointer inline-flex items-center justify-center rounded-lg text-muted-foreground opacity-0 group-hover/row:opacity-100 transition-all duration-300 hover:text-foreground hover:bg-primary/20 active:scale-95"
 			onclick={() => PlayNext(song)}
+			title="Play next"
 		>
-			<ListStart class="h-4 w-4" />
+			<ListStart class="size-4" />
 		</button>
 	</div>
 {/snippet}

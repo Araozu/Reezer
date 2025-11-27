@@ -16,13 +16,26 @@
 	let debouncedSearchTerm = $state(searchQuery);
 	let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
 
+	let cachedTotalCount = $state(1);
+	let cachedPageSize = $state(20);
+
 	const albumsQuery = useAlbums(
 		toStore(() => requestPage),
 		toStore(() => requestPageSize),
 		toStore(() => debouncedSearchTerm || undefined),
 	);
-	const totalCount = $derived(($albumsQuery.data?.totalCount as number) ?? 1);
-	const pageSize = $derived(($albumsQuery.data?.pageSize as number) ?? 20);
+
+	$effect(() =>
+	{
+		if ($albumsQuery.data)
+		{
+			cachedTotalCount = $albumsQuery.data.totalCount as number;
+			cachedPageSize = $albumsQuery.data.pageSize as number;
+		}
+	});
+
+	const totalCount = $derived(($albumsQuery.data?.totalCount as number | undefined) ?? cachedTotalCount);
+	const pageSize = $derived(($albumsQuery.data?.pageSize as number | undefined) ?? cachedPageSize);
 
 	function handleSearchInput(event: Event)
 	{
