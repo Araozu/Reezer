@@ -22,18 +22,18 @@
 <div class="grid grid-cols-[3rem_auto_3rem] items-center gap-4">
 	<div>
 		<img
-			class={["shadow aspect-square object-cover", "rounded"]}
+			class={["shadow-lg aspect-square object-cover", "rounded-xl"]}
 			src={coverUrl}
 			alt="Album portrait"
 		/>
 	</div>
 	<button class="inline-block w-full text-left" onclick={expand}>
-		<p>{song?.name ?? "-"}</p>
-		<p>{song?.artist ?? "-"}</p>
+		<p class="font-medium truncate">{song?.name ?? "-"}</p>
+		<p class="text-sm text-muted-foreground truncate">{song?.artist ?? "-"}</p>
 	</button>
 	<div>
 		<button
-			class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-full cursor-pointer transition-colors"
+			class="hover:bg-glass-bg-hover rounded-full cursor-pointer transition-all duration-300 active:scale-95"
 			onclick={() => player.TogglePlayPause()}
 		>
 			{#if isBuffering}

@@ -18,7 +18,7 @@
 </script>
 
 <div class={["p-1", "h-screen sticky top-0 w-auto"]}>
-	<Card.Root class="h-full border-primary py-6 rounded-xl">
+	<Card.Root class="h-full border-primary py-6 rounded-2xl">
 		<Card.Header class={collapsed ? "px-0" : ""}>
 			<Card.Title
 				class={[
@@ -45,7 +45,7 @@
 
 				<button
 					class={[
-						"hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors px-1",
+						"hover:bg-glass-bg-hover rounded-xl cursor-pointer transition-all duration-300 px-1.5 py-1.5",
 						!collapsed && "mr-1",
 					]}
 					onclick={() =>
@@ -54,9 +54,9 @@
 					}}
 				>
 					{#if collapsed}
-						<ChevronsLeft />
+						<ChevronsLeft class="size-5" />
 					{:else}
-						<ChevronsRight />
+						<ChevronsRight class="size-5" />
 					{/if}
 				</button>
 			</Card.Title>

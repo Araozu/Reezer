@@ -12,7 +12,7 @@
 
 <a class="inline-block" href={`/${roomId}/albums/${album.id}`}>
 	<Card.Root
-		class="w-full hover:border-primary transition-colors"
+		class="w-full hover:bg-glass-bg-hover hover:border-glass-border-hover transition-all duration-300"
 	>
 		<Card.Content>
 			<AlbumCover albumId={album.id} albumName={album.name} />
@@ -24,7 +24,7 @@
 			<a
 				href={`/${roomId}/artists/${album.artistId}`}
 			>
-				<Card.Description class="truncate underline hover:text-primary transition-colors">
+				<Card.Description class="truncate hover:text-foreground transition-colors">
 					<span>{album.artistName}</span>
 				</Card.Description>
 			</a>

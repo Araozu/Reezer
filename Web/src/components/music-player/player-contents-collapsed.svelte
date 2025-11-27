@@ -27,20 +27,20 @@
 </script>
 
 <img
-	class={["shadow aspect-square object-cover", "rounded"]}
+	class={["shadow-lg aspect-square object-cover", "rounded-xl"]}
 	src={coverUrl}
 	alt="Album portrait"
 />
 
 <div class={["flex items-center gap-1 my-8", "flex-col"]}>
 	<button
-		class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors"
+		class="hover:bg-glass-bg-hover rounded-xl cursor-pointer transition-all duration-300 active:scale-95"
 		onclick={() => player.Prev()}
 	>
 		<SkipBack class="m-2" size={16} />
 	</button>
 	<button
-		class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-full cursor-pointer transition-colors"
+		class="hover:bg-glass-bg-hover rounded-full cursor-pointer transition-all duration-300 active:scale-95"
 		onclick={() => player.TogglePlayPause()}
 	>
 		{#if $isBuffering}
@@ -52,7 +52,7 @@
 		{/if}
 	</button>
 	<button
-		class="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-sm cursor-pointer transition-colors"
+		class="hover:bg-glass-bg-hover rounded-xl cursor-pointer transition-all duration-300 active:scale-95"
 		onclick={() => player.Next()}
 	>
 		<SkipForward class="m-2" size={16} />
