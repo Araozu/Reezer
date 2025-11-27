@@ -17,6 +17,6 @@
 			cancelButton: "bg-glass-bg text-foreground border-glass-border",
 		},
 	}}
-	style="--normal-bg: var(--glass-bg); --normal-text: var(--color-foreground); --normal-border: var(--glass-border);"
+	style="--normal-bg: var(--glass-bg); --normal-text: var(--foreground); --normal-border: var(--glass-border);"
 	{...restProps}
 />
