@@ -11,20 +11,22 @@
 	} from "lucide-svelte";
 	import VolumeSlider from "./volume-slider.svelte";
 	import PositionSlider from "./position-slider.svelte";
-	import { GetPlayerContext } from "~/player2/context/player-store";
+	import { GetPlayerContext, GetQueueContext } from "~/player2/context/player-store";
 
 	let {
 		coverUrl = $bindable(),
-		song = $bindable(),
+		song,
 	}: {
 		coverUrl: string;
-		song: ISong;
+		song: ISong | null;
 	} = $props();
 
 	let player = GetPlayerContext();
+	let queue = GetQueueContext();
 
-	let isPaused = player.isPaused;
-	let isBuffering = $derived(player.isBuffering);
+	// FIXME: regression
+	let isPaused = false;
+	let isBuffering = false;
 </script>
 
 <div class="flex justify-center">
@@ -32,7 +34,7 @@
 		class={[
 			"shadow-lg aspect-square object-cover",
 			"rounded-2xl h-full w-full",
-			"max-h-60 max-w-60 md:max-w-[30rem] md:max-h-[30rem]",
+			"max-h-60 max-w-60 md:max-w-120 md:max-h-120",
 		]}
 		src={coverUrl}
 		alt="Album portrait"
@@ -56,7 +58,7 @@
 <div class={["flex items-center gap-1 my-6"]}>
 	<button
 		class="hover:bg-glass-bg-hover rounded-xl cursor-pointer transition-all duration-300 active:scale-95"
-		onclick={() => player.Prev()}
+		onclick={() => queue.Prev()}
 	>
 		<SkipBack class="m-2.5" size={18} />
 	</button>
@@ -66,7 +68,7 @@
 	>
 		{#if isBuffering}
 			<LoaderCircle class="m-2 animate-spin" size={32} />
-		{:else if $isPaused}
+		{:else if isPaused}
 			<Play class="m-2" size={32} />
 		{:else}
 			<Pause class="m-2" size={32} />
@@ -74,7 +76,7 @@
 	</button>
 	<button
 		class="hover:bg-glass-bg-hover rounded-xl cursor-pointer transition-all duration-300 active:scale-95"
-		onclick={() => player.Next()}
+		onclick={() => queue.Next()}
 	>
 		<SkipForward class="m-2.5" size={18} />
 	</button>

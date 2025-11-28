@@ -5,18 +5,19 @@
 
 	let {
 		coverUrl = $bindable(),
-		song = $bindable(),
+		song,
 		expand,
 	}: {
 		coverUrl: string;
-		song: ISong | undefined;
+		song: ISong | null;
 		expand: () => void;
 	} = $props();
 
 	let player = GetPlayerContext();
 
-	let isPaused = player.isPaused;
-	let isBuffering = $derived(player.isBuffering);
+	// FIXME: regression
+	let isPaused = false;
+	let isBuffering = false;
 </script>
 
 <div class="grid grid-cols-[3rem_auto_3rem] items-center gap-4">
@@ -41,7 +42,7 @@
 					class="m-2 animate-spin"
 					size={32}
 				/>
-			{:else if $isPaused}
+			{:else if isPaused}
 				<Play class="m-2" size={32} />
 			{:else}
 				<Pause class="m-2" size={32} />

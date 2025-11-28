@@ -22,7 +22,7 @@
 		>
 			<button
 				class="flex-1 text-left cursor-pointer hover:bg-glass-bg rounded-lg p-2 -m-2 transition-all duration-300"
-				onclick={() => queue.PlayIdx(index)}
+				onclick={() => queue.PlayAt(index)}
 			>
 				<p class="font-medium truncate">
 					{song.name}
@@ -38,7 +38,7 @@
 				onclick={(e) =>
 				{
 					e.stopPropagation();
-					queue.RemoveIdx(index);
+					queue.RemoveAt(index);
 				}}
 				aria-label="Remove song from queue"
 			>

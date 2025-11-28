@@ -5,16 +5,18 @@
 	import PlayerContentsCollapsed from "./player-contents-collapsed.svelte";
 	import PlayerContentsPlaying from "./player-contents-playing.svelte";
 	import PlayerContentsQueue from "./player-contents-queue.svelte";
-	import { GetPlayerContext } from "~/player2/context/player-store";
+	import { GetQueueContext } from "~/player2/context/player-store";
+	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
 
 	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
-	let player = GetPlayerContext();
+	let queue = GetQueueContext();
+	let svelteQueue = new SvelteRuneQueue(queue);
 
-	let song = $derived(player.currentSong);
+	let currentSong = $derived(svelteQueue.currentSong);
 	let currentTab = $state<"playing" | "queue">("playing");
 
-	let coverUrl = $derived(song ? `/api/Albums/${song.albumId}/cover` : "/vinyl.jpg");
+	let coverUrl = $derived(currentSong ? `/api/Albums/${currentSong.albumId}/cover` : "/vinyl.jpg");
 </script>
 
 <div class={["p-1", "h-screen sticky top-0 w-auto"]}>
@@ -63,12 +65,11 @@
 			{#if collapsed}
 				<PlayerContentsCollapsed
 					bind:coverUrl
-					bind:song
 				/>
 			{:else if !collapsed && currentTab === "playing"}
 				<PlayerContentsPlaying
 					bind:coverUrl
-					bind:song
+					song={currentSong}
 				/>
 			{:else if !collapsed && currentTab === "queue"}
 				<PlayerContentsQueue />
