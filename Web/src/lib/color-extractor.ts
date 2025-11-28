@@ -9,6 +9,13 @@ interface ExtractedColors {
 	isDark: boolean;
 }
 
+const QUANTIZATION_FACTOR = 32;
+const MIN_COLOR_DISTANCE = 60;
+const FALLBACK_COLORS: ExtractedColors = {
+	colors: ["#ff6b6b", "#4ecdc4", "#ffe66d"],
+	isDark: false,
+};
+
 function rgbToHex(r: number, g: number, b: number): string {
 	return `#${[r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("")}`;
 }
@@ -34,7 +41,7 @@ export async function extractColorsFromImage(imageUrl: string): Promise<Extracte
 			const canvas = document.createElement("canvas");
 			const ctx = canvas.getContext("2d");
 			if (!ctx) {
-				resolve({ colors: ["#ff6b6b", "#4ecdc4", "#ffe66d"], isDark: false });
+				resolve(FALLBACK_COLORS);
 				return;
 			}
 
@@ -52,9 +59,9 @@ export async function extractColorsFromImage(imageUrl: string): Promise<Extracte
 			let pixelCount = 0;
 
 			for (let i = 0; i < pixels.length; i += 4) {
-				const r = Math.floor(pixels[i] / 32) * 32;
-				const g = Math.floor(pixels[i + 1] / 32) * 32;
-				const b = Math.floor(pixels[i + 2] / 32) * 32;
+				const r = Math.floor(pixels[i] / QUANTIZATION_FACTOR) * QUANTIZATION_FACTOR;
+				const g = Math.floor(pixels[i + 1] / QUANTIZATION_FACTOR) * QUANTIZATION_FACTOR;
+				const b = Math.floor(pixels[i + 2] / QUANTIZATION_FACTOR) * QUANTIZATION_FACTOR;
 
 				totalLuminance += getColorLuminance(pixels[i], pixels[i + 1], pixels[i + 2]);
 				pixelCount++;
@@ -75,11 +82,10 @@ export async function extractColorsFromImage(imageUrl: string): Promise<Extracte
 				.sort((a, b) => b.count - a.count);
 
 			const prominentColors: RGB[] = [];
-			const minDistance = 60;
 
 			for (const color of sortedColors) {
 				const isTooClose = prominentColors.some(
-					(existing) => colorDistance(existing, color.rgb) < minDistance,
+					(existing) => colorDistance(existing, color.rgb) < MIN_COLOR_DISTANCE,
 				);
 
 				if (!isTooClose) {
@@ -104,7 +110,7 @@ export async function extractColorsFromImage(imageUrl: string): Promise<Extracte
 		};
 
 		img.onerror = () => {
-			resolve({ colors: ["#ff6b6b", "#4ecdc4", "#ffe66d"], isDark: false });
+			resolve(FALLBACK_COLORS);
 		};
 
 		img.src = imageUrl;

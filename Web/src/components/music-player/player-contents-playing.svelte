@@ -37,10 +37,15 @@
 
 	$effect(() => {
 		if (coverUrl) {
-			extractColorsFromImage(coverUrl).then((result) => {
-				extractedColors = result.colors;
-				isDark = result.isDark;
-			});
+			extractColorsFromImage(coverUrl)
+				.then((result) => {
+					extractedColors = result.colors;
+					isDark = result.isDark;
+				})
+				.catch(() => {
+					extractedColors = ["#ff6b6b", "#4ecdc4", "#ffe66d"];
+					isDark = false;
+				});
 		}
 	});
 </script>
