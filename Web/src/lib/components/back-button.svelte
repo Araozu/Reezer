@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { ChevronLeft } from "lucide-svelte";
 
-	function goBack() {
+	function goBack()
+	{
 		history.back();
 	}
 </script>
