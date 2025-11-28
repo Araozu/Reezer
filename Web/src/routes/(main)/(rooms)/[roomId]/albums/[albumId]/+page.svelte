@@ -9,6 +9,7 @@
 	import { ListEnd, ListStart, Play, Plus } from "lucide-svelte";
 	import Button from "$lib/components/ui/button/button.svelte";
 	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
+	import BackButton from "$lib/components/back-button.svelte";
 
 	type SongDto = components["schemas"]["SongDto"];
 
@@ -32,7 +33,8 @@
 	<title>Reezer - {albumName}</title>
 </svelte:head>
 
-<h1 class="font-display text-4xl font-semibold py-8 px-4">
+<h1 class="font-display text-4xl font-semibold py-8 px-4 flex items-center gap-3">
+	<BackButton />
 	<a href="." class="hover:underline">Albums</a>
 	&gt;
 	<span class="font-medium">{albumName}</span>

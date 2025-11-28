@@ -4,6 +4,7 @@
 	import { useArtistByIdQuery } from "./queries";
 	import AlbumCard from "~/components/album-card.svelte";
 	import AlbumCardSkeleton from "~/components/album-card-skeleton.svelte";
+	import BackButton from "$lib/components/back-button.svelte";
 
 	let artistId = toStore(() => page.params.artistId ?? "-");
 	let artistQuery = useArtistByIdQuery(artistId);
@@ -16,7 +17,8 @@
 	<title>Reezer - {artistName}</title>
 </svelte:head>
 
-<h1 class="font-display text-4xl font-semibold py-8 px-4">
+<h1 class="font-display text-4xl font-semibold py-8 px-4 flex items-center gap-3">
+	<BackButton />
 	<span class="font-medium">{artistName}</span>
 </h1>
 
