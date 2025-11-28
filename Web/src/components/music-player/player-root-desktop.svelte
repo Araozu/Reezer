@@ -5,8 +5,10 @@
 	import PlayerContentsCollapsed from "./player-contents-collapsed.svelte";
 	import PlayerContentsPlaying from "./player-contents-playing.svelte";
 	import PlayerContentsQueue from "./player-contents-queue.svelte";
+	import ColorBlobs from "./color-blobs.svelte";
 	import { GetQueueContext } from "~/player2/context/player-store";
 	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
+	import { extractColorsFromImage } from "$lib/color-extractor";
 
 	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
@@ -17,10 +19,24 @@
 	let currentTab = $state<"playing" | "queue">("playing");
 
 	let coverUrl = $derived(currentSong ? `/api/Albums/${currentSong.albumId}/cover` : "/vinyl.jpg");
+
+	let extractedColors = $state<string[]>(["#ff6b6b", "#4ecdc4", "#ffe66d", "#9b59b6"]);
+
+	$effect(() =>
+	{
+		if (coverUrl)
+		{
+			extractColorsFromImage(coverUrl).then((result) =>
+			{
+				extractedColors = result.colors;
+			});
+		}
+	});
 </script>
 
 <div class={["p-1", "h-screen sticky top-0 w-auto"]}>
-	<Card.Root class="h-full border-primary py-6 rounded-2xl">
+	<ColorBlobs colors={extractedColors} />
+	<Card.Root class="h-full border-primary py-6 rounded-2xl relative z-10">
 		<Card.Header class={collapsed ? "px-0" : ""}>
 			<Card.Title
 				class={[
