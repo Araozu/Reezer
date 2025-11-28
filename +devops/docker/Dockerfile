@@ -26,9 +26,6 @@ COPY Infrastructure/ ./Infrastructure
 RUN dotnet publish Api -c Release -r linux-musl-x64 \
     -o /app/out
 
-# Copy the built frontend static assets
-COPY Web/build /app/out/wwwroot
-
 # Create EF migrations bundle (self-contained)
 ENV ConnectionStrings__DefaultConnection=Host=localhost;Database=reezer;Username=root;Password=root
 RUN dotnet ef migrations bundle --project Api \
@@ -47,17 +44,13 @@ RUN apk add --no-cache curl ffmpeg libwebp-tools
 # Create non-root user for security
 RUN adduser -D -s /bin/sh appuser
 
-# Copy published application
-COPY --from=build-env /app/out ./
-COPY +devops/docker/docker-entrypoint.sh ./
+# Copy neccesary assets
+COPY --chown=appuser:appuser --from=build-env /app/out ./
+COPY --chown=appuser:appuser Web/build ./wwwroot
+COPY --chown=appuser:appuser +devops/docker/docker-entrypoint.sh ./
 
 # Make scripts executable
 RUN chmod +x ./docker-entrypoint.sh ./efbundle
 
-# Change ownership to non-root user
-RUN chown -R appuser:appuser /app
-
-# Switch to non-root user
 USER appuser
-
 ENTRYPOINT ["./docker-entrypoint.sh"]

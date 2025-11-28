@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from "$app/state";
 	import type { ISong } from "../../providers";
 	import {
 		Play,
@@ -23,6 +24,7 @@
 
 	let player = GetPlayerContext();
 	let queue = GetQueueContext();
+	const roomId = page.params.roomId;
 
 	// FIXME: regression
 	let isPaused = false;
@@ -45,11 +47,11 @@
 		{song?.name ?? "-"}
 	</p>
 	<p class="font-medium text-muted-foreground">
-		<a class="hover:text-foreground transition-colors" href={`/artists/${song?.artistId ?? ""}`}>
+		<a class="hover:text-foreground transition-colors" href={`/${roomId}/artists/${song?.artistId ?? ""}`}>
 			{song?.artist ?? "-"}
 		</a>
 		•
-		<a class="hover:text-foreground transition-colors" href={`/albums/${song?.albumId}`}>
+		<a class="hover:text-foreground transition-colors" href={`/${roomId}/albums/${song?.albumId}`}>
 			{song?.album ?? "-"}
 		</a>
 	</p>
