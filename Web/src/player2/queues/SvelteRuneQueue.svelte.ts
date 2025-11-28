@@ -6,11 +6,17 @@ import type { ISong } from "~/providers";
  */
 export class SvelteRuneQueue
 {
-	public queue = $state<Array<ISong>>([]);
+	public queue = $state<Readonly<Array<ISong>>>([]);
 	public currentIdx = $state(-1);
+	public currentSong: ISong | null = $state(null);
 
-	constructor(private IQueue: IQueue)
-	{}
-
-	// TODO: setup listeners & update svelte signals
+	constructor(private iqueue: IQueue)
+	{
+		iqueue.OnQueueChanged(() =>
+		{
+			this.queue = iqueue.queue;
+			this.currentIdx = iqueue.currentIdx;
+			this.currentSong = iqueue.currentSong;
+		});
+	}
 }

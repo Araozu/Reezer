@@ -20,7 +20,8 @@
 		},
 	});
 
-	if (browser && "serviceWorker" in navigator) {
+	if (browser && "serviceWorker" in navigator)
+	{
 		navigator.serviceWorker.register("/sw.js");
 	}
 

@@ -3,7 +3,7 @@
 	import { toStore } from "svelte/store";
 	import { useAlbumByIdQuery } from "./queries";
 	import type { ISong } from "~/providers";
-	import { GetPlayerContext } from "~/player2/context/player-store";
+	import { GetQueueContext } from "~/player2/context/player-store";
 	import type { PageProps } from "./$types";
 	import type { components } from "~/api";
 	import { ListEnd, ListStart, Play, Plus } from "lucide-svelte";
@@ -13,7 +13,7 @@
 
 	let { data }: PageProps = $props();
 
-	const player = GetPlayerContext();
+	const queue = GetQueueContext();
 
 	let albumId = toStore(() => page.params.albumId ?? "-");
 	let dataStore = toStore(() => data.albumData);
@@ -21,30 +21,7 @@
 
 	let albumName = $derived($albumQuery.data?.name ?? "");
 
-	function PlayNow(song: ISong)
-	{
-		player.Play(song.id);
-	}
-
-	function PlayAllNow()
-	{
-		alert("regression");
-	}
-
-	function PlayAllLast()
-	{
-		alert("regression");
-	}
-
-	function PlayLast(song: ISong)
-	{
-		alert("regression");
-	}
-
-	function PlayNext(song: ISong)
-	{
-		player.Prefetch(song.id);
-	}
+	let songs: Array<ISong> = $derived($albumQuery.data?.songs ?? []);
 </script>
 
 <svelte:head>
@@ -68,12 +45,12 @@
 		/>
 
 		<div class="md:text-left text-center">
-			<Button onclick={PlayAllNow}>
+			<Button onclick={() => queue.PlaySongList(songs)} class="mr-2">
 				<Play />
 				Play All
 			</Button>
 
-			<Button onclick={PlayAllLast} variant="outline">
+			<Button onclick={() => queue.AddLastSongList(songs)} variant="outline">
 				<ListEnd />
 				Add to queue
 			</Button>
@@ -93,7 +70,7 @@
 	<div class="group/row grid grid-cols-[auto_2.5rem_2.5rem] rounded-xl transition-all duration-300 hover:bg-glass-bg-hover hover:backdrop-blur-lg hover:shadow-[inset_0_1px_1px_var(--glass-highlight)]">
 		<button
 			class="cursor-pointer inline-block w-full text-left px-3 py-3"
-			onclick={() => PlayNow(song)}
+			onclick={() => queue.PlaySong(song)}
 		>
 			<div class="grid grid-cols-[2rem_auto] gap-4 items-center">
 				<div class="inline-flex items-center justify-center h-6 text-muted-foreground">
@@ -107,14 +84,14 @@
 		</button>
 		<button
 			class="cursor-pointer inline-flex items-center justify-center rounded-lg text-muted-foreground transition-all duration-300 hover:text-foreground hover:bg-primary/20 active:scale-95"
-			onclick={() => PlayLast(song)}
+			onclick={() => queue.AddLastSong(song)}
 			title="Add to queue"
 		>
 			<Plus class="size-4" />
 		</button>
 		<button
 			class="cursor-pointer inline-flex items-center justify-center rounded-lg text-muted-foreground transition-all duration-300 hover:text-foreground hover:bg-primary/20 active:scale-95"
-			onclick={() => PlayNext(song)}
+			onclick={() => queue.AddNextSong(song)}
 			title="Play next"
 		>
 			<ListStart class="size-4" />

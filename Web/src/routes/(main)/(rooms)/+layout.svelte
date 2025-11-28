@@ -15,7 +15,7 @@
             $userQuery.error?.status === 403
     	)
     	{
-    		goto("/login");
+    		goto("/");
     	}
     });
 

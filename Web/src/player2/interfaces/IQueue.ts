@@ -8,7 +8,9 @@ import type { ISong } from "~/providers";
  */
 export interface IQueue
 {
-	queueState: Array<ISong>;
+	get queue(): Readonly<Array<ISong>>;
+	get currentSong(): ISong | null;
+	get currentIdx(): number;
 
 	/**
 	 * Immediately play a single song.
@@ -59,12 +61,14 @@ export interface IQueue
 	/**
 	 * Plays the song at index `idx` of the queue
 	 */
-	PlayIdx(idx: number): void;
+	PlayAt(idx: number): void;
 
 	/**
 	 * Clears the entire queue
 	 */
 	ClearQueue(): void;
 
-	RemoveIdx(idx: number): void;
+	RemoveAt(idx: number): void;
+
+	OnQueueChanged(callback: () => void): void;
 }
