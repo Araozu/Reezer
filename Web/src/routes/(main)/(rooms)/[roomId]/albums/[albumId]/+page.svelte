@@ -9,6 +9,7 @@
 	import { ListEnd, ListStart, Play, Plus } from "lucide-svelte";
 	import Button from "$lib/components/ui/button/button.svelte";
 	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
+	import BackButton from "$lib/components/back-button.svelte";
 
 	type SongDto = components["schemas"]["SongDto"];
 
@@ -32,7 +33,8 @@
 	<title>Reezer - {albumName}</title>
 </svelte:head>
 
-<h1 class="font-display text-4xl font-semibold py-8 px-4">
+<h1 class="font-display text-4xl font-semibold py-8 px-4 flex items-center gap-3">
+	<BackButton />
 	<a href="." class="hover:underline">Albums</a>
 	&gt;
 	<span class="font-medium">{albumName}</span>
@@ -63,14 +65,14 @@
 
 	<div class="py-6">
 		{#if $albumQuery.data}
-			{#each $albumQuery.data.songs as song (song.id)}
-				{@render Song(song, currentSongId)}
+			{#each $albumQuery.data.songs as song, index (song.id)}
+				{@render Song(song, currentSongId, () => queue.PlaySongList(songs.slice(index)))}
 			{/each}
 		{/if}
 	</div>
 </div>
 
-{#snippet Song(song: SongDto, currentSongId: string | null)}
+{#snippet Song(song: SongDto, currentSongId: string | null, onPlay: () => void)}
 	{@const isCurrentSong = song.id === currentSongId}
 	{@const currentSongClass = isCurrentSong
 		? "bg-primary/10 border border-primary/30 shadow-[0_0_0_1px_var(--glass-border),inset_0_1px_1px_var(--glass-highlight)]"
@@ -78,7 +80,7 @@
 	<div class={`group/row grid grid-cols-[auto_2.5rem_2.5rem] rounded-xl transition-all duration-300 hover:bg-glass-bg-hover hover:backdrop-blur-lg hover:shadow-[inset_0_1px_1px_var(--glass-highlight)] ${currentSongClass}`}>
 		<button
 			class="cursor-pointer inline-block w-full text-left px-3 py-3"
-			onclick={() => queue.PlaySong(song)}
+			onclick={onPlay}
 		>
 			<div class="grid grid-cols-[2rem_auto] gap-4 items-center">
 				<div class="inline-flex items-center justify-center h-6 text-muted-foreground">

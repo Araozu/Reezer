@@ -11,8 +11,8 @@ self.addEventListener("activate", (event) =>
 	event.waitUntil(clients.claim());
 });
 
-self.addEventListener("fetch", (event) =>
+self.addEventListener("fetch", () =>
 {
-	// Let all requests pass through to the network without caching
-	event.respondWith(fetch(event.request));
+	// Do nothing - let the browser handle all requests normally
+	// Not calling event.respondWith() passes the request through unchanged
 });

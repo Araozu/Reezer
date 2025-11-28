@@ -14,7 +14,20 @@ export class GeneralPurposeQueue implements IQueue
 	private _onQueueChangedCallbacks: Array<() => void> = [];
 
 	constructor(private readonly audioBackend: IAudioBackend)
-	{}
+	{
+		this.audioBackend.OnSongEnd(this.onSongEnd);
+	}
+
+	private onSongEnd = (_endedSongId: string) =>
+	{
+		// Move to next song if available
+		if (this._currentIdx < this._queueState.length - 1)
+		{
+			this._currentIdx += 1;
+			this.notifyQueueChanged();
+			this.backendPlayAndUpdate();
+		}
+	};
 
 	get queue():Readonly<Array<ISong>>
 	{
@@ -35,17 +48,15 @@ export class GeneralPurposeQueue implements IQueue
 		{
 			this._queueState = [song];
 			this._currentIdx = 0;
-			// this.audioBackend.PlaySong(song);
 		}
 		else
 		{
 			this.clearCurrentOnwards();
 			this._queueState.push(song);
 			this._currentIdx += 1;
-			// this.audioBackend.PlaySong(song);
 		}
 		this.notifyQueueChanged();
-		this.updatePlayerState();
+		this.backendPlayAndUpdate();
 	}
 
 	PlaySongList(songs: Array<ISong>): void
@@ -54,17 +65,15 @@ export class GeneralPurposeQueue implements IQueue
 		{
 			this._queueState = songs;
 			this._currentIdx = 0;
-			// this.audioBackend.PlaySong(songs[0]);
 		}
 		else
 		{
 			this.clearCurrentOnwards();
 			this._queueState.push(...songs);
 			this._currentIdx += 1;
-			// this.audioBackend.PlaySong(songs[0]);
 		}
 		this.notifyQueueChanged();
-		this.updatePlayerState();
+		this.backendPlayAndUpdate();
 	}
 
 	AddLastSong(song: ISong): void
@@ -83,37 +92,83 @@ export class GeneralPurposeQueue implements IQueue
 	{
 		this._queueState.splice(this._currentIdx + 1, 0, song);
 		this.notifyQueueChanged();
+		this.backendUpdate();
 	}
 
 	AddNextSongList(song: Array<ISong>): void
 	{
 		this._queueState.splice(this._currentIdx + 1, 0, ...song);
 		this.notifyQueueChanged();
+		this.backendUpdate();
 	}
 
 	Next(): void
 	{
-		throw new Error("Method not implemented.");
+		if (this._currentIdx < this._queueState.length - 1)
+		{
+			this._currentIdx += 1;
+			this.notifyQueueChanged();
+			this.backendPlayAndUpdate();
+		}
 	}
 
 	Prev(): void
 	{
-		throw new Error("Method not implemented.");
+		if (this._currentIdx > 0)
+		{
+			this._currentIdx -= 1;
+			this.notifyQueueChanged();
+			this.backendPlayAndUpdate();
+		}
 	}
 
 	PlayAt(idx: number): void
 	{
-		throw new Error("Method not implemented.");
+		if (idx >= 0 && idx < this._queueState.length)
+		{
+			this._currentIdx = idx;
+			this.notifyQueueChanged();
+			this.backendPlayAndUpdate();
+		}
 	}
 
 	ClearQueue(): void
 	{
-		throw new Error("Method not implemented.");
+		this._queueState = [];
+		this._currentIdx = -1;
+		this.notifyQueueChanged();
+		this.audioBackend.ClearPrefetch();
 	}
 
 	RemoveAt(idx: number): void
 	{
-		throw new Error("Method not implemented.");
+		if (idx < 0 || idx >= this._queueState.length) return;
+
+		this._queueState.splice(idx, 1);
+
+		if (idx < this._currentIdx)
+		{
+			this._currentIdx -= 1;
+		}
+		else if (idx === this._currentIdx)
+		{
+			// Removed the currently playing song
+			if (this._currentIdx >= this._queueState.length)
+			{
+				this._currentIdx = this._queueState.length - 1;
+			}
+			if (this._currentIdx >= 0)
+			{
+				this.backendPlayAndUpdate();
+			}
+		}
+		else
+		{
+			// Removed a song after current, just update prefetch
+			this.backendUpdate();
+		}
+
+		this.notifyQueueChanged();
 	}
 
 	private clearCurrentOnwards()
@@ -125,10 +180,9 @@ export class GeneralPurposeQueue implements IQueue
 	}
 
 	/**
-	 * To be called after a queue state change. Updates the audio backend's player state,
-	 * commands it to play the current song, queue next song, etc.
+	 * Immediately plays the current song in the backend and prefetches the next one
 	 */
-	private updatePlayerState()
+	private backendPlayAndUpdate()
 	{
 		if (this._currentIdx === -1 || this._currentIdx > this._queueState.length)
 		{
@@ -143,16 +197,26 @@ export class GeneralPurposeQueue implements IQueue
 		if (nextSong) this.audioBackend.Prefetch(nextSong.id);
 	}
 
+	/**
+	 * Updates the prefetched song in the backend. Doesn't alter current playback.
+	 */
+	private backendUpdate()
+	{
+		if (this._currentIdx === -1 || this._currentIdx >= this._queueState.length) return;
+
+		const nextSong: ISong | null = this._queueState[this._currentIdx + 1] ?? null;
+
+		if (nextSong) this.audioBackend.Prefetch(nextSong.id);
+		else this.audioBackend.ClearPrefetch();
+	}
+
 	OnQueueChanged(callback: () => void): void
 	{
 		this._onQueueChangedCallbacks.push(callback);
 	}
 	private notifyQueueChanged()
 	{
-		for (const callback of this._onQueueChangedCallbacks)
-		{
-			callback();
-		}
+		this._onQueueChangedCallbacks.forEach((callback) => callback());
 	}
 
 	// FIXME: Add init/deinit methods that also setup the audio backend
