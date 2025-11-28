@@ -13,6 +13,8 @@
 	import VolumeSlider from "./volume-slider.svelte";
 	import PositionSlider from "./position-slider.svelte";
 	import { GetPlayerContext, GetQueueContext } from "~/player2/context/player-store";
+	import LavaLamp from "./lava-lamp.svelte";
+	import { extractColorsFromImage } from "$lib/color-extractor";
 
 	let {
 		coverUrl = $bindable(),
@@ -29,18 +31,32 @@
 	// FIXME: regression
 	let isPaused = false;
 	let isBuffering = false;
+
+	let extractedColors = $state<string[]>(["#ff6b6b", "#4ecdc4", "#ffe66d"]);
+	let isDark = $state(false);
+
+	$effect(() => {
+		if (coverUrl) {
+			extractColorsFromImage(coverUrl).then((result) => {
+				extractedColors = result.colors;
+				isDark = result.isDark;
+			});
+		}
+	});
 </script>
 
 <div class="flex justify-center">
-	<img
-		class={[
-			"shadow-lg aspect-square object-cover",
-			"rounded-2xl h-full w-full",
-			"max-h-60 max-w-60 md:max-w-120 md:max-h-120",
-		]}
-		src={coverUrl}
-		alt="Album portrait"
-	/>
+	<div class="relative max-h-60 max-w-60 md:max-w-120 md:max-h-120 aspect-square w-full">
+		<LavaLamp colors={extractedColors} {isDark} />
+		<img
+			class={[
+				"shadow-lg aspect-square object-cover",
+				"rounded-2xl h-full w-full relative z-10",
+			]}
+			src={coverUrl}
+			alt="Album portrait"
+		/>
+	</div>
 </div>
 <div class="py-3">
 	<p class="font-bold font-display text-xl">
