@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -9,7 +10,7 @@ using Reezer.Infrastructure.Options;
 
 namespace Reezer.Infrastructure.Services;
 
-public class LibraryInitializationService(
+public partial class LibraryInitializationService(
     ReezerDbContext dbContext,
     IOptions<StorageOptions> storageOptions,
     ILogger<LibraryInitializationService> logger
@@ -34,6 +35,9 @@ public class LibraryInitializationService(
         "front.jpeg",
         "front.png",
     ];
+
+    [GeneratedRegex(@"(?:CD|Disc|Disk)\s*(\d+)", RegexOptions.IgnoreCase)]
+    private static partial Regex DiscFolderRegex();
 
     private StorageOptions StorageOptions => storageOptions.Value;
 
@@ -134,7 +138,7 @@ public class LibraryInitializationService(
     private static string? FindAlbumCover(
         string? currentDirectory,
         bool isInDiscFolder,
-        string libraryInitPath
+        string libraryInitFullPath
     )
     {
         if (currentDirectory == null)
@@ -151,7 +155,7 @@ public class LibraryInitializationService(
                 parentDirectory != null
                 && !string.Equals(
                     Path.GetFullPath(parentDirectory),
-                    Path.GetFullPath(libraryInitPath),
+                    libraryInitFullPath,
                     StringComparison.OrdinalIgnoreCase
                 )
             )
@@ -197,9 +201,8 @@ public class LibraryInitializationService(
             if (pathParts.Length == 4)
             {
                 var discFolder = pathParts[2];
-                if (
-                    int.TryParse(new string(discFolder.Where(char.IsDigit).ToArray()), out var disc)
-                )
+                var match = DiscFolderRegex().Match(discFolder);
+                if (match.Success && int.TryParse(match.Groups[1].Value, out var disc))
                 {
                     discNumber = disc;
                 }
