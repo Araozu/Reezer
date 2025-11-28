@@ -31,14 +31,12 @@
 				{#if !collapsed}
 					<Tabs.Root bind:value={currentTab}>
 						<Tabs.List>
-							<Tabs.Trigger
-								value="playing"
-								>Now Playing</Tabs.Trigger
-							>
-							<Tabs.Trigger
-								value="queue"
-								>Queue</Tabs.Trigger
-							>
+							<Tabs.Trigger value="playing">
+								Now Playing
+							</Tabs.Trigger>
+							<Tabs.Trigger value="queue">
+								Queue
+							</Tabs.Trigger>
 						</Tabs.List>
 					</Tabs.Root>
 				{/if}

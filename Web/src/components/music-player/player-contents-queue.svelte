@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { X } from "lucide-svelte";
 	import { GetQueueContext } from "~/player2/context/player-store";
-	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue";
+	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
 
 	let queue = GetQueueContext();
 	let sv_queue = new SvelteRuneQueue(queue);
