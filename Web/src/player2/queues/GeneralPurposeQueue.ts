@@ -35,17 +35,15 @@ export class GeneralPurposeQueue implements IQueue
 		{
 			this._queueState = [song];
 			this._currentIdx = 0;
-			// this.audioBackend.PlaySong(song);
 		}
 		else
 		{
 			this.clearCurrentOnwards();
 			this._queueState.push(song);
 			this._currentIdx += 1;
-			// this.audioBackend.PlaySong(song);
 		}
 		this.notifyQueueChanged();
-		this.updatePlayerState();
+		this.backendPlayAndUpdate();
 	}
 
 	PlaySongList(songs: Array<ISong>): void
@@ -54,17 +52,15 @@ export class GeneralPurposeQueue implements IQueue
 		{
 			this._queueState = songs;
 			this._currentIdx = 0;
-			// this.audioBackend.PlaySong(songs[0]);
 		}
 		else
 		{
 			this.clearCurrentOnwards();
 			this._queueState.push(...songs);
 			this._currentIdx += 1;
-			// this.audioBackend.PlaySong(songs[0]);
 		}
 		this.notifyQueueChanged();
-		this.updatePlayerState();
+		this.backendPlayAndUpdate();
 	}
 
 	AddLastSong(song: ISong): void
@@ -83,12 +79,14 @@ export class GeneralPurposeQueue implements IQueue
 	{
 		this._queueState.splice(this._currentIdx + 1, 0, song);
 		this.notifyQueueChanged();
+		this.backendUpdate();
 	}
 
 	AddNextSongList(song: Array<ISong>): void
 	{
 		this._queueState.splice(this._currentIdx + 1, 0, ...song);
 		this.notifyQueueChanged();
+		this.backendUpdate();
 	}
 
 	Next(): void
@@ -125,10 +123,9 @@ export class GeneralPurposeQueue implements IQueue
 	}
 
 	/**
-	 * To be called after a queue state change. Updates the audio backend's player state,
-	 * commands it to play the current song, queue next song, etc.
+	 * Immediately plays the current song in the backend and prefetches the next one
 	 */
-	private updatePlayerState()
+	private backendPlayAndUpdate()
 	{
 		if (this._currentIdx === -1 || this._currentIdx > this._queueState.length)
 		{
@@ -143,16 +140,26 @@ export class GeneralPurposeQueue implements IQueue
 		if (nextSong) this.audioBackend.Prefetch(nextSong.id);
 	}
 
+	/**
+	 * Updates the prefetched song in the backend. Doesn't alter current playback.
+	 */
+	private backendUpdate()
+	{
+		if (this._currentIdx === -1 || this._currentIdx >= this._queueState.length) return;
+
+		const nextSong: ISong | null = this._queueState[this._currentIdx + 1] ?? null;
+
+		if (nextSong) this.audioBackend.Prefetch(nextSong.id);
+		else this.audioBackend.ClearPrefetch();
+	}
+
 	OnQueueChanged(callback: () => void): void
 	{
 		this._onQueueChangedCallbacks.push(callback);
 	}
 	private notifyQueueChanged()
 	{
-		for (const callback of this._onQueueChangedCallbacks)
-		{
-			callback();
-		}
+		this._onQueueChangedCallbacks.forEach((callback) => callback());
 	}
 
 	// FIXME: Add init/deinit methods that also setup the audio backend

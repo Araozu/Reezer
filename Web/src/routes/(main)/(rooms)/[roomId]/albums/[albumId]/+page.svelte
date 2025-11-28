@@ -63,14 +63,14 @@
 
 	<div class="py-6">
 		{#if $albumQuery.data}
-			{#each $albumQuery.data.songs as song (song.id)}
-				{@render Song(song, currentSongId)}
+			{#each $albumQuery.data.songs as song, index (song.id)}
+				{@render Song(song, currentSongId, () => queue.PlaySongList(songs.slice(index)))}
 			{/each}
 		{/if}
 	</div>
 </div>
 
-{#snippet Song(song: SongDto, currentSongId: string | null)}
+{#snippet Song(song: SongDto, currentSongId: string | null, onPlay: () => void)}
 	{@const isCurrentSong = song.id === currentSongId}
 	{@const currentSongClass = isCurrentSong
 		? "bg-primary/10 border border-primary/30 shadow-[0_0_0_1px_var(--glass-border),inset_0_1px_1px_var(--glass-highlight)]"
@@ -78,7 +78,7 @@
 	<div class={`group/row grid grid-cols-[auto_2.5rem_2.5rem] rounded-xl transition-all duration-300 hover:bg-glass-bg-hover hover:backdrop-blur-lg hover:shadow-[inset_0_1px_1px_var(--glass-highlight)] ${currentSongClass}`}>
 		<button
 			class="cursor-pointer inline-block w-full text-left px-3 py-3"
-			onclick={() => queue.PlaySong(song)}
+			onclick={onPlay}
 		>
 			<div class="grid grid-cols-[2rem_auto] gap-4 items-center">
 				<div class="inline-flex items-center justify-center h-6 text-muted-foreground">
