@@ -8,12 +8,16 @@
 	import type { components } from "~/api";
 	import { ListEnd, ListStart, Play, Plus } from "lucide-svelte";
 	import Button from "$lib/components/ui/button/button.svelte";
+	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
 
 	type SongDto = components["schemas"]["SongDto"];
 
 	let { data }: PageProps = $props();
 
 	const queue = GetQueueContext();
+	const svQueue = new SvelteRuneQueue(queue);
+
+	const currentSongId = $derived(svQueue.currentSong?.id ?? null);
 
 	let albumId = toStore(() => page.params.albumId ?? "-");
 	let dataStore = toStore(() => data.albumData);
@@ -60,14 +64,18 @@
 	<div class="py-6">
 		{#if $albumQuery.data}
 			{#each $albumQuery.data.songs as song (song.id)}
-				{@render Song(song)}
+				{@render Song(song, currentSongId)}
 			{/each}
 		{/if}
 	</div>
 </div>
 
-{#snippet Song(song: SongDto)}
-	<div class="group/row grid grid-cols-[auto_2.5rem_2.5rem] rounded-xl transition-all duration-300 hover:bg-glass-bg-hover hover:backdrop-blur-lg hover:shadow-[inset_0_1px_1px_var(--glass-highlight)]">
+{#snippet Song(song: SongDto, currentSongId: string | null)}
+	{@const isCurrentSong = song.id === currentSongId}
+	{@const currentSongClass = isCurrentSong
+		? "bg-primary/10 border border-primary/30 shadow-[0_0_0_1px_var(--glass-border),inset_0_1px_1px_var(--glass-highlight)]"
+		: "border border-transparent"}
+	<div class={`group/row grid grid-cols-[auto_2.5rem_2.5rem] rounded-xl transition-all duration-300 hover:bg-glass-bg-hover hover:backdrop-blur-lg hover:shadow-[inset_0_1px_1px_var(--glass-highlight)] ${currentSongClass}`}>
 		<button
 			class="cursor-pointer inline-block w-full text-left px-3 py-3"
 			onclick={() => queue.PlaySong(song)}

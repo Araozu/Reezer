@@ -12,6 +12,10 @@ export class SvelteRuneQueue
 
 	constructor(private iqueue: IQueue)
 	{
+		this.queue = iqueue.queue;
+		this.currentIdx = iqueue.currentIdx;
+		this.currentSong = iqueue.currentSong;
+
 		iqueue.OnQueueChanged(() =>
 		{
 			this.queue = iqueue.queue;

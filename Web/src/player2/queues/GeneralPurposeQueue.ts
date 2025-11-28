@@ -45,6 +45,7 @@ export class GeneralPurposeQueue implements IQueue
 			// this.audioBackend.PlaySong(song);
 		}
 		this.notifyQueueChanged();
+		this.updatePlayerState();
 	}
 
 	PlaySongList(songs: Array<ISong>): void
@@ -63,6 +64,7 @@ export class GeneralPurposeQueue implements IQueue
 			// this.audioBackend.PlaySong(songs[0]);
 		}
 		this.notifyQueueChanged();
+		this.updatePlayerState();
 	}
 
 	AddLastSong(song: ISong): void
@@ -128,7 +130,17 @@ export class GeneralPurposeQueue implements IQueue
 	 */
 	private updatePlayerState()
 	{
+		if (this._currentIdx === -1 || this._currentIdx > this._queueState.length)
+		{
+			console.error("Queue is empty or currentIdx is out of bounds, cannot update player state");
+			return;
+		}
 
+		const currentSong = this._queueState[this._currentIdx];
+		const nextSong: ISong | null = this._queueState[this._currentIdx] ?? null;
+
+		this.audioBackend.Play(currentSong.id);
+		if (nextSong) this.audioBackend.Prefetch(nextSong.id);
 	}
 
 	OnQueueChanged(callback: () => void): void
