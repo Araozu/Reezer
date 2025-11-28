@@ -1,15 +1,17 @@
 <script lang="ts">
 	import * as Drawer from "$lib/components/ui/drawer/index.js";
+    import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
 	import PlayerContentsCollapsedMobile from "./player-contents-collapsed-mobile.svelte";
 	import PlayerContentsPlaying from "./player-contents-playing.svelte";
 	import PlayerContentsQueue from "./player-contents-queue.svelte";
-	import { GetPlayerContext } from "~/player2/context/player-store";
+	import { GetQueueContext } from "~/player2/context/player-store";
 
 	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
-	let player = GetPlayerContext();
+	let queue = GetQueueContext();
+	let svelteQueue = new SvelteRuneQueue(queue);
 
-	let song = $derived(player.currentSong);
+	let song = $derived(svelteQueue.currentSong);
 	let currentTab = $state<"playing" | "queue">("playing");
 
 	let coverUrl = $derived(song ? `/api/Albums/${song.albumId}/cover` : "/vinyl.jpg");
@@ -23,13 +25,13 @@
 			{#if collapsed}
 				<PlayerContentsCollapsedMobile
 					bind:coverUrl
-					bind:song
+					{song}
 					expand={() => (open = true)}
 				/>
 			{:else if !collapsed && currentTab === "playing"}
 				<PlayerContentsPlaying
 					bind:coverUrl
-					bind:song
+					{song}
 				/>
 			{:else if !collapsed && currentTab === "queue"}
 				<PlayerContentsQueue />
@@ -41,7 +43,7 @@
 <Drawer.Root bind:open>
 	<Drawer.Content class="h-90vh">
 		<div class="px-4 py-8">
-			<PlayerContentsPlaying bind:coverUrl bind:song />
+			<PlayerContentsPlaying bind:coverUrl {song} />
 		</div>
 	</Drawer.Content>
 </Drawer.Root>

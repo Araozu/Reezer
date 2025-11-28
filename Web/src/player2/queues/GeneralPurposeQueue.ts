@@ -137,7 +137,7 @@ export class GeneralPurposeQueue implements IQueue
 		}
 
 		const currentSong = this._queueState[this._currentIdx];
-		const nextSong: ISong | null = this._queueState[this._currentIdx] ?? null;
+		const nextSong: ISong | null = this._queueState[this._currentIdx + 1] ?? null;
 
 		this.audioBackend.Play(currentSong.id);
 		if (nextSong) this.audioBackend.Prefetch(nextSong.id);

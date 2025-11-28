@@ -10,7 +10,7 @@ export class SvelteRuneQueue
 	public currentIdx = $state(-1);
 	public currentSong: ISong | null = $state(null);
 
-	constructor(private iqueue: IQueue)
+	constructor(iqueue: IQueue)
 	{
 		this.queue = iqueue.queue;
 		this.currentIdx = iqueue.currentIdx;
