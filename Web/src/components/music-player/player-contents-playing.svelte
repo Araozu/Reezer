@@ -29,6 +29,21 @@
 	// FIXME: regression
 	let isPaused = false;
 	let isBuffering = false;
+<<<<<<< HEAD
+=======
+
+	let extractedColors = $state<string[]>(["#ff6b6b", "#4ecdc4", "#ffe66d"]);
+	let isDark = $state(false);
+
+	$effect(() => {
+		if (coverUrl) {
+			extractColorsFromImage(coverUrl).then((result) => {
+				extractedColors = result.colors;
+				isDark = result.isDark;
+			});
+		}
+	});
+>>>>>>> parent of 58ab8ed (Address code review feedback: add named constants and error handling)
 </script>
 
 <div class="flex justify-center">
