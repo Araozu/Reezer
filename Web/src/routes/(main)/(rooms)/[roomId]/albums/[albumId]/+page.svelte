@@ -106,14 +106,14 @@
 			</div>
 		</button>
 		<button
-			class="cursor-pointer inline-flex items-center justify-center rounded-lg text-muted-foreground opacity-0 group-hover/row:opacity-100 transition-all duration-300 hover:text-foreground hover:bg-primary/20 active:scale-95"
+			class="cursor-pointer inline-flex items-center justify-center rounded-lg text-muted-foreground transition-all duration-300 hover:text-foreground hover:bg-primary/20 active:scale-95"
 			onclick={() => PlayLast(song)}
 			title="Add to queue"
 		>
 			<Plus class="size-4" />
 		</button>
 		<button
-			class="cursor-pointer inline-flex items-center justify-center rounded-lg text-muted-foreground opacity-0 group-hover/row:opacity-100 transition-all duration-300 hover:text-foreground hover:bg-primary/20 active:scale-95"
+			class="cursor-pointer inline-flex items-center justify-center rounded-lg text-muted-foreground transition-all duration-300 hover:text-foreground hover:bg-primary/20 active:scale-95"
 			onclick={() => PlayNext(song)}
 			title="Play next"
 		>
