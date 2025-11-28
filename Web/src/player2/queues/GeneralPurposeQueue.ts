@@ -14,7 +14,20 @@ export class GeneralPurposeQueue implements IQueue
 	private _onQueueChangedCallbacks: Array<() => void> = [];
 
 	constructor(private readonly audioBackend: IAudioBackend)
-	{}
+	{
+		this.audioBackend.OnSongEnd(this.onSongEnd);
+	}
+
+	private onSongEnd = (_endedSongId: string) =>
+	{
+		// Move to next song if available
+		if (this._currentIdx < this._queueState.length - 1)
+		{
+			this._currentIdx += 1;
+			this.notifyQueueChanged();
+			this.backendPlayAndUpdate();
+		}
+	};
 
 	get queue():Readonly<Array<ISong>>
 	{
@@ -91,27 +104,71 @@ export class GeneralPurposeQueue implements IQueue
 
 	Next(): void
 	{
-		throw new Error("Method not implemented.");
+		if (this._currentIdx < this._queueState.length - 1)
+		{
+			this._currentIdx += 1;
+			this.notifyQueueChanged();
+			this.backendPlayAndUpdate();
+		}
 	}
 
 	Prev(): void
 	{
-		throw new Error("Method not implemented.");
+		if (this._currentIdx > 0)
+		{
+			this._currentIdx -= 1;
+			this.notifyQueueChanged();
+			this.backendPlayAndUpdate();
+		}
 	}
 
 	PlayAt(idx: number): void
 	{
-		throw new Error("Method not implemented.");
+		if (idx >= 0 && idx < this._queueState.length)
+		{
+			this._currentIdx = idx;
+			this.notifyQueueChanged();
+			this.backendPlayAndUpdate();
+		}
 	}
 
 	ClearQueue(): void
 	{
-		throw new Error("Method not implemented.");
+		this._queueState = [];
+		this._currentIdx = -1;
+		this.notifyQueueChanged();
+		this.audioBackend.ClearPrefetch();
 	}
 
 	RemoveAt(idx: number): void
 	{
-		throw new Error("Method not implemented.");
+		if (idx < 0 || idx >= this._queueState.length) return;
+
+		this._queueState.splice(idx, 1);
+
+		if (idx < this._currentIdx)
+		{
+			this._currentIdx -= 1;
+		}
+		else if (idx === this._currentIdx)
+		{
+			// Removed the currently playing song
+			if (this._currentIdx >= this._queueState.length)
+			{
+				this._currentIdx = this._queueState.length - 1;
+			}
+			if (this._currentIdx >= 0)
+			{
+				this.backendPlayAndUpdate();
+			}
+		}
+		else
+		{
+			// Removed a song after current, just update prefetch
+			this.backendUpdate();
+		}
+
+		this.notifyQueueChanged();
 	}
 
 	private clearCurrentOnwards()

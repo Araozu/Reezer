@@ -39,6 +39,12 @@ export interface IAudioBackend {
 	OnReady(callback: () => void): void;
 
 	/**
+	 * Registers a callback to be called when a song finishes playing.
+	 * Multiple callbacks can be registered.
+	 */
+	OnSongEnd(callback: (endedSongId: string) => void): void;
+
+	/**
 	 * Deinitializes the audio backend, releasing any resources held.
 	 */
 	Deinit(): void;
