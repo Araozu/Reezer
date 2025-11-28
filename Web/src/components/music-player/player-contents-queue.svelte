@@ -1,26 +1,28 @@
 <script lang="ts">
 	import { X } from "lucide-svelte";
-	import { GetPlayerContext } from "~/player2/context/player-store";
+	import { GetQueueContext } from "~/player2/context/player-store";
+	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue";
 
-	let player = GetPlayerContext();
+	let queue = GetQueueContext();
+	let sv_queue = new SvelteRuneQueue(queue);
 
-	let queue = $derived(player.queue);
-	let currentSongIdx = $derived(player.currentSongIdx);
+	let current_queue = $derived(sv_queue.queue);
+	let currentIdx = $derived(sv_queue.currentIdx);
 </script>
 
 <div class="space-y-1.5 max-h-[calc(100vh-8rem)] overflow-scroll">
-	{#each queue as song, index (song.id + index)}
+	{#each current_queue as song, index (song.id + index)}
 		<div
 			class={[
 				"group/queue-item w-full flex items-center gap-2 p-3 border border-glass-border rounded-xl transition-all duration-300",
-				index === currentSongIdx
+				index === currentIdx
 					? "bg-primary/15 border-primary/30"
 					: "hover:bg-glass-bg-hover",
 			]}
 		>
 			<button
 				class="flex-1 text-left cursor-pointer hover:bg-glass-bg rounded-lg p-2 -m-2 transition-all duration-300"
-				onclick={() => player.PlayIdx(index)}
+				onclick={() => queue.PlayIdx(index)}
 			>
 				<p class="font-medium truncate">
 					{song.name}
@@ -36,7 +38,7 @@
 				onclick={(e) =>
 				{
 					e.stopPropagation();
-					player.RemoveSongFromQueue(index);
+					queue.RemoveIdx(index);
 				}}
 				aria-label="Remove song from queue"
 			>
@@ -44,7 +46,7 @@
 			</button>
 		</div>
 	{/each}
-	{#if queue.length === 0}
+	{#if current_queue.length === 0}
 		<p class="text-center text-muted-foreground py-8">
 			No songs in queue
 		</p>

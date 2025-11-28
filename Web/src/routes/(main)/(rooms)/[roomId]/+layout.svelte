@@ -4,13 +4,19 @@
 	import { UrlAudioSource } from "~/player2/audio-sources/UrlAudioSource";
 	import { GaplessBackend } from "~/player2/backends/GaplessBackend";
 	import type { IAudioBackend } from "~/player2/interfaces/IAudioBackend";
-	import { SetPlayerContext } from "~/player2/context/player-store";
+	import { SetPlayerContext, SetQueueContext } from "~/player2/context/player-store";
+    import { GeneralPurposeQueue } from "~/player2/queues/GeneralPurposeQueue";
+    import type { IQueue } from "~/player2/interfaces/IQueue";
 
 	let { children } = $props();
 
 	// Setup music player
+	// FIXME: Remove context for audio backend, should use the IQueue instead
 	const audioBackend: IAudioBackend = new GaplessBackend(new UrlAudioSource());
 	SetPlayerContext(audioBackend);
+
+	const queue: IQueue = new GeneralPurposeQueue(audioBackend);
+	SetQueueContext(queue);
 
 	let audioTagSetup = $state(false);
 	let playerCollapsed = $state(true);
