@@ -17,11 +17,13 @@ public class GetAlbumWithTracklistUseCase(IAlbumRepository albumRepository)
             var album = await albumRepository.GetAlbumWithSongsAsync(albumId, cancellationToken);
 
             var songDtos = album
-                .Songs.OrderBy(song => song.TrackNumber)
+                .Songs.OrderBy(song => song.DiscNumber ?? 1)
+                .ThenBy(song => song.TrackNumber)
                 .Select(song => new SongDto(
                     song.Id,
                     song.Name,
                     song.TrackNumber,
+                    song.DiscNumber,
                     album.Artist.Name,
                     album.Name,
                     album.ArtistId,

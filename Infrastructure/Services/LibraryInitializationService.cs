@@ -15,6 +15,26 @@ public class LibraryInitializationService(
     ILogger<LibraryInitializationService> logger
 ) : ILibraryInitializationService
 {
+    private static readonly string[] CoverFilePatterns =
+    [
+        "cover.jpg",
+        "cover.jpeg",
+        "cover.png",
+        "cover.webp",
+        "folder.jpg",
+        "folder.jpeg",
+        "folder.png",
+        "album.jpg",
+        "album.jpeg",
+        "album.png",
+        "artwork.jpg",
+        "artwork.jpeg",
+        "artwork.png",
+        "front.jpg",
+        "front.jpeg",
+        "front.png",
+    ];
+
     private StorageOptions StorageOptions => storageOptions.Value;
 
     public async Task InitializeLibraryAsync()
@@ -72,10 +92,11 @@ public class LibraryInitializationService(
                 }
 
                 var albumDirectory = Path.GetDirectoryName(audioFile);
-                var coverPath =
-                    albumDirectory != null ? Path.Combine(albumDirectory, "cover.jpg") : null;
-
-                var albumCoverPath = coverPath != null && File.Exists(coverPath) ? coverPath : null;
+                var albumCoverPath = FindAlbumCover(
+                    albumDirectory,
+                    parsedInfo.DiscNumber.HasValue,
+                    libraryInitPath
+                );
 
                 var album = await dbContext.Albums.FirstOrDefaultAsync(a =>
                     a.Name == parsedInfo.Album && a.ArtistId == artist.Id
@@ -92,7 +113,8 @@ public class LibraryInitializationService(
                     parsedInfo.SongName,
                     audioFile,
                     album,
-                    parsedInfo.TrackNumber
+                    parsedInfo.TrackNumber,
+                    parsedInfo.DiscNumber
                 );
                 dbContext.Songs.Add(song);
                 logger.LogInformation(
@@ -107,6 +129,52 @@ public class LibraryInitializationService(
 
         await dbContext.SaveChangesAsync();
         logger.LogInformation("Saved changes to database");
+    }
+
+    private static string? FindAlbumCover(
+        string? currentDirectory,
+        bool isInDiscFolder,
+        string libraryInitPath
+    )
+    {
+        if (currentDirectory == null)
+            return null;
+
+        var cover = FindCoverInDirectory(currentDirectory);
+        if (cover != null)
+            return cover;
+
+        if (isInDiscFolder)
+        {
+            var parentDirectory = Path.GetDirectoryName(currentDirectory);
+            if (
+                parentDirectory != null
+                && !string.Equals(
+                    Path.GetFullPath(parentDirectory),
+                    Path.GetFullPath(libraryInitPath),
+                    StringComparison.OrdinalIgnoreCase
+                )
+            )
+            {
+                cover = FindCoverInDirectory(parentDirectory);
+                if (cover != null)
+                    return cover;
+            }
+        }
+
+        return null;
+    }
+
+    private static string? FindCoverInDirectory(string directory)
+    {
+        foreach (var pattern in CoverFilePatterns)
+        {
+            var coverPath = Path.Combine(directory, pattern);
+            if (File.Exists(coverPath))
+                return coverPath;
+        }
+
+        return null;
     }
 
     private static ParsedAudioInfo ParseAudioFilePath(string audioFilePath, string libraryInitPath)

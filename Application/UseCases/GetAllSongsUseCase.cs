@@ -14,6 +14,7 @@ public class GetAllSongsUseCase(ISongRepository songRepository)
             song.Id,
             song.Name,
             song.TrackNumber,
+            song.DiscNumber,
             song.Album.Artist.Name,
             song.Album.Name,
             song.Album.Artist.Id,
