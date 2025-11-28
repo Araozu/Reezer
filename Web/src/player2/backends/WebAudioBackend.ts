@@ -194,10 +194,14 @@ export class WebAudioBackend implements IAudioBackend
 		try
 		{
 			const response = await fetch(url);
+			if (!response.ok)
+			{
+				throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+			}
 			const arrayBuffer = await response.arrayBuffer();
 			return await this.audioContext.decodeAudioData(arrayBuffer);
 		}
-		catch (error)
+		catch (error: unknown)
 		{
 			console.error("Error fetching/decoding audio:", error);
 			return null;
@@ -240,7 +244,7 @@ export class WebAudioBackend implements IAudioBackend
 				this.currentSource.onended = null;
 				this.currentSource.stop();
 			}
-			catch
+			catch (_error: unknown)
 			{
 				// Source may already be stopped
 			}
