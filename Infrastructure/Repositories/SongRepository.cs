@@ -84,7 +84,7 @@ public class SongRepository(ReezerDbContext dbContext, IOptions<StorageOptions> 
 
             try
             {
-                // Perform transcoding to fragmented WebM with Opus (DASH-compatible)
+                // Perform transcoding to WebM with Opus
                 await FFMpegArguments
                     .FromFileInput(song.RawPath)
                     .OutputToFile(
@@ -94,11 +94,7 @@ public class SongRepository(ReezerDbContext dbContext, IOptions<StorageOptions> 
                             options
                                 .WithAudioCodec("libopus")
                                 .WithAudioBitrate(64)
-                                .WithCustomArgument("-avoid_negative_ts make_zero")
-                                .ForceFormat("webm")
-                                .WithCustomArgument("-dash 1")
-                                .WithCustomArgument("-cluster_size_limit 2M")
-                                .WithCustomArgument("-cluster_time_limit 5000")
+                                .WithCustomArgument("-vn")
                     )
                     .ProcessAsynchronously();
 
