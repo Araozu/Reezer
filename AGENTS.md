@@ -7,6 +7,7 @@
 - **Build**: `cd Web && npm run build` or `pnpm build`
 - **TypeScript/Svelte check**: `cd Web && npm run check` or `pnpm check`
 - **Watch mode check**: `cd Web && npm run check:watch` or `pnpm check:watch`
+- **Types from the server**: To know the actual shape of things coming from the backend, **grep** `Web/src/api/api.d.ts`. Don't read that whole file unless strictly neccesary, it is massive.
 
 ### Backend (.NET)
 - **Build solution**: `dotnet build`
@@ -30,15 +31,9 @@
 
 ### C#
 - **Framework**: .NET 10.0
-- **Nullable**: Enabled
-- **Implicit usings**: Enabled
-- **Formatting**: Use CSharpier for consistent formatting
-- **Naming**: PascalCase for classes/methods/properties, camelCase for local variables
-- **Features**: Always use primary constructor, file namespaces, records for DTOs
+- **Features**: Always use primary constructor, file namespaces, records for DTOs. Nullable & implicit imports enabled.
 - **EF**: When writing Fluent configuration, NEVER use the Fluent API for things that convention-based entities already cover
 
-- Use `record` classes for DTOs
-- Use primary constructors
 - Error handling uses the `OneOf` library and the types defined at `Domain/Utils/ErrorTypes.cs`
 - Non 2XX API responses **MUST** use `ProblemDetails` with at least `Details`
 - If an operation cannot fail, just return the data, without wrapping it in `OneOf`

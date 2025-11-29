@@ -80,11 +80,16 @@
 
 	$effect(() =>
 	{
-		if (colors.length > 0 && blobs.length !== colors.length)
+		if (colors.length > 0 && (blobs.length !== colors.length || hasWeightsChanged()))
 		{
 			initBlobs();
 		}
 	});
+
+	function hasWeightsChanged(): boolean
+	{
+		return weights.length !== blobs.length;
+	}
 </script>
 
 <div

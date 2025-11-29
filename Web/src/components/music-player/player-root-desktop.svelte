@@ -20,14 +20,14 @@
 
 	let coverUrl = $derived(currentSong ? `/api/Albums/${currentSong.albumId}/cover` : "/vinyl.jpg");
 
-	let extractedColors = $state<string[]>(["#ff6b6b", "#4ecdc4", "#ffe66d", "#9b59b6"]);
-	let colorWeights = $state<number[]>([1, 0.8, 0.6, 0.5]);
+	let extractedColors = $state<string[]>([]);
+	let colorWeights = $state<number[]>([]);
 
 	$effect(() =>
 	{
 		if (coverUrl)
 		{
-			extractColorsFromImage(coverUrl).then((result) =>
+			extractColorsFromImage(coverUrl, 6).then((result) =>
 			{
 				extractedColors = result.colors;
 				colorWeights = result.weights;

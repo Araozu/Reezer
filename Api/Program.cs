@@ -5,6 +5,7 @@ using Reezer.Application;
 using Reezer.Infrastructure;
 using Reezer.Infrastructure.Data;
 using Reezer.Infrastructure.Identity;
+using RezerV4.Api.Utils;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -124,6 +125,7 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
+app.UseGlobalExceptionHandler();
 app.UseCors("Allow Frontend");
 
 app.UseAuthentication();

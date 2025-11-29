@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using FFMpegCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -65,36 +66,48 @@ public partial class LibraryInitializationService(
 
         logger.LogInformation("Found {AudioFiles} audio files", audioFiles.Length);
 
+        var artistCache = new Dictionary<string, Artist>(StringComparer.OrdinalIgnoreCase);
+        var albumCache = new Dictionary<(string ArtistName, string AlbumName), Album>(
+            new AlbumKeyComparer()
+        );
+
+        var existingArtists = await dbContext.Artists.ToListAsync();
+        foreach (var a in existingArtists)
+            artistCache[a.Name] = a;
+
+        var existingAlbums = await dbContext.Albums.Include(a => a.Artist).ToListAsync();
+        foreach (var a in existingAlbums)
+            albumCache[(a.Artist.Name, a.Name)] = a;
+
+        var existingSongPaths = await dbContext.Songs.Select(s => s.RawPath).ToHashSetAsync();
+
         foreach (var audioFile in audioFiles)
         {
-            var parsedInfo = ParseAudioFilePath(audioFile, libraryInitPath);
+            if (existingSongPaths.Contains(audioFile))
+                continue;
+
+            var parsedInfo = await ExtractAudioInfoAsync(audioFile, libraryInitPath);
 
             logger.LogInformation(
-                "Parsed: Artist='{Artist}', Album='{Album}', Disc={Disc}, Track={Track}, Song='{Song}'",
+                "Parsed: Artist='{Artist}', Album='{Album}', Disc={Disc}, Track={Track}, Song='{Song}' (Source: {Source})",
                 parsedInfo.Artist,
                 parsedInfo.Album,
                 parsedInfo.DiscNumber ?? 0,
                 parsedInfo.TrackNumber ?? 0,
-                parsedInfo.SongName
+                parsedInfo.SongName,
+                parsedInfo.FromMetadata ? "metadata" : "filepath"
             );
 
-            var existingSong = await dbContext.Songs.FirstOrDefaultAsync(s =>
-                s.RawPath == audioFile
-            );
-
-            if (existingSong is null)
+            if (!artistCache.TryGetValue(parsedInfo.Artist, out var artist))
             {
-                var artist = await dbContext.Artists.FirstOrDefaultAsync(a =>
-                    a.Name == parsedInfo.Artist
-                );
+                artist = Artist.Create(parsedInfo.Artist);
+                dbContext.Artists.Add(artist);
+                artistCache[parsedInfo.Artist] = artist;
+            }
 
-                if (artist is null)
-                {
-                    artist = Artist.Create(parsedInfo.Artist);
-                    dbContext.Artists.Add(artist);
-                    await dbContext.SaveChangesAsync();
-                }
-
+            var albumKey = (parsedInfo.Artist, parsedInfo.Album);
+            if (!albumCache.TryGetValue(albumKey, out var album))
+            {
                 var albumDirectory = Path.GetDirectoryName(audioFile);
                 var albumCoverPath = FindAlbumCover(
                     albumDirectory,
@@ -102,37 +115,51 @@ public partial class LibraryInitializationService(
                     libraryInitPath
                 );
 
-                var album = await dbContext.Albums.FirstOrDefaultAsync(a =>
-                    a.Name == parsedInfo.Album && a.ArtistId == artist.Id
-                );
+                album = Album.Create(parsedInfo.Album, artist, albumCoverPath);
+                dbContext.Albums.Add(album);
+                albumCache[albumKey] = album;
 
-                if (album is null)
-                {
-                    album = Album.Create(parsedInfo.Album, artist, albumCoverPath);
-                    dbContext.Albums.Add(album);
-                    await dbContext.SaveChangesAsync();
-                }
-
-                var song = Song.CreateFromLibrary(
-                    parsedInfo.SongName,
-                    audioFile,
-                    album,
-                    parsedInfo.TrackNumber,
-                    parsedInfo.DiscNumber
-                );
-                dbContext.Songs.Add(song);
                 logger.LogInformation(
-                    "Added song '{SongName}' to database (from {Artist}/{Album}){CoverInfo}",
-                    parsedInfo.SongName,
-                    parsedInfo.Artist,
+                    "Created album '{Album}' for artist '{Artist}'{CoverInfo}",
                     parsedInfo.Album,
+                    parsedInfo.Artist,
                     albumCoverPath != null ? $" with cover: {albumCoverPath}" : ""
                 );
             }
+
+            var song = Song.CreateFromLibrary(
+                parsedInfo.SongName,
+                audioFile,
+                album,
+                parsedInfo.TrackNumber,
+                parsedInfo.DiscNumber
+            );
+            dbContext.Songs.Add(song);
+            existingSongPaths.Add(audioFile);
+
+            logger.LogInformation(
+                "Added song '{SongName}' to database (from {Artist}/{Album})",
+                parsedInfo.SongName,
+                parsedInfo.Artist,
+                parsedInfo.Album
+            );
         }
 
         await dbContext.SaveChangesAsync();
         logger.LogInformation("Saved changes to database");
+    }
+
+    private sealed class AlbumKeyComparer : IEqualityComparer<(string ArtistName, string AlbumName)>
+    {
+        public bool Equals(
+            (string ArtistName, string AlbumName) x,
+            (string ArtistName, string AlbumName) y
+        ) =>
+            string.Equals(x.ArtistName, y.ArtistName, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(x.AlbumName, y.AlbumName, StringComparison.OrdinalIgnoreCase);
+
+        public int GetHashCode((string ArtistName, string AlbumName) obj) =>
+            HashCode.Combine(obj.ArtistName.ToLowerInvariant(), obj.AlbumName.ToLowerInvariant());
     }
 
     private static string? FindAlbumCover(
@@ -181,6 +208,88 @@ public partial class LibraryInitializationService(
         return null;
     }
 
+    private async Task<ParsedAudioInfo> ExtractAudioInfoAsync(
+        string audioFilePath,
+        string libraryInitPath
+    )
+    {
+        var pathInfo = ParseAudioFilePath(audioFilePath, libraryInitPath);
+
+        try
+        {
+            var mediaInfo = await FFProbe.AnalyseAsync(audioFilePath);
+            var tags = mediaInfo.Format.Tags;
+
+            if (tags != null)
+            {
+                var hasAlbum =
+                    tags.TryGetValue("album", out var album)
+                    || tags.TryGetValue("ALBUM", out album);
+
+                var hasTitle =
+                    tags.TryGetValue("title", out var title)
+                    || tags.TryGetValue("TITLE", out title);
+
+                if (
+                    hasAlbum
+                    && hasTitle
+                    && !string.IsNullOrWhiteSpace(album)
+                    && !string.IsNullOrWhiteSpace(title)
+                )
+                {
+                    int? trackNumber = null;
+                    int? discNumber = null;
+
+                    if (
+                        (
+                            tags.TryGetValue("track", out var trackStr)
+                            || tags.TryGetValue("TRACK", out trackStr)
+                            || tags.TryGetValue("TRACKNUMBER", out trackStr)
+                        ) && !string.IsNullOrWhiteSpace(trackStr)
+                    )
+                    {
+                        var trackPart = trackStr.Split('/')[0];
+                        if (int.TryParse(trackPart, out var track))
+                            trackNumber = track;
+                    }
+
+                    if (
+                        (
+                            tags.TryGetValue("disc", out var discStr)
+                            || tags.TryGetValue("DISC", out discStr)
+                            || tags.TryGetValue("DISCNUMBER", out discStr)
+                        ) && !string.IsNullOrWhiteSpace(discStr)
+                    )
+                    {
+                        var discPart = discStr.Split('/')[0];
+                        if (int.TryParse(discPart, out var disc))
+                            discNumber = disc;
+                    }
+
+                    return new ParsedAudioInfo
+                    {
+                        Artist = pathInfo.Artist,
+                        Album = album!,
+                        SongName = title!,
+                        TrackNumber = trackNumber ?? pathInfo.TrackNumber,
+                        DiscNumber = discNumber ?? pathInfo.DiscNumber,
+                        FromMetadata = true,
+                    };
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Failed to extract metadata from {AudioFile}, falling back to filepath parsing",
+                audioFilePath
+            );
+        }
+
+        return pathInfo;
+    }
+
     private static ParsedAudioInfo ParseAudioFilePath(string audioFilePath, string libraryInitPath)
     {
         var relativePath = Path.GetRelativePath(libraryInitPath, audioFilePath);
@@ -226,6 +335,7 @@ public partial class LibraryInitializationService(
             DiscNumber = discNumber,
             TrackNumber = trackNumber,
             SongName = songName,
+            FromMetadata = false,
         };
     }
 
@@ -286,5 +396,6 @@ public partial class LibraryInitializationService(
         public int? DiscNumber { get; init; }
         public int? TrackNumber { get; init; }
         public required string SongName { get; init; }
+        public bool FromMetadata { get; init; }
     }
 }

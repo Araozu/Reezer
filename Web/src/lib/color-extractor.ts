@@ -173,7 +173,7 @@ function kMeansClustering(pixels: RGB[], k: number, iterations: number = 10): RG
 	return centroids;
 }
 
-export async function extractColorsFromImage(imageUrl: string): Promise<ExtractedColors>
+export async function extractColorsFromImage(imageUrl: string, maxColors: number = 4): Promise<ExtractedColors>
 {
 	return new Promise((resolve) =>
 	{
@@ -186,7 +186,7 @@ export async function extractColorsFromImage(imageUrl: string): Promise<Extracte
 			const ctx = canvas.getContext("2d");
 			if (!ctx)
 			{
-				resolve({ colors: ["#ff6b6b", "#4ecdc4", "#ffe66d", "#9b59b6"], weights: [1, 0.8, 0.6, 0.5], isDark: false });
+				resolve({ colors: [], weights: [], isDark: false });
 				return;
 			}
 
@@ -252,13 +252,13 @@ export async function extractColorsFromImage(imageUrl: string): Promise<Extracte
 				if (!isTooClose && !isTooExtreme)
 				{
 					selectedCandidates.push(candidate);
-					if (selectedCandidates.length >= 4) break;
+					if (selectedCandidates.length >= maxColors) break;
 				}
 			}
 
 			for (const candidate of candidates)
 			{
-				if (selectedCandidates.length >= 4) break;
+				if (selectedCandidates.length >= maxColors) break;
 
 				const isTooClose = selectedCandidates.some((existing) => colorDistanceLab(existing.rgb, candidate.rgb) < minDistance);
 
@@ -268,21 +268,10 @@ export async function extractColorsFromImage(imageUrl: string): Promise<Extracte
 				}
 			}
 
-			while (selectedCandidates.length < 4)
+			if (selectedCandidates.length === 0)
 			{
-				const fallbacks = [
-					{ r: 255, g: 107, b: 107 },
-					{ r: 78, g: 205, b: 196 },
-					{ r: 255, g: 230, b: 109 },
-					{ r: 155, g: 89, b: 182 },
-				];
-				const fb = fallbacks[selectedCandidates.length];
-				selectedCandidates.push({
-					rgb: fb,
-					hsl: rgbToHsl(fb.r, fb.g, fb.b),
-					count: 100,
-					score: 0.5,
-				});
+				resolve({ colors: [], weights: [], isDark });
+				return;
 			}
 
 			const weights = selectedCandidates.map((c) =>
@@ -304,7 +293,7 @@ export async function extractColorsFromImage(imageUrl: string): Promise<Extracte
 
 		img.onerror = () =>
 		{
-			resolve({ colors: ["#ff6b6b", "#4ecdc4", "#ffe66d", "#9b59b6"], weights: [1, 0.8, 0.6, 0.5], isDark: false });
+			resolve({ colors: [], weights: [], isDark: false });
 		};
 
 		img.src = imageUrl;
