@@ -39,7 +39,7 @@ WORKDIR /app
 
 # Install minimal runtime dependencies
 # Needed for docker compose healthchecks
-RUN apk add --no-cache curl ffmpeg libwebp-tools
+RUN apk add --no-cache curl ffmpeg libwebp-tools krb5-libs
 
 # Create non-root user for security
 RUN adduser -D -s /bin/sh appuser

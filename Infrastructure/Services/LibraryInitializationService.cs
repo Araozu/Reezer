@@ -81,9 +81,10 @@ public partial class LibraryInitializationService(
 
         var existingSongPaths = await dbContext.Songs.Select(s => s.RawPath).ToHashSetAsync();
 
-        var songsByAlbum = new Dictionary<(string ArtistName, string AlbumName), List<(string AudioFile, ParsedAudioInfo Info)>>(
-            new AlbumKeyComparer()
-        );
+        var songsByAlbum = new Dictionary<
+            (string ArtistName, string AlbumName),
+            List<(string AudioFile, ParsedAudioInfo Info)>
+        >(new AlbumKeyComparer());
 
         foreach (var audioFile in audioFiles)
         {
