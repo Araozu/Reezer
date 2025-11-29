@@ -81,22 +81,32 @@ public partial class LibraryInitializationService(
 
         var existingSongPaths = await dbContext.Songs.Select(s => s.RawPath).ToHashSetAsync();
 
+        var songsByAlbum = new Dictionary<(string ArtistName, string AlbumName), List<(string AudioFile, ParsedAudioInfo Info)>>(
+            new AlbumKeyComparer()
+        );
+
         foreach (var audioFile in audioFiles)
         {
             if (existingSongPaths.Contains(audioFile))
                 continue;
 
             var parsedInfo = await ExtractAudioInfoAsync(audioFile, libraryInitPath);
+            var albumKey = (parsedInfo.Artist, parsedInfo.Album);
 
-            logger.LogInformation(
-                "Parsed: Artist='{Artist}', Album='{Album}', Disc={Disc}, Track={Track}, Song='{Song}' (Source: {Source})",
-                parsedInfo.Artist,
-                parsedInfo.Album,
-                parsedInfo.DiscNumber ?? 0,
-                parsedInfo.TrackNumber ?? 0,
-                parsedInfo.SongName,
-                parsedInfo.FromMetadata ? "metadata" : "filepath"
-            );
+            if (!songsByAlbum.TryGetValue(albumKey, out var songs))
+            {
+                songs = [];
+                songsByAlbum[albumKey] = songs;
+            }
+            songs.Add((audioFile, parsedInfo));
+        }
+
+        logger.LogInformation("Found {AlbumCount} albums to process", songsByAlbum.Count);
+
+        foreach (var (albumKey, songs) in songsByAlbum)
+        {
+            var firstSong = songs[0];
+            var parsedInfo = firstSong.Info;
 
             if (!artistCache.TryGetValue(parsedInfo.Artist, out var artist))
             {
@@ -105,10 +115,9 @@ public partial class LibraryInitializationService(
                 artistCache[parsedInfo.Artist] = artist;
             }
 
-            var albumKey = (parsedInfo.Artist, parsedInfo.Album);
             if (!albumCache.TryGetValue(albumKey, out var album))
             {
-                var albumDirectory = Path.GetDirectoryName(audioFile);
+                var albumDirectory = Path.GetDirectoryName(firstSong.AudioFile);
                 var albumCoverPath = FindAlbumCover(
                     albumDirectory,
                     parsedInfo.DiscNumber.HasValue,
@@ -127,26 +136,35 @@ public partial class LibraryInitializationService(
                 );
             }
 
-            var song = Song.CreateFromLibrary(
-                parsedInfo.SongName,
-                audioFile,
-                album,
-                parsedInfo.TrackNumber,
-                parsedInfo.DiscNumber
-            );
-            dbContext.Songs.Add(song);
-            existingSongPaths.Add(audioFile);
+            foreach (var (audioFile, songInfo) in songs)
+            {
+                var song = Song.CreateFromLibrary(
+                    songInfo.SongName,
+                    audioFile,
+                    album,
+                    songInfo.TrackNumber,
+                    songInfo.DiscNumber
+                );
+                dbContext.Songs.Add(song);
 
+                logger.LogDebug(
+                    "Added song '{SongName}' (Track {Track}, Disc {Disc})",
+                    songInfo.SongName,
+                    songInfo.TrackNumber ?? 0,
+                    songInfo.DiscNumber ?? 0
+                );
+            }
+
+            await dbContext.SaveChangesAsync();
             logger.LogInformation(
-                "Added song '{SongName}' to database (from {Artist}/{Album})",
-                parsedInfo.SongName,
+                "Saved album '{Album}' by '{Artist}' with {SongCount} songs",
+                parsedInfo.Album,
                 parsedInfo.Artist,
-                parsedInfo.Album
+                songs.Count
             );
         }
 
-        await dbContext.SaveChangesAsync();
-        logger.LogInformation("Saved changes to database");
+        logger.LogInformation("Library initialization complete");
     }
 
     private sealed class AlbumKeyComparer : IEqualityComparer<(string ArtistName, string AlbumName)>

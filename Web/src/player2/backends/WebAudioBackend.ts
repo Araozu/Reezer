@@ -69,7 +69,7 @@ export class WebAudioBackend implements IAudioBackend
 
 		const mediaUrlResult = await this.audioSource.GetTrack(id);
 		await mediaUrlResult.match(
-			async (mediaUrl) =>
+			async(mediaUrl) =>
 			{
 				const buffer = await this.fetchAndDecodeAudio(mediaUrl);
 				if (buffer)
@@ -134,7 +134,7 @@ export class WebAudioBackend implements IAudioBackend
 	{
 		const mediaUrlResult = await this.audioSource.GetTrack(id);
 		await mediaUrlResult.match(
-			async (mediaUrl) =>
+			async(mediaUrl) =>
 			{
 				const buffer = await this.fetchAndDecodeAudio(mediaUrl);
 				if (buffer)
