@@ -27,18 +27,21 @@
 
 	let songs: SongDto[] = $derived($albumQuery.data?.songs ?? []);
 
-	let uniqueDiscs = $derived(() => {
+	let uniqueDiscs = $derived(() =>
+	{
 		const discs = new Set(songs.map((s) => Number(s.discNumber ?? 1)));
 		return Array.from(discs).sort((a, b) => a - b);
 	});
 
 	let hasMultipleDiscs = $derived(uniqueDiscs().length > 1);
 
-	function getSongsForDisc(discNumber: number): SongDto[] {
+	function getSongsForDisc(discNumber: number): SongDto[]
+	{
 		return songs.filter((s) => Number(s.discNumber ?? 1) === discNumber);
 	}
 
-	function getSongIndex(song: SongDto): number {
+	function getSongIndex(song: SongDto): number
+	{
 		return songs.findIndex((s) => s.id === song.id);
 	}
 </script>
