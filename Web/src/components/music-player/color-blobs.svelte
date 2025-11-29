@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 
-	let { colors }: { colors: string[] } = $props();
+	let { colors, weights = [] }: { colors: string[]; weights?: number[] } = $props();
 
 	interface Blob {
 		x: number;
@@ -27,13 +27,21 @@
 
 	function initBlobs()
 	{
-		blobs = colors.map(() => ({
-			x: Math.random() * 100,
-			y: Math.random() * 100,
-			vx: randomInRange(SPEED_MIN, SPEED_MAX) * (Math.random() > 0.5 ? 1 : -1),
-			vy: randomInRange(SPEED_MIN, SPEED_MAX) * (Math.random() > 0.5 ? 1 : -1),
-			size: randomInRange(BLOB_SIZE_MIN, BLOB_SIZE_MAX),
-		}));
+		blobs = colors.map((_, i) =>
+		{
+			const weight = weights[i] ?? 0.5;
+			const sizeRange = BLOB_SIZE_MAX - BLOB_SIZE_MIN;
+			const baseSize = BLOB_SIZE_MIN + (sizeRange * weight);
+			const sizeVariation = randomInRange(-50, 50);
+
+			return {
+				x: Math.random() * 100,
+				y: Math.random() * 100,
+				vx: randomInRange(SPEED_MIN, SPEED_MAX) * (Math.random() > 0.5 ? 1 : -1),
+				vy: randomInRange(SPEED_MIN, SPEED_MAX) * (Math.random() > 0.5 ? 1 : -1),
+				size: Math.max(BLOB_SIZE_MIN, baseSize + sizeVariation),
+			};
+		});
 	}
 
 	function animate()

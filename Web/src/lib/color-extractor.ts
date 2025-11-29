@@ -12,6 +12,7 @@ interface HSL {
 
 interface ExtractedColors {
 	colors: string[];
+	weights: number[];
 	isDark: boolean;
 }
 
@@ -185,7 +186,7 @@ export async function extractColorsFromImage(imageUrl: string): Promise<Extracte
 			const ctx = canvas.getContext("2d");
 			if (!ctx)
 			{
-				resolve({ colors: ["#ff6b6b", "#4ecdc4", "#ffe66d", "#9b59b6"], isDark: false });
+				resolve({ colors: ["#ff6b6b", "#4ecdc4", "#ffe66d", "#9b59b6"], weights: [1, 0.8, 0.6, 0.5], isDark: false });
 				return;
 			}
 
@@ -239,35 +240,35 @@ export async function extractColorsFromImage(imageUrl: string): Promise<Extracte
 
 			candidates.sort((a, b) => b.score - a.score);
 
-			const prominentColors: RGB[] = [];
+			const selectedCandidates: ColorCandidate[] = [];
 			const minDistance = 35;
 
 			for (const candidate of candidates)
 			{
-				const isTooClose = prominentColors.some((existing) => colorDistanceLab(existing, candidate.rgb) < minDistance);
+				const isTooClose = selectedCandidates.some((existing) => colorDistanceLab(existing.rgb, candidate.rgb) < minDistance);
 
 				const isTooExtreme = candidate.hsl.l < 0.08 || candidate.hsl.l > 0.95;
 
 				if (!isTooClose && !isTooExtreme)
 				{
-					prominentColors.push(candidate.rgb);
-					if (prominentColors.length >= 4) break;
+					selectedCandidates.push(candidate);
+					if (selectedCandidates.length >= 4) break;
 				}
 			}
 
 			for (const candidate of candidates)
 			{
-				if (prominentColors.length >= 4) break;
+				if (selectedCandidates.length >= 4) break;
 
-				const isTooClose = prominentColors.some((existing) => colorDistanceLab(existing, candidate.rgb) < minDistance);
+				const isTooClose = selectedCandidates.some((existing) => colorDistanceLab(existing.rgb, candidate.rgb) < minDistance);
 
 				if (!isTooClose)
 				{
-					prominentColors.push(candidate.rgb);
+					selectedCandidates.push(candidate);
 				}
 			}
 
-			while (prominentColors.length < 4)
+			while (selectedCandidates.length < 4)
 			{
 				const fallbacks = [
 					{ r: 255, g: 107, b: 107 },
@@ -275,18 +276,35 @@ export async function extractColorsFromImage(imageUrl: string): Promise<Extracte
 					{ r: 255, g: 230, b: 109 },
 					{ r: 155, g: 89, b: 182 },
 				];
-				prominentColors.push(fallbacks[prominentColors.length]);
+				const fb = fallbacks[selectedCandidates.length];
+				selectedCandidates.push({
+					rgb: fb,
+					hsl: rgbToHsl(fb.r, fb.g, fb.b),
+					count: 100,
+					score: 0.5,
+				});
 			}
 
+			const weights = selectedCandidates.map((c) =>
+			{
+				const frequency = c.count / rgbPixels.length;
+				const vividness = c.hsl.s * (1 - Math.abs(c.hsl.l - 0.5));
+				return (frequency * 0.6) + (vividness * 0.4);
+			});
+
+			const maxWeight = Math.max(...weights);
+			const normalizedWeights = weights.map((w) => Math.max(0.3, w / maxWeight));
+
 			resolve({
-				colors: prominentColors.map((c) => rgbToHex(c.r, c.g, c.b)),
+				colors: selectedCandidates.map((c) => rgbToHex(c.rgb.r, c.rgb.g, c.rgb.b)),
+				weights: normalizedWeights,
 				isDark,
 			});
 		};
 
 		img.onerror = () =>
 		{
-			resolve({ colors: ["#ff6b6b", "#4ecdc4", "#ffe66d", "#9b59b6"], isDark: false });
+			resolve({ colors: ["#ff6b6b", "#4ecdc4", "#ffe66d", "#9b59b6"], weights: [1, 0.8, 0.6, 0.5], isDark: false });
 		};
 
 		img.src = imageUrl;
