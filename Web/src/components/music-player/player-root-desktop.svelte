@@ -36,7 +36,7 @@
 
 <div class={["p-1", "h-screen sticky top-0 w-auto"]}>
 	<ColorBlobs colors={extractedColors} />
-	<Card.Root class="h-full border-primary py-6 rounded-2xl relative z-10">
+	<Card.Root class="h-full py-6 rounded-2xl relative z-10">
 		<Card.Header class={collapsed ? "px-0" : ""}>
 			<Card.Title
 				class={[

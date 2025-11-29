@@ -11,10 +11,10 @@
 		size: number;
 	}
 
-	const BLOB_SIZE_MIN = 180;
-	const BLOB_SIZE_MAX = 280;
-	const SPEED_MIN = 0.15;
-	const SPEED_MAX = 0.35;
+	const BLOB_SIZE_MIN = 200;
+	const BLOB_SIZE_MAX = 500;
+	const SPEED_MIN = 0.05;
+	const SPEED_MAX = 0.25;
 
 	let blobs = $state<Blob[]>([]);
 	let containerRef = $state<HTMLDivElement | null>(null);
@@ -22,7 +22,7 @@
 
 	function randomInRange(min: number, max: number): number
 	{
-		return Math.random() * (max - min) + min;
+		return (Math.random() * (max - min)) + min;
 	}
 
 	function initBlobs()
@@ -45,10 +45,10 @@
 			x += vx;
 			y += vy;
 
-			if (x < -20) x = 120;
-			if (x > 120) x = -20;
-			if (y < -20) y = 120;
-			if (y > 120) y = -20;
+			if (x < -50) x = 150;
+			if (x > 150) x = -50;
+			if (y < -50) y = 150;
+			if (y > 150) y = -50;
 
 			return { ...blob, x, y };
 		});
@@ -81,11 +81,11 @@
 
 <div
 	bind:this={containerRef}
-	class="absolute inset-0 overflow-hidden pointer-events-none -z-10"
+	class="absolute inset-0 overflow-hidden pointer-events-none -z-10 rounded-2xl"
 >
-	{#each blobs as blob, i}
+	{#each blobs as blob, i (i)}
 		<div
-			class="absolute rounded-full blur-3xl opacity-50 transition-colors duration-1000"
+			class="absolute rounded-full blur-3xl opacity-75 transition-colors duration-1000"
 			style="
 				left: {blob.x}%;
 				top: {blob.y}%;
