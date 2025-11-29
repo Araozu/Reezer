@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using FFMpegCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Reezer.Domain.Entities;
 using Reezer.Domain.Entities.Songs;
 using Reezer.Domain.Repositories;
 using Reezer.Infrastructure.Data;
