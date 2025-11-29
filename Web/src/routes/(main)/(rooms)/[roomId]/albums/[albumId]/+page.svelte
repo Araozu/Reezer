@@ -2,11 +2,10 @@
 	import { page } from "$app/state";
 	import { toStore } from "svelte/store";
 	import { useAlbumByIdQuery } from "./queries";
-	import type { ISong } from "~/providers";
 	import { GetQueueContext } from "~/player2/context/player-store";
 	import type { PageProps } from "./$types";
 	import type { components } from "~/api";
-	import { ListEnd, ListStart, Play, Plus } from "lucide-svelte";
+	import { Disc, ListEnd, ListStart, Play, Plus } from "lucide-svelte";
 	import Button from "$lib/components/ui/button/button.svelte";
 	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
 	import BackButton from "$lib/components/back-button.svelte";
@@ -26,7 +25,22 @@
 
 	let albumName = $derived($albumQuery.data?.name ?? "");
 
-	let songs: Array<ISong> = $derived($albumQuery.data?.songs ?? []);
+	let songs: SongDto[] = $derived($albumQuery.data?.songs ?? []);
+
+	let uniqueDiscs = $derived(() => {
+		const discs = new Set(songs.map((s) => Number(s.discNumber ?? 1)));
+		return Array.from(discs).sort((a, b) => a - b);
+	});
+
+	let hasMultipleDiscs = $derived(uniqueDiscs().length > 1);
+
+	function getSongsForDisc(discNumber: number): SongDto[] {
+		return songs.filter((s) => Number(s.discNumber ?? 1) === discNumber);
+	}
+
+	function getSongIndex(song: SongDto): number {
+		return songs.findIndex((s) => s.id === song.id);
+	}
 </script>
 
 <svelte:head>
@@ -65,9 +79,23 @@
 
 	<div class="py-6">
 		{#if $albumQuery.data}
-			{#each $albumQuery.data.songs as song, index (song.id)}
-				{@render Song(song, currentSongId, () => queue.PlaySongList(songs.slice(index)))}
-			{/each}
+			{#if hasMultipleDiscs}
+				{#each uniqueDiscs() as discNumber (discNumber)}
+					<div class="mb-6">
+						<div class="flex items-center gap-2 px-3 py-2 mb-2 text-muted-foreground">
+							<Disc class="size-4" />
+							<span class="text-sm font-medium">Disc {discNumber}</span>
+						</div>
+						{#each getSongsForDisc(discNumber) as song (song.id)}
+							{@render Song(song, currentSongId, () => queue.PlaySongList(songs.slice(getSongIndex(song))))}
+						{/each}
+					</div>
+				{/each}
+			{:else}
+				{#each $albumQuery.data.songs as song, index (song.id)}
+					{@render Song(song, currentSongId, () => queue.PlaySongList(songs.slice(index)))}
+				{/each}
+			{/if}
 		{/if}
 	</div>
 </div>
