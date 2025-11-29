@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -9,12 +10,35 @@ using Reezer.Infrastructure.Options;
 
 namespace Reezer.Infrastructure.Services;
 
-public class LibraryInitializationService(
+public partial class LibraryInitializationService(
     ReezerDbContext dbContext,
     IOptions<StorageOptions> storageOptions,
     ILogger<LibraryInitializationService> logger
 ) : ILibraryInitializationService
 {
+    private static readonly string[] CoverFilePatterns =
+    [
+        "cover.jpg",
+        "cover.jpeg",
+        "cover.png",
+        "cover.webp",
+        "folder.jpg",
+        "folder.jpeg",
+        "folder.png",
+        "album.jpg",
+        "album.jpeg",
+        "album.png",
+        "artwork.jpg",
+        "artwork.jpeg",
+        "artwork.png",
+        "front.jpg",
+        "front.jpeg",
+        "front.png",
+    ];
+
+    [GeneratedRegex(@"(?:CD|Disc|Disk)\s*(\d+)", RegexOptions.IgnoreCase)]
+    private static partial Regex DiscFolderRegex();
+
     private StorageOptions StorageOptions => storageOptions.Value;
 
     public async Task InitializeLibraryAsync()
@@ -72,10 +96,11 @@ public class LibraryInitializationService(
                 }
 
                 var albumDirectory = Path.GetDirectoryName(audioFile);
-                var coverPath =
-                    albumDirectory != null ? Path.Combine(albumDirectory, "cover.jpg") : null;
-
-                var albumCoverPath = coverPath != null && File.Exists(coverPath) ? coverPath : null;
+                var albumCoverPath = FindAlbumCover(
+                    albumDirectory,
+                    parsedInfo.DiscNumber.HasValue,
+                    libraryInitPath
+                );
 
                 var album = await dbContext.Albums.FirstOrDefaultAsync(a =>
                     a.Name == parsedInfo.Album && a.ArtistId == artist.Id
@@ -92,7 +117,8 @@ public class LibraryInitializationService(
                     parsedInfo.SongName,
                     audioFile,
                     album,
-                    parsedInfo.TrackNumber
+                    parsedInfo.TrackNumber,
+                    parsedInfo.DiscNumber
                 );
                 dbContext.Songs.Add(song);
                 logger.LogInformation(
@@ -107,6 +133,52 @@ public class LibraryInitializationService(
 
         await dbContext.SaveChangesAsync();
         logger.LogInformation("Saved changes to database");
+    }
+
+    private static string? FindAlbumCover(
+        string? currentDirectory,
+        bool isInDiscFolder,
+        string libraryInitFullPath
+    )
+    {
+        if (currentDirectory == null)
+            return null;
+
+        var cover = FindCoverInDirectory(currentDirectory);
+        if (cover != null)
+            return cover;
+
+        if (isInDiscFolder)
+        {
+            var parentDirectory = Path.GetDirectoryName(currentDirectory);
+            if (
+                parentDirectory != null
+                && !string.Equals(
+                    Path.GetFullPath(parentDirectory),
+                    libraryInitFullPath,
+                    StringComparison.OrdinalIgnoreCase
+                )
+            )
+            {
+                cover = FindCoverInDirectory(parentDirectory);
+                if (cover != null)
+                    return cover;
+            }
+        }
+
+        return null;
+    }
+
+    private static string? FindCoverInDirectory(string directory)
+    {
+        foreach (var pattern in CoverFilePatterns)
+        {
+            var coverPath = Path.Combine(directory, pattern);
+            if (File.Exists(coverPath))
+                return coverPath;
+        }
+
+        return null;
     }
 
     private static ParsedAudioInfo ParseAudioFilePath(string audioFilePath, string libraryInitPath)
@@ -129,9 +201,8 @@ public class LibraryInitializationService(
             if (pathParts.Length == 4)
             {
                 var discFolder = pathParts[2];
-                if (
-                    int.TryParse(new string(discFolder.Where(char.IsDigit).ToArray()), out var disc)
-                )
+                var match = DiscFolderRegex().Match(discFolder);
+                if (match.Success && int.TryParse(match.Groups[1].Value, out var disc))
                 {
                     discNumber = disc;
                 }
