@@ -21,6 +21,7 @@
 	let coverUrl = $derived(currentSong ? `/api/Albums/${currentSong.albumId}/cover` : "/vinyl.jpg");
 
 	let extractedColors = $state<string[]>(["#ff6b6b", "#4ecdc4", "#ffe66d", "#9b59b6"]);
+	let colorWeights = $state<number[]>([1, 0.8, 0.6, 0.5]);
 
 	$effect(() =>
 	{
@@ -29,14 +30,15 @@
 			extractColorsFromImage(coverUrl).then((result) =>
 			{
 				extractedColors = result.colors;
+				colorWeights = result.weights;
 			});
 		}
 	});
 </script>
 
 <div class={["p-1", "h-screen sticky top-0 w-auto"]}>
-	<ColorBlobs colors={extractedColors} />
-	<Card.Root class="h-full border-primary py-6 rounded-2xl relative z-10">
+	<ColorBlobs colors={extractedColors} weights={colorWeights} />
+	<Card.Root class="h-full py-6 rounded-2xl relative z-10">
 		<Card.Header class={collapsed ? "px-0" : ""}>
 			<Card.Title
 				class={[

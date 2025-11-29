@@ -65,7 +65,7 @@
 		<SkipBack class="m-2.5" size={18} />
 	</button>
 	<button
-		class="bg-glass-bg hover:bg-glass-bg-hover rounded-full cursor-pointer transition-all duration-300 active:scale-95 border border-glass-border"
+		class="hover:bg-glass-bg-hover rounded-full cursor-pointer transition-all duration-300 active:scale-95 border border-glass-border"
 		onclick={() => player.TogglePlayPause()}
 	>
 		{#if isBuffering}
