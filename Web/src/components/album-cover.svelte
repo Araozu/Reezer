@@ -19,7 +19,7 @@
 
 <img
     class={[
-    	"rounded-md w-full aspect-square object-cover transition-opacity",
+    	"rounded-xl w-full aspect-square object-cover transition-opacity",
     	errored ? "opacity-75" : "",
     	loaded ? "opacity-100" : "opacity-0",
     ]}

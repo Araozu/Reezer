@@ -7,6 +7,7 @@ VERBOSITY ?= minimal
 
 clean:
 	find Api Application Domain Infrastructure -type d \( -name "obj" -o -name "bin" \) -exec rm -rf {} +
+	dotnet clean Reezer.sln
 
 build:
 	dotnet build Reezer.sln --configuration $(CONFIG) --framework $(FRAMEWORK) --verbosity $(VERBOSITY) $(ARGS)

@@ -1,14 +1,31 @@
+using Acide.Perucontrol.Domain.Utils;
+using OneOf;
 using Reezer.Domain.Repositories;
 
 namespace Reezer.Application.UseCases;
 
 public class GetAlbumCoverUseCase(IAlbumRepository albumRepository)
 {
-    public async Task<(Stream Stream, string ContentType)> GetAlbumCoverAsync(
-        Guid albumId,
-        CancellationToken cancellationToken = default
-    )
+    public async Task<
+        OneOf<(Stream Stream, string ContentType), NotFound, InternalError>
+    > GetAlbumCoverAsync(Guid albumId, CancellationToken cancellationToken = default)
     {
-        return await albumRepository.GetAlbumCoverStreamAsync(albumId, cancellationToken);
+        try
+        {
+            var result = await albumRepository.GetAlbumCoverStreamAsync(albumId, cancellationToken);
+            return result;
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return new NotFound(ex.Message);
+        }
+        catch (FileNotFoundException ex)
+        {
+            return new NotFound(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return new InternalError(ex.Message);
+        }
     }
 }

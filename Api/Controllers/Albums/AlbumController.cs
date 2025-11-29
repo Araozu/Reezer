@@ -38,7 +38,7 @@ public class AlbumsController(
             cancellationToken
         );
 
-        Response.Headers.CacheControl = "public, max-age=1800"; // 30 minutes
+        Response.Headers.CacheControl = "public, max-age=1800";
         return Ok(result);
     }
 
@@ -53,8 +53,15 @@ public class AlbumsController(
             albumId,
             cancellationToken
         );
-        Response.Headers.CacheControl = "public, max-age=1800"; // 30 minutes
-        return Ok(result);
+
+        return result.Match<ActionResult<AlbumWithTracklistDto>>(
+            album =>
+            {
+                Response.Headers.CacheControl = "public, max-age=1800";
+                return Ok(album);
+            },
+            notFound => NotFound(new ProblemDetails { Detail = notFound.Reason })
+        );
     }
 
     [EndpointSummary("Get album cover by album ID")]
@@ -64,15 +71,16 @@ public class AlbumsController(
         CancellationToken cancellationToken
     )
     {
-        try
-        {
-            var result = await getAlbumCoverUseCase.GetAlbumCoverAsync(albumId, cancellationToken);
-            Response.Headers.CacheControl = "public, max-age=2592000";
-            return File(result.Stream, result.ContentType);
-        }
-        catch (FileNotFoundException)
-        {
-            return NotFound();
-        }
+        var result = await getAlbumCoverUseCase.GetAlbumCoverAsync(albumId, cancellationToken);
+
+        return result.Match<IActionResult>(
+            success =>
+            {
+                Response.Headers.CacheControl = "public, max-age=2592000";
+                return File(success.Stream, success.ContentType);
+            },
+            notFound => NotFound(new ProblemDetails { Detail = notFound.Reason }),
+            internalError => StatusCode(500, new ProblemDetails { Detail = internalError.Reason })
+        );
     }
 }

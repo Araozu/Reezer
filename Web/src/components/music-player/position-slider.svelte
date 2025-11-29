@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { Slider } from "$lib/components/ui/slider";
-	import { GetCurrentPlayer } from "../../player/index.svelte";
+	import { GetPlayerContext } from "~/player2/context/player-store";
 
-	let player = GetCurrentPlayer();
+	let player = GetPlayerContext();
+
 	let duration = player.duration;
 	let currentTime = player.currentTime;
 

@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using FFMpegCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Reezer.Domain.Entities;
 using Reezer.Domain.Entities.Songs;
 using Reezer.Domain.Repositories;
 using Reezer.Infrastructure.Data;
@@ -50,7 +49,7 @@ public class SongRepository(ReezerDbContext dbContext, IOptions<StorageOptions> 
                 await dbContext.Songs.FirstOrDefaultAsync(s => s.Id == songId, cancellationToken)
                 ?? throw new KeyNotFoundException($"Song with ID {songId} not found.");
 
-            // Check if OPUS version already exists
+            // Check if WebM/Opus version already exists
             if (!string.IsNullOrEmpty(song.TranscodedPath) && File.Exists(song.TranscodedPath))
             {
                 return (
@@ -60,7 +59,7 @@ public class SongRepository(ReezerDbContext dbContext, IOptions<StorageOptions> 
                         FileAccess.Read,
                         FileShare.Read
                     ),
-                    "audio/opus"
+                    "audio/webm"
                 );
             }
 
@@ -70,50 +69,50 @@ public class SongRepository(ReezerDbContext dbContext, IOptions<StorageOptions> 
                 throw new FileNotFoundException($"Raw song file not found at path: {song.RawPath}");
             }
 
-            // Transcode FLAC to OPUS
-            var opusPath = Path.Combine(StorageOptions.LibraryTranscodedPath, $"{songId}.opus");
+            // Transcode FLAC to fragmented WebM with Opus codec (DASH-ready)
+            var webmPath = Path.Combine(StorageOptions.LibraryTranscodedPath, $"{songId}.webm");
 
             // Ensure transcoded directory exists
             Directory.CreateDirectory(StorageOptions.LibraryTranscodedPath);
 
             // Clean up any partial/corrupted file from previous failed attempts
-            if (File.Exists(opusPath))
+            if (File.Exists(webmPath))
             {
-                File.Delete(opusPath);
+                File.Delete(webmPath);
             }
 
             try
             {
-                // Perform transcoding (blocking)
+                // Perform transcoding to WebM with Opus
                 await FFMpegArguments
                     .FromFileInput(song.RawPath)
                     .OutputToFile(
-                        opusPath,
+                        webmPath,
                         false,
                         options =>
                             options
                                 .WithAudioCodec("libopus")
                                 .WithAudioBitrate(64)
-                                .WithCustomArgument("-avoid_negative_ts make_zero")
+                                .WithCustomArgument("-vn")
                     )
                     .ProcessAsynchronously();
 
                 // Update database with transcoded path only after successful transcoding
-                song.SetTranscodedPath(opusPath);
+                song.SetTranscodedPath(webmPath);
                 await dbContext.SaveChangesAsync(cancellationToken);
 
-                // Return stream to the transcoded OPUS file
+                // Return stream to the transcoded WebM file
                 return (
-                    new FileStream(opusPath, FileMode.Open, FileAccess.Read, FileShare.Read),
-                    "audio/opus"
+                    new FileStream(webmPath, FileMode.Open, FileAccess.Read, FileShare.Read),
+                    "audio/webm"
                 );
             }
             catch
             {
                 // Clean up partial file if transcoding fails or is cancelled
-                if (File.Exists(opusPath))
+                if (File.Exists(webmPath))
                 {
-                    File.Delete(opusPath);
+                    File.Delete(webmPath);
                 }
                 throw;
             }

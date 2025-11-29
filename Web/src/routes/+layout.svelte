@@ -20,6 +20,11 @@
 		},
 	});
 
+	if (browser && "serviceWorker" in navigator)
+	{
+		navigator.serviceWorker.register("/sw.js");
+	}
+
 	let { children } = $props();
 </script>
 

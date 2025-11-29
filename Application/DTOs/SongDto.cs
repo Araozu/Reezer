@@ -4,6 +4,7 @@ public record SongDto(
     Guid Id,
     string Name,
     int? TrackNumber,
+    int? DiscNumber,
     string Artist,
     string Album,
     Guid ArtistId,

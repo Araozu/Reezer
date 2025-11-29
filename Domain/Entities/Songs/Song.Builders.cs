@@ -6,7 +6,8 @@ public partial class Song
         string name,
         string rawPath,
         Album album,
-        int? trackNumber = null
+        int? trackNumber = null,
+        int? discNumber = null
     ) =>
         new()
         {
@@ -15,5 +16,6 @@ public partial class Song
             Album = album,
             AlbumId = album.Id,
             TrackNumber = trackNumber,
+            DiscNumber = discNumber,
         };
 }
