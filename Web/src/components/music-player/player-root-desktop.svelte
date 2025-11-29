@@ -79,7 +79,7 @@
 				</button>
 			</Card.Title>
 		</Card.Header>
-		<Card.Content class={collapsed ? "px-2" : ""}>
+		<Card.Content class={collapsed ? "px-1 md:px-1" : ""}>
 			{#if collapsed}
 				<PlayerContentsCollapsed
 					bind:coverUrl
