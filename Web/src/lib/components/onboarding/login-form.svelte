@@ -9,14 +9,19 @@
 	} from "$lib/components/ui/field/index.js";
 	import { Input } from "$lib/components/ui/input/index.js";
 	import { CircleArrowRight, LoaderCircle } from "lucide-svelte";
+	import Disc_3 from "lucide-svelte/icons/disc-3";
 
 	let { loading, loggedIn }: { loading: boolean; loggedIn: boolean } =
 		$props();
 	const id = $props.id();
 
+	let loadingLogin = $state(false);
+	let spinnerClass = $derived(loadingLogin ? "opacity-100" : "opacity-0");
+
 	function handleGoogleLogin()
 	{
 		const returnUrl = encodeURIComponent(`${window.location.origin}/`);
+		loadingLogin = true;
 		window.location.href = `/api/auth/google?returnUrl=${returnUrl}`;
 	}
 </script>
@@ -56,6 +61,7 @@
 							type="button"
 							onclick={handleGoogleLogin}
 						>
+							<Disc_3 class={`animate-spin transition-opacity ${spinnerClass}`} />
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 24 24"
