@@ -9,6 +9,7 @@
 	import Button from "$lib/components/ui/button/button.svelte";
 	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
 	import BackButton from "$lib/components/back-button.svelte";
+    import AlbumCover from "~/components/album-cover.svelte";
 
 	type SongDto = components["schemas"]["SongDto"];
 
@@ -50,34 +51,66 @@
 	<title>Reezer - {albumName}</title>
 </svelte:head>
 
-<h1 class="font-display text-4xl font-semibold py-8 px-4 flex items-center gap-3">
-	<BackButton />
-	<a href="." class="hover:underline">Albums</a>
-	&gt;
-	<span class="font-medium">{albumName}</span>
-</h1>
+<div>
+	<div class="hidden sm:block">
+		<h1 class="font-display text-4xl font-semibold py-8 px-4 flex items-center gap-3">
+			<BackButton />
+			<a href="." class="hover:underline">Albums</a>
+			&gt;
+			<span class="font-medium">{albumName}</span>
+		</h1>
+		<div
+			class="grid grid-cols-[20rem_auto] justify-center md:justify-start gap-2 px-4"
+		>
 
-<div class="px-4">
-	<div
-		class="grid md:grid-cols-[20rem_auto] justify-center md:justify-start gap-2"
-	>
-		<img
-			class="rounded-md w-64 h-64"
-			src={`/api/Albums/${$albumId}/cover`}
-			alt=""
-		/>
+			<img
+				class="rounded-md w-64 h-64"
+				src={`/api/Albums/${$albumId}/cover`}
+				alt=""
+			/>
 
-		<div class="md:text-left text-center">
-			<Button onclick={() => queue.PlaySongList(songs)} class="mr-2">
-				<Play />
-				Play All
-			</Button>
+			<div class="md:text-left text-center">
+				<Button onclick={() => queue.PlaySongList(songs)} class="mr-2">
+					<Play />
+					Play All
+				</Button>
 
-			<Button onclick={() => queue.AddLastSongList(songs)} variant="outline">
-				<ListEnd />
-				Add to queue
-			</Button>
+				<Button onclick={() => queue.AddLastSongList(songs)} variant="outline">
+					<ListEnd />
+					Add to queue
+				</Button>
+			</div>
 		</div>
+	</div>
+
+	<div class="sm:hidden">
+	<div class="relative">
+		<AlbumCover albumId={$albumId} {albumName} class="rounded-none"/>
+	</div>
+
+	<div class="w-full px-4 py-2 transform -translate-y-8">
+		<div class="py-1 font-display text-3xl font-bold text-center backdrop-blur-xl bg-glass-bg border border-glass-border rounded-2xl
+			shadow-[0_4px_24px_-4px_var(--glass-shadow) inset_0_1px_1px_var(--glass-highlight)]">
+			{albumName}
+		</div>
+
+		<div
+			class="mt-2 grid md:grid-cols-[20rem_auto] justify-center md:justify-start gap-2"
+		>
+
+			<div class="md:text-left text-center">
+				<Button onclick={() => queue.PlaySongList(songs)} class="mr-2">
+					<Play />
+					Play All
+				</Button>
+
+				<Button onclick={() => queue.AddLastSongList(songs)} variant="outline">
+					<ListEnd />
+					Add to queue
+				</Button>
+			</div>
+		</div>
+	</div>
 	</div>
 
 	<div class="py-6">
