@@ -10,11 +10,14 @@
 
 	let sliderVolume = $derived(volumeToSlider(rawVolume));
 
+	const VOLUME_STORAGE_KEY = "reezer-volume";
+
 	function UpdateRawVolume(sliderNumber: number)
 	{
 		let value = sliderToVolume[Math.round(sliderNumber)] ?? 0;
 		rawVolume = value;
 		player.volume = value;
+		localStorage.setItem(VOLUME_STORAGE_KEY, String(value));
 	}
 </script>
 
