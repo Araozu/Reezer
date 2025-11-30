@@ -1,4 +1,4 @@
-import type { IAudioBackend } from "../interfaces/IAudioBackend";
+import type { IAudioBackend, PlayState } from "../interfaces/IAudioBackend";
 import type { IAudioSource } from "../interfaces/IAudioSource";
 
 /**
@@ -9,28 +9,35 @@ import type { IAudioSource } from "../interfaces/IAudioSource";
 export class WebAudioBackend implements IAudioBackend
 {
 	private _volume = 1.0;
-	private audioContext: AudioContext = null!;
-	private gainNode: GainNode = null!;
+	private audioContext: AudioContext | null = null;
+	private gainNode: GainNode | null = null;
 
-	// Current and next buffer sources for gapless playback
+	// Current source for playback
 	private currentSource: AudioBufferSourceNode | null = null;
-	private prefetchedBuffer: AudioBuffer | null = null;
-
-	// Track IDs
+	private currentBuffer: AudioBuffer | null = null;
 	private currentSongId: string | null = null;
+
+	// Prefetched buffer for gapless playback
+	private prefetchedBuffer: AudioBuffer | null = null;
 	private prefetchedSongId: string | null = null;
 
 	// Playback state
 	private isPaused = false;
 	private pausedAt = 0;
 	private startedAt = 0;
-	private currentBuffer: AudioBuffer | null = null;
 
-	// Timestamp when the current song started playing (for duplicate play detection)
+	// Prevents duplicate play calls and race conditions
 	private currentSongStartTime = 0;
+	private isLoading = false;
 
 	private readyCallbacks: Array<() => void> = [];
 	private songEndCallbacks: Array<(endedSongId: string) => void> = [];
+	private positionUpdateCallbacks: Array<(positionSeconds: number) => void> = [];
+	private durationChangeCallbacks: Array<(durationSeconds: number) => void> = [];
+	private playStateChangeCallbacks: Array<(state: PlayState) => void> = [];
+
+	private positionInterval: ReturnType<typeof setInterval> | null = null;
+	private lastReportedSecond = -1;
 
 	constructor(private audioSource: IAudioSource)
 	{}
@@ -54,8 +61,19 @@ export class WebAudioBackend implements IAudioBackend
 		}
 	}
 
+	get duration(): number | null
+	{
+		return this.currentBuffer ? this.currentBuffer.duration : null;
+	}
+
 	async Play(id: string): Promise<void>
 	{
+		if (!this.audioContext || !this.gainNode)
+		{
+			console.error("WebAudioBackend not initialized");
+			return;
+		}
+
 		const timeSinceSongStart = Date.now() - this.currentSongStartTime;
 
 		// Ignore duplicate play calls within 1 second of the same song starting
@@ -64,29 +82,65 @@ export class WebAudioBackend implements IAudioBackend
 			return;
 		}
 
-		// Stop any currently playing source
-		this.stopCurrentSource();
+		// Prevent concurrent loading
+		if (this.isLoading)
+		{
+			return;
+		}
 
-		const mediaUrlResult = await this.audioSource.GetTrack(id);
-		await mediaUrlResult.match(
-			async(mediaUrl) =>
-			{
-				const buffer = await this.fetchAndDecodeAudio(mediaUrl);
-				if (buffer)
+		// Check if we have this song prefetched
+		if (this.prefetchedSongId === id && this.prefetchedBuffer)
+		{
+			this.stopCurrentSource();
+			this.currentBuffer = this.prefetchedBuffer;
+			this.currentSongId = id;
+			this.currentSongStartTime = Date.now();
+			this.pausedAt = 0;
+			this.isPaused = false;
+			this.playBuffer(this.prefetchedBuffer, 0);
+			this.ClearPrefetch();
+			this.notifyDurationChange(this.currentBuffer.duration);
+			this.notifyPlayStateChange("playing");
+			this.startPositionTracking();
+			return;
+		}
+
+		this.isLoading = true;
+		this.stopCurrentSource();
+		this.notifyPlayStateChange("buffering");
+
+		try
+		{
+			await this.ensureAudioContextResumed();
+
+			const mediaUrlResult = await this.audioSource.GetTrack(id);
+			await mediaUrlResult.match(
+				async(mediaUrl) =>
 				{
-					this.currentBuffer = buffer;
-					this.currentSongId = id;
-					this.currentSongStartTime = Date.now();
-					this.pausedAt = 0;
-					this.isPaused = false;
-					this.playBuffer(buffer, 0);
-				}
-			},
-			(e) =>
-			{
-				console.error("Error fetching track:", e);
-			},
-		);
+					const buffer = await this.fetchAndDecodeAudio(mediaUrl);
+					if (buffer)
+					{
+						this.currentBuffer = buffer;
+						this.currentSongId = id;
+						this.currentSongStartTime = Date.now();
+						this.pausedAt = 0;
+						this.isPaused = false;
+						this.playBuffer(buffer, 0);
+						this.notifyDurationChange(buffer.duration);
+						this.notifyPlayStateChange("playing");
+						this.startPositionTracking();
+					}
+				},
+				(e) =>
+				{
+					console.error("Error fetching track:", e);
+				},
+			);
+		}
+		finally
+		{
+			this.isLoading = false;
+		}
 	}
 
 	TogglePlayPause(): void
@@ -98,16 +152,19 @@ export class WebAudioBackend implements IAudioBackend
 
 		if (this.isPaused)
 		{
-			// Resume playback
+			this.ensureAudioContextResumed();
 			this.isPaused = false;
 			this.playBuffer(this.currentBuffer, this.pausedAt);
+			this.notifyPlayStateChange("playing");
+			this.startPositionTracking();
 		}
 		else
 		{
-			// Pause playback
 			this.isPaused = true;
 			this.pausedAt = this.audioContext.currentTime - this.startedAt;
 			this.stopCurrentSource();
+			this.notifyPlayStateChange("paused");
+			this.stopPositionTracking();
 		}
 	}
 
@@ -118,7 +175,6 @@ export class WebAudioBackend implements IAudioBackend
 			return;
 		}
 
-		// Clamp position to valid range
 		const clampedPosition = Math.max(0, Math.min(position, this.currentBuffer.duration));
 
 		this.stopCurrentSource();
@@ -132,6 +188,17 @@ export class WebAudioBackend implements IAudioBackend
 
 	async Prefetch(id: string): Promise<void>
 	{
+		if (!this.audioContext)
+		{
+			return;
+		}
+
+		// Don't prefetch the same song that's playing or already prefetched
+		if (id === this.currentSongId || id === this.prefetchedSongId)
+		{
+			return;
+		}
+
 		const mediaUrlResult = await this.audioSource.GetTrack(id);
 		await mediaUrlResult.match(
 			async(mediaUrl) =>
@@ -176,21 +243,58 @@ export class WebAudioBackend implements IAudioBackend
 		this.songEndCallbacks.push(callback);
 	}
 
+	OnPositionUpdate(callback: (positionSeconds: number) => void): void
+	{
+		this.positionUpdateCallbacks.push(callback);
+	}
+
+	OnDurationChange(callback: (durationSeconds: number) => void): void
+	{
+		this.durationChangeCallbacks.push(callback);
+	}
+
+	OnPlayStateChange(callback: (state: PlayState) => void): void
+	{
+		this.playStateChangeCallbacks.push(callback);
+	}
+
 	Deinit(): void
 	{
+		this.stopPositionTracking();
 		this.stopCurrentSource();
+		this.ClearPrefetch();
+		this.currentBuffer = null;
+		this.currentSongId = null;
+
 		if (this.audioContext)
 		{
 			this.audioContext.close();
+			this.audioContext = null;
+			this.gainNode = null;
 		}
-		console.log("Deinitializing WebAudioBackend");
+
+		this.readyCallbacks = [];
+		this.songEndCallbacks = [];
+		this.positionUpdateCallbacks = [];
+		this.durationChangeCallbacks = [];
+		this.playStateChangeCallbacks = [];
 	}
 
-	/**
-	 * Fetches audio data from URL and decodes it into an AudioBuffer.
-	 */
+	private async ensureAudioContextResumed(): Promise<void>
+	{
+		if (this.audioContext && this.audioContext.state === "suspended")
+		{
+			await this.audioContext.resume();
+		}
+	}
+
 	private async fetchAndDecodeAudio(url: string): Promise<AudioBuffer | null>
 	{
+		if (!this.audioContext)
+		{
+			return null;
+		}
+
 		try
 		{
 			const response = await fetch(url);
@@ -208,11 +312,13 @@ export class WebAudioBackend implements IAudioBackend
 		}
 	}
 
-	/**
-	 * Creates and plays an AudioBufferSourceNode from the given buffer.
-	 */
 	private playBuffer(buffer: AudioBuffer, offset: number): void
 	{
+		if (!this.audioContext || !this.gainNode)
+		{
+			return;
+		}
+
 		const source = this.audioContext.createBufferSource();
 		source.buffer = buffer;
 		source.connect(this.gainNode);
@@ -232,9 +338,6 @@ export class WebAudioBackend implements IAudioBackend
 		source.start(0, offset);
 	}
 
-	/**
-	 * Stops the currently playing source node.
-	 */
 	private stopCurrentSource(): void
 	{
 		if (this.currentSource)
@@ -244,7 +347,7 @@ export class WebAudioBackend implements IAudioBackend
 				this.currentSource.onended = null;
 				this.currentSource.stop();
 			}
-			catch (_error: unknown)
+			catch
 			{
 				// Source may already be stopped
 			}
@@ -252,12 +355,10 @@ export class WebAudioBackend implements IAudioBackend
 		}
 	}
 
-	/**
-	 * Handles the end of a song, transitioning to prefetched content if available.
-	 */
 	private handleSongEnded(): void
 	{
 		const endedSongId = this.currentSongId;
+		this.stopPositionTracking();
 
 		if (this.prefetchedBuffer && this.prefetchedSongId)
 		{
@@ -267,6 +368,9 @@ export class WebAudioBackend implements IAudioBackend
 			this.currentSongStartTime = Date.now();
 			this.pausedAt = 0;
 			this.playBuffer(this.prefetchedBuffer, 0);
+			this.notifyDurationChange(this.currentBuffer.duration);
+			this.notifyPlayStateChange("playing");
+			this.startPositionTracking();
 
 			this.prefetchedBuffer = null;
 			this.prefetchedSongId = null;
@@ -275,12 +379,55 @@ export class WebAudioBackend implements IAudioBackend
 		{
 			this.currentSource = null;
 			this.currentBuffer = null;
+			this.currentSongId = null;
+			this.notifyPlayStateChange("paused");
 		}
 
-		// Notify listeners that the song ended
 		if (endedSongId)
 		{
 			this.songEndCallbacks.forEach((callback) => callback(endedSongId));
 		}
+	}
+
+	private startPositionTracking(): void
+	{
+		this.stopPositionTracking();
+		this.lastReportedSecond = -1;
+
+		this.positionInterval = setInterval(() =>
+		{
+			if (!this.audioContext || this.isPaused)
+			{
+				return;
+			}
+
+			const currentPosition = this.audioContext.currentTime - this.startedAt;
+			const currentSecond = Math.floor(currentPosition);
+
+			if (currentSecond !== this.lastReportedSecond)
+			{
+				this.lastReportedSecond = currentSecond;
+				this.positionUpdateCallbacks.forEach((cb) => cb(currentSecond));
+			}
+		}, 250);
+	}
+
+	private stopPositionTracking(): void
+	{
+		if (this.positionInterval)
+		{
+			clearInterval(this.positionInterval);
+			this.positionInterval = null;
+		}
+	}
+
+	private notifyDurationChange(duration: number): void
+	{
+		this.durationChangeCallbacks.forEach((cb) => cb(duration));
+	}
+
+	private notifyPlayStateChange(state: PlayState): void
+	{
+		this.playStateChangeCallbacks.forEach((cb) => cb(state));
 	}
 }
