@@ -1,13 +1,31 @@
 <script lang="ts">
-	import { X } from "lucide-svelte";
+	import { EllipsisVertical, MoreVertical, X } from "lucide-svelte";
 	import { GetQueueContext } from "~/player2/context/player-store";
 	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
+	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 
 	let queue = GetQueueContext();
 	let sv_queue = new SvelteRuneQueue(queue);
 
 	let current_queue = $derived(sv_queue.queue);
 	let currentIdx = $derived(sv_queue.currentIdx);
+
+	function clearAbove(index: number)
+	{
+		for (let i = index - 1; i >= 0; i--)
+		{
+			queue.RemoveAt(i);
+		}
+	}
+
+	function clearBelow(index: number)
+	{
+		const length = current_queue.length;
+		for (let i = length - 1; i > index; i--)
+		{
+			queue.RemoveAt(i);
+		}
+	}
 </script>
 
 <div class="space-y-1.5 max-h-[calc(100vh-8rem)] overflow-scroll">
@@ -35,6 +53,22 @@
 					<span class="truncate">{song.album}</span>
 				</p>
 			</button>
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger
+					class="px-2 opacity-0 group-hover/queue-item:opacity-100 hover:bg-glass-bg-hover transition-all duration-300 active:scale-95 flex items-center cursor-pointer"
+					onclick={(e) => e.stopPropagation()}
+				>
+					<EllipsisVertical size={18} class="text-muted-foreground" />
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content>
+					<DropdownMenu.Item onclick={() => clearAbove(index)} disabled={index === 0}>
+						Clear queue above
+					</DropdownMenu.Item>
+					<DropdownMenu.Item onclick={() => clearBelow(index)} disabled={index === current_queue.length - 1}>
+						Clear queue below
+					</DropdownMenu.Item>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
 			<button
 				class="px-3 opacity-0 group-hover/queue-item:opacity-100 hover:bg-destructive/20 rounded-r-[11px] transition-all duration-300 active:scale-95 flex items-center"
 				onclick={(e) =>
