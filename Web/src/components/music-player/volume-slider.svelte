@@ -6,18 +6,14 @@
 	let { collapsed }: { collapsed: boolean } = $props();
 
 	let player = GetPlayerContext();
-	let rawVolume = player.volume;
+	let rawVolume = $state(player.volume);
 
-	// Map between the slider values & the actual
-	// volume level: Math.pow(volume / 100, 2);
 	let sliderVolume = $derived(volumeToSlider(rawVolume));
 
-	// Given a number from 0-100, it sets the volume of the audio
-	// to a mapped value of it
 	function UpdateRawVolume(sliderNumber: number)
 	{
 		let value = sliderToVolume[Math.round(sliderNumber)] ?? 0;
-
+		rawVolume = value;
 		player.volume = value;
 	}
 </script>
