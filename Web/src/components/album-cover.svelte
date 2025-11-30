@@ -1,9 +1,12 @@
 <script lang="ts">
-    let {albumId, albumName}: {albumId: string, albumName: string} = $props();
+    import { cn } from "~/lib/utils";
+
+    let {albumId, albumName, class: className}: {albumId: string, albumName: string, class?: string} = $props();
 
     let imageSrc = $state(`/api/Albums/${albumId}/cover`);
     let errored = $state(false);
     let loaded = $state(false);
+    let imgClasses = $derived(`rounded-xl w-full aspect-square object-cover transition-opacity ${errored ? "opacity-75" : ""} ${loaded ? "opacity-100" : "opacity-0"}`);
 
     function handleError()
     {
@@ -18,11 +21,7 @@
 </script>
 
 <img
-    class={[
-    	"rounded-xl w-full aspect-square object-cover transition-opacity",
-    	errored ? "opacity-75" : "",
-    	loaded ? "opacity-100" : "opacity-0",
-    ]}
+    class={cn(imgClasses, className)}
     src={imageSrc}
     alt={`Cover for ${albumName}`}
     onerror={handleError}
