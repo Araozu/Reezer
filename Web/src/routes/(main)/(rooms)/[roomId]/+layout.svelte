@@ -7,12 +7,13 @@
 	import { SetPlayerContext, SetQueueContext } from "~/player2/context/player-store";
     import { GeneralPurposeQueue } from "~/player2/queues/GeneralPurposeQueue";
     import type { IQueue } from "~/player2/interfaces/IQueue";
+    import { WebAudioBackend } from "~/player2/backends/WebAudioBackend";
 
 	let { children } = $props();
 
 	// Setup music player
 	// FIXME: Remove context for audio backend, should use the IQueue instead
-	const audioBackend: IAudioBackend = new GaplessBackend(new UrlAudioSource());
+	const audioBackend: IAudioBackend = new WebAudioBackend(new UrlAudioSource());
 	SetPlayerContext(audioBackend);
 
 	const queue: IQueue = new GeneralPurposeQueue(audioBackend);
