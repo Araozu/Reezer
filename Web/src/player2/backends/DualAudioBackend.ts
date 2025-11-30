@@ -1,7 +1,7 @@
-import type { IAudioBackend } from "../interfaces/IAudioBackend";
+import type { IAudioBackend, PlayState } from "../interfaces/IAudioBackend";
 import type { IAudioSource } from "../interfaces/IAudioSource";
 
-export class GaplessBackend implements IAudioBackend
+export class DualAudioBackend implements IAudioBackend
 {
 	private _volume = 1.0;
 	private player1: HTMLAudioElement = null!;
@@ -20,9 +20,26 @@ export class GaplessBackend implements IAudioBackend
 
 	private readyCallbacks: Array<() => void> = [];
 	private songEndCallbacks: Array<(endedSongId: string) => void> = [];
+	private positionUpdateCallbacks: Array<(positionSeconds: number) => void> = [];
+	private durationChangeCallbacks: Array<(durationSeconds: number) => void> = [];
+	private playStateChangeCallbacks: Array<(state: PlayState) => void> = [];
+
+	private positionInterval: ReturnType<typeof setInterval> | null = null;
+	private lastReportedSecond = -1;
 
 	constructor(private audioSource: IAudioSource)
 	{}
+	get duration(): number | null
+	{
+		const player = this.GetCurrentPlayer();
+		return player && !isNaN(player.duration) ? player.duration : null;
+	}
+
+	get position(): number
+	{
+		const player = this.GetCurrentPlayer();
+		return player ? player.currentTime : 0;
+	}
 
 	get volume(): number
 	{
@@ -53,6 +70,7 @@ export class GaplessBackend implements IAudioBackend
 
 		const player = this.GetCurrentPlayer();
 		player.pause();
+		this.notifyPlayStateChange("buffering");
 
 		const mediaUrlResult = await this.audioSource.GetTrack(id);
 		mediaUrlResult.match(
@@ -62,6 +80,8 @@ export class GaplessBackend implements IAudioBackend
 				this.SetCurrentSongId(id);
 				this.currentSongStartTime = Date.now();
 				player.play();
+				this.notifyPlayStateChange("playing");
+				this.startPositionTracking();
 			},
 			(e) =>
 			{
@@ -76,16 +96,21 @@ export class GaplessBackend implements IAudioBackend
 		if (player.paused)
 		{
 			player.play();
+			this.notifyPlayStateChange("playing");
+			this.startPositionTracking();
 		}
 		else
 		{
 			player.pause();
+			this.notifyPlayStateChange("paused");
+			this.stopPositionTracking();
 		}
 	}
 
 	Seek(position: number): void
 	{
-		throw new Error(`Method not implemented.${position}`);
+		const player = this.GetCurrentPlayer();
+		player.currentTime = position;
 	}
 
 	async Prefetch(id: string): Promise<void>
@@ -115,6 +140,7 @@ export class GaplessBackend implements IAudioBackend
 	autoPlayNext = () =>
 	{
 		const endedSongId = this.GetCurrentSongId();
+		this.stopPositionTracking();
 
 		if (this.hasPrefetch)
 		{
@@ -123,6 +149,12 @@ export class GaplessBackend implements IAudioBackend
 			this.currentSongStartTime = Date.now();
 			currentPlayer.play();
 			this.hasPrefetch = false;
+			this.notifyPlayStateChange("playing");
+			this.startPositionTracking();
+		}
+		else
+		{
+			this.notifyPlayStateChange("paused");
 		}
 
 		// Notify listeners that the song ended
@@ -148,6 +180,9 @@ export class GaplessBackend implements IAudioBackend
 		this.player1.addEventListener("ended", this.autoPlayNext);
 		this.player2.addEventListener("ended", this.autoPlayNext);
 
+		this.player1.addEventListener("loadedmetadata", () => this.notifyDurationChange(this.player1.duration));
+		this.player2.addEventListener("loadedmetadata", () => this.notifyDurationChange(this.player2.duration));
+
 		this.readyCallbacks.forEach((callback) => callback());
 	}
 
@@ -161,12 +196,31 @@ export class GaplessBackend implements IAudioBackend
 		this.songEndCallbacks.push(callback);
 	}
 
-	/**
-	 * Releases all resources held by the backend.
-	 */
+	OnPositionUpdate(callback: (positionSeconds: number) => void): void
+	{
+		this.positionUpdateCallbacks.push(callback);
+	}
+
+	OnDurationChange(callback: (durationSeconds: number) => void): void
+	{
+		this.durationChangeCallbacks.push(callback);
+	}
+
+	OnPlayStateChange(callback: (state: PlayState) => void): void
+	{
+		this.playStateChangeCallbacks.push(callback);
+	}
+
 	Deinit(): void
 	{
-		console.log("Deinitializing GaplessBackend");
+		this.stopPositionTracking();
+		this.player1?.removeEventListener("ended", this.autoPlayNext);
+		this.player2?.removeEventListener("ended", this.autoPlayNext);
+		this.readyCallbacks = [];
+		this.songEndCallbacks = [];
+		this.positionUpdateCallbacks = [];
+		this.durationChangeCallbacks = [];
+		this.playStateChangeCallbacks = [];
 	}
 
 	private GetCurrentPlayer(): HTMLAudioElement
@@ -206,5 +260,46 @@ export class GaplessBackend implements IAudioBackend
 		{
 			this.player1SongId = id;
 		}
+	}
+
+	private startPositionTracking(): void
+	{
+		this.stopPositionTracking();
+		this.lastReportedSecond = -1;
+
+		this.positionInterval = setInterval(() =>
+		{
+			const player = this.GetCurrentPlayer();
+			if (!player || player.paused)
+			{
+				return;
+			}
+
+			const currentSecond = Math.floor(player.currentTime);
+			if (currentSecond !== this.lastReportedSecond)
+			{
+				this.lastReportedSecond = currentSecond;
+				this.positionUpdateCallbacks.forEach((cb) => cb(currentSecond));
+			}
+		}, 250);
+	}
+
+	private stopPositionTracking(): void
+	{
+		if (this.positionInterval)
+		{
+			clearInterval(this.positionInterval);
+			this.positionInterval = null;
+		}
+	}
+
+	private notifyDurationChange(duration: number): void
+	{
+		this.durationChangeCallbacks.forEach((cb) => cb(duration));
+	}
+
+	private notifyPlayStateChange(state: PlayState): void
+	{
+		this.playStateChangeCallbacks.forEach((cb) => cb(state));
 	}
 }

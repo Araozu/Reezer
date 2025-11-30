@@ -2,7 +2,6 @@
 	import MusicPlayer from "~/components/music-player/index.svelte";
 	import ClickTrap from "./click-trap.svelte";
 	import { UrlAudioSource } from "~/player2/audio-sources/UrlAudioSource";
-	import { GaplessBackend } from "~/player2/backends/GaplessBackend";
 	import type { IAudioBackend } from "~/player2/interfaces/IAudioBackend";
 	import { SetPlayerContext, SetQueueContext } from "~/player2/context/player-store";
     import { GeneralPurposeQueue } from "~/player2/queues/GeneralPurposeQueue";
