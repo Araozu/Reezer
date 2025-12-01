@@ -12,7 +12,6 @@
 		albumName: string;
 		songs: SongDto[];
 		currentSongId: string | null;
-		hasMultipleDiscs: boolean;
 		uniqueDiscs: number[];
 		getSongsForDisc: (discNumber: number) => SongDto[];
 		getSongIndex: (song: SongDto) => number;
@@ -21,14 +20,15 @@
 		onPlayFromSong: (index: number) => void;
 		onAddLastSong: (song: SongDto) => void;
 		onAddNextSong: (song: SongDto) => void;
+		roomId: string;
+		artistId: string;
+		artistName: string;
 	}
 
 	let {
 		albumId,
 		albumName,
-		songs,
 		currentSongId,
-		hasMultipleDiscs,
 		uniqueDiscs,
 		getSongsForDisc,
 		getSongIndex,
@@ -69,33 +69,21 @@
 </div>
 
 <div class="py-6">
-	{#if hasMultipleDiscs}
-		{#each uniqueDiscs as discNumber (discNumber)}
-			<div class="mb-6">
-				<div class="flex items-center gap-2 px-3 py-2 mb-2 text-muted-foreground">
-					<Disc class="size-4" />
-					<span class="text-sm font-medium">Disc {discNumber}</span>
-				</div>
-				{#each getSongsForDisc(discNumber) as song (song.id)}
-					<SongRow
-						{song}
-						isCurrentSong={song.id === currentSongId}
-						onPlay={() => onPlayFromSong(getSongIndex(song))}
-						onAddLast={() => onAddLastSong(song)}
-						onAddNext={() => onAddNextSong(song)}
-					/>
-				{/each}
+	{#each uniqueDiscs as discNumber (discNumber)}
+		<div class="mb-6">
+			<div class="flex items-center gap-2 px-3 py-2 mb-2 text-muted-foreground">
+				<Disc class="size-4" />
+				<span class="text-sm font-medium">Disc {discNumber}</span>
 			</div>
-		{/each}
-	{:else}
-		{#each songs as song, index (song.id)}
-			<SongRow
-				{song}
-				isCurrentSong={song.id === currentSongId}
-				onPlay={() => onPlayFromSong(index)}
-				onAddLast={() => onAddLastSong(song)}
-				onAddNext={() => onAddNextSong(song)}
-			/>
-		{/each}
-	{/if}
+			{#each getSongsForDisc(discNumber) as song (song.id)}
+				<SongRow
+					{song}
+					isCurrentSong={song.id === currentSongId}
+					onPlay={() => onPlayFromSong(getSongIndex(song))}
+					onAddLast={() => onAddLastSong(song)}
+					onAddNext={() => onAddNextSong(song)}
+				/>
+			{/each}
+		</div>
+	{/each}
 </div>

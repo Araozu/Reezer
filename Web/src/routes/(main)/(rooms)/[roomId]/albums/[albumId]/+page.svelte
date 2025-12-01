@@ -36,8 +36,6 @@
 		return Array.from(discs).sort((a, b) => a - b);
 	});
 
-	let hasMultipleDiscs = $derived(uniqueDiscs().length > 1);
-
 	function getSongsForDisc(discNumber: number): SongDto[]
 	{
 		return songs.filter((s) => Number(s.discNumber ?? 1) === discNumber);
@@ -65,7 +63,6 @@
 			{albumName}
 			{songs}
 			{currentSongId}
-			{hasMultipleDiscs}
 			uniqueDiscs={uniqueDiscs()}
 			{getSongsForDisc}
 			{getSongIndex}
@@ -88,6 +85,7 @@
 			onPlayFromSong={playFromSong}
 			onAddLastSong={(song) => queue.AddLastSong(song)}
 			onAddNextSong={(song) => queue.AddNextSong(song)}
+			onPlayAll={() => queue.PlaySongList(songs)}
 			roomId={$roomId}
 			{artistId}
 			{artistName}

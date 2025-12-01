@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { components } from "~/api";
-	import { Disc } from "lucide-svelte";
+	import { Disc, ListEnd, Play } from "lucide-svelte";
 	import AlbumCover from "~/components/album-cover.svelte";
 	import SongRow from "./SongRow.svelte";
+    import { Button } from "~/lib/components/ui/button";
 
 	type SongDto = components["schemas"]["SongDto"];
 
@@ -17,6 +18,8 @@
 		onPlayFromSong: (index: number) => void;
 		onAddLastSong: (song: SongDto) => void;
 		onAddNextSong: (song: SongDto) => void;
+		onPlayAll: () => void;
+		onAddAllToQueue: () => void;
 		roomId: string;
 		artistId: string;
 		artistName: string;
@@ -32,6 +35,8 @@
 		onPlayFromSong,
 		onAddLastSong,
 		onAddNextSong,
+		onPlayAll,
+		onAddAllToQueue,
 		roomId,
 		artistId,
 		artistName,
@@ -54,6 +59,17 @@
 				hover:bg-glass-bg-hover transition-colors">
 				<a href="/{roomId}/artists/{artistId}" class="block">{artistName}</a>
 			</div>
+		</div>
+		<div class="md:text-left text-center">
+			<Button onclick={onPlayAll} class="mr-2">
+				<Play />
+				Play All
+			</Button>
+
+			<Button onclick={onAddAllToQueue} variant="outline">
+				<ListEnd />
+				Add to queue
+			</Button>
 		</div>
 	</div>
 	<div>
