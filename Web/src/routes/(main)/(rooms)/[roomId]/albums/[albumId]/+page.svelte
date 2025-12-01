@@ -19,12 +19,16 @@
 	const currentSongId = $derived(svQueue.currentSong?.id ?? null);
 
 	let albumId = toStore(() => page.params.albumId ?? "-");
+	let roomId = toStore(() => page.params.roomId ?? "-");
 	let dataStore = toStore(() => data.albumData);
 	let albumQuery = useAlbumByIdQuery(albumId, dataStore);
 
 	let albumName = $derived($albumQuery.data?.name ?? "");
 
 	let songs: SongDto[] = $derived($albumQuery.data?.songs ?? []);
+
+	let artistId = $derived(songs[0]?.artistId ?? "");
+	let artistName = $derived(songs[0]?.artist ?? "");
 
 	let uniqueDiscs = $derived(() =>
 	{
@@ -84,6 +88,9 @@
 			onPlayFromSong={playFromSong}
 			onAddLastSong={(song) => queue.AddLastSong(song)}
 			onAddNextSong={(song) => queue.AddNextSong(song)}
+			roomId={$roomId}
+			{artistId}
+			{artistName}
 		/>
 	</div>
 {/if}
