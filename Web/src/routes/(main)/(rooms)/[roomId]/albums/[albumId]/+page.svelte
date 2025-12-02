@@ -70,10 +70,10 @@
 
 {#await data.albumDataPromise}
 	<div class="block md:hidden">
-		<AlbumMobileSkeleton />
+		<AlbumMobileSkeleton {albumId} />
 	</div>
 	<div class="hidden md:block">
-		<AlbumDesktopSkeleton />
+		<AlbumDesktopSkeleton {albumId} />
 	</div>
 {:then albumData}
 	{@const songs = getSongs(albumData)}

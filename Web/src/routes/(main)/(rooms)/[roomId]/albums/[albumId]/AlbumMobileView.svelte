@@ -41,7 +41,7 @@
 </script>
 
 <div class="relative">
-	<AlbumCover {albumId} {albumName} class="rounded-none"/>
+	<AlbumCover {albumId} {albumName} class="rounded-none" skipFadeIn />
 </div>
 
 <div class="w-full px-4 py-2 transform -translate-y-8">

@@ -1,11 +1,18 @@
 <script lang="ts">
     import { cn } from "~/lib/utils";
 
-    let {albumId, albumName, class: className}: {albumId: string, albumName: string, class?: string} = $props();
+    interface Props {
+        albumId: string;
+        albumName: string;
+        class?: string;
+        skipFadeIn?: boolean;
+    }
+
+    let { albumId, albumName, class: className, skipFadeIn = false }: Props = $props();
 
     let imageSrc = $state(`/api/Albums/${albumId}/cover`);
     let errored = $state(false);
-    let loaded = $state(false);
+    let loaded = $state(skipFadeIn);
     let imgClasses = $derived(`rounded-xl w-full aspect-square object-cover transition-opacity ${errored ? "opacity-75" : ""} ${loaded ? "opacity-100" : "opacity-0"}`);
 
     function handleError()
