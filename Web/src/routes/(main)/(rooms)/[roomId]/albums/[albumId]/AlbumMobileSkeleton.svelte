@@ -1,16 +1,23 @@
 <script lang="ts">
 	import { Disc } from "lucide-svelte";
 	import { Skeleton } from "~/lib/components/ui/skeleton";
+	import AlbumCover from "~/components/album-cover.svelte";
+
+	interface Props {
+		albumId: string;
+	}
+
+	let { albumId }: Props = $props();
 </script>
 
 <div class="relative">
-	<Skeleton class="w-full aspect-square rounded-none" />
+	<AlbumCover {albumId} albumName="Loading..." class="rounded-none" />
 </div>
 
 <div class="w-full px-4 py-2 transform -translate-y-8">
-	<div class="py-1 backdrop-blur-xl bg-glass-bg border border-glass-border rounded-2xl
+	<div class="py-1 font-display text-3xl font-bold text-center backdrop-blur-xl bg-glass-bg border border-glass-border rounded-2xl
 		shadow-[0_4px_24px_-4px_var(--glass-shadow) inset_0_1px_1px_var(--glass-highlight)]">
-		<Skeleton class="h-9 w-48 mx-auto rounded-lg" />
+		Loading...
 	</div>
 
 	<div class="mt-2 flex justify-center gap-2">
