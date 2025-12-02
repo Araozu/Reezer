@@ -1,15 +1,16 @@
 <script lang="ts">
 	import { page } from "$app/state";
-	import { toStore } from "svelte/store";
-	import { useAlbumByIdQuery } from "./queries";
 	import { GetQueueContext } from "~/player2/context/player-store";
 	import type { PageProps } from "./$types";
 	import type { components } from "~/api";
 	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
 	import AlbumMobileView from "./AlbumMobileView.svelte";
 	import AlbumDesktopView from "./AlbumDesktopView.svelte";
+	import AlbumMobileSkeleton from "./AlbumMobileSkeleton.svelte";
+	import AlbumDesktopSkeleton from "./AlbumDesktopSkeleton.svelte";
 
 	type SongDto = components["schemas"]["SongDto"];
+	type AlbumWithTracklistDto = components["schemas"]["AlbumWithTracklistDto"];
 
 	let { data }: PageProps = $props();
 
@@ -18,79 +19,110 @@
 
 	const currentSongId = $derived(svQueue.currentSong?.id ?? null);
 
-	let albumId = toStore(() => page.params.albumId ?? "-");
-	let roomId = toStore(() => page.params.roomId ?? "-");
-	let dataStore = toStore(() => data.albumData);
-	let albumQuery = useAlbumByIdQuery(albumId, dataStore);
+	let albumId = $derived(page.params.albumId ?? "-");
+	let roomId = $derived(page.params.roomId ?? "-");
 
-	let albumName = $derived($albumQuery.data?.name ?? "");
+	function getAlbumName(albumData: AlbumWithTracklistDto): string
+	{
+		return albumData.name ?? "";
+	}
 
-	let songs: SongDto[] = $derived($albumQuery.data?.songs ?? []);
+	function getSongs(albumData: AlbumWithTracklistDto): SongDto[]
+	{
+		return albumData.songs ?? [];
+	}
 
-	let artistId = $derived(songs[0]?.artistId ?? "");
-	let artistName = $derived(songs[0]?.artist ?? "");
+	function getArtistId(songs: SongDto[]): string
+	{
+		return songs[0]?.artistId ?? "";
+	}
 
-	let uniqueDiscs = $derived(() =>
+	function getArtistName(songs: SongDto[]): string
+	{
+		return songs[0]?.artist ?? "";
+	}
+
+	function getUniqueDiscs(songs: SongDto[]): number[]
 	{
 		const discs = new Set(songs.map((s) => Number(s.discNumber ?? 1)));
 		return Array.from(discs).sort((a, b) => a - b);
-	});
+	}
 
-	let hasMultipleDiscs = $derived(uniqueDiscs().length > 1);
-
-	function getSongsForDisc(discNumber: number): SongDto[]
+	function getSongsForDisc(songs: SongDto[], discNumber: number): SongDto[]
 	{
 		return songs.filter((s) => Number(s.discNumber ?? 1) === discNumber);
 	}
 
-	function getSongIndex(song: SongDto): number
+	function getSongIndex(songs: SongDto[], song: SongDto): number
 	{
 		return songs.findIndex((s) => s.id === song.id);
 	}
 
-	function playFromSong(index: number)
+	function playFromSong(songs: SongDto[], index: number)
 	{
 		queue.PlaySongList(songs.slice(index));
 	}
 </script>
 
 <svelte:head>
-	<title>Reezer - {albumName}</title>
+	<title>Reezer - Album</title>
 </svelte:head>
 
-{#if $albumQuery.data}
+{#await data.albumDataPromise}
 	<div class="block md:hidden">
-		<AlbumMobileView
-			albumId={$albumId}
-			{albumName}
-			{songs}
-			{currentSongId}
-			{hasMultipleDiscs}
-			uniqueDiscs={uniqueDiscs()}
-			{getSongsForDisc}
-			{getSongIndex}
-			onPlayAll={() => queue.PlaySongList(songs)}
-			onAddAllToQueue={() => queue.AddLastSongList(songs)}
-			onPlayFromSong={playFromSong}
-			onAddLastSong={(song) => queue.AddLastSong(song)}
-			onAddNextSong={(song) => queue.AddNextSong(song)}
-		/>
+		<AlbumMobileSkeleton />
 	</div>
 	<div class="hidden md:block">
-		<AlbumDesktopView
-			albumId={$albumId}
+		<AlbumDesktopSkeleton />
+	</div>
+{:then albumData}
+	{@const songs = getSongs(albumData)}
+	{@const albumName = getAlbumName(albumData)}
+	{@const artistId = getArtistId(songs)}
+	{@const artistName = getArtistName(songs)}
+	{@const uniqueDiscs = getUniqueDiscs(songs)}
+
+	<div class="block md:hidden">
+		<AlbumMobileView
+			{albumId}
 			{albumName}
 			{songs}
 			{currentSongId}
-			uniqueDiscs={uniqueDiscs()}
-			{getSongsForDisc}
-			{getSongIndex}
-			onPlayFromSong={playFromSong}
+			{uniqueDiscs}
+			getSongsForDisc={(disc) => getSongsForDisc(songs, disc)}
+			getSongIndex={(song) => getSongIndex(songs, song)}
+			onPlayAll={() => queue.PlaySongList(songs)}
+			onAddAllToQueue={() => queue.AddLastSongList(songs)}
+			onPlayFromSong={(idx) => playFromSong(songs, idx)}
 			onAddLastSong={(song) => queue.AddLastSong(song)}
 			onAddNextSong={(song) => queue.AddNextSong(song)}
-			roomId={$roomId}
+			{roomId}
 			{artistId}
 			{artistName}
 		/>
 	</div>
-{/if}
+	<div class="hidden md:block">
+		<AlbumDesktopView
+			{albumId}
+			{albumName}
+			{songs}
+			{currentSongId}
+			{uniqueDiscs}
+			getSongsForDisc={(disc) => getSongsForDisc(songs, disc)}
+			getSongIndex={(song) => getSongIndex(songs, song)}
+			onPlayFromSong={(idx) => playFromSong(songs, idx)}
+			onAddLastSong={(song) => queue.AddLastSong(song)}
+			onAddNextSong={(song) => queue.AddNextSong(song)}
+			onPlayAll={() => queue.PlaySongList(songs)}
+			onAddAllToQueue={() => queue.AddLastSongList(songs)}
+			{roomId}
+			{artistId}
+			{artistName}
+		/>
+	</div>
+{:catch error}
+	<div class="flex flex-col items-center justify-center h-64 gap-4">
+		<p class="text-destructive">Error loading album</p>
+		<p class="text-muted-foreground text-sm">{error?.message ?? 'Unknown error'}</p>
+	</div>
+{/await}

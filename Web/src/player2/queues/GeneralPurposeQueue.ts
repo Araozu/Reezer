@@ -80,12 +80,14 @@ export class GeneralPurposeQueue implements IQueue
 	{
 		this._queueState.push(song);
 		this.notifyQueueChanged();
+		this.backendUpdate();
 	}
 
 	AddLastSongList(song: Array<ISong>): void
 	{
 		this._queueState.push(...song);
 		this.notifyQueueChanged();
+		this.backendUpdate();
 	}
 
 	AddNextSong(song: ISong): void
