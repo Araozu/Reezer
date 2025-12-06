@@ -24,6 +24,8 @@
           # Frontend development
           nodejs_22
           pnpm
+          # for yt-dlp
+          deno
 
           # Backend development
           dotnetCorePackages.sdk_10_0-bin
