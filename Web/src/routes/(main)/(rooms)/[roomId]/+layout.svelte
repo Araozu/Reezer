@@ -4,9 +4,10 @@
 	import { UrlAudioSource } from "~/player2/audio-sources/UrlAudioSource";
 	import type { IAudioBackend } from "~/player2/interfaces/IAudioBackend";
 	import { SetPlayerContext, SetQueueContext } from "~/player2/context/player-store";
-    import { GeneralPurposeQueue } from "~/player2/queues/GeneralPurposeQueue";
-    import type { IQueue } from "~/player2/interfaces/IQueue";
-    import { WebAudioBackend } from "~/player2/backends/WebAudioBackend";
+	import { GeneralPurposeQueue } from "~/player2/queues/GeneralPurposeQueue";
+	import type { IQueue } from "~/player2/interfaces/IQueue";
+	import { WebAudioBackend } from "~/player2/backends/WebAudioBackend";
+	import * as Menubar from "$lib/components/ui/menubar/index.js";
 
 	let { children } = $props();
 
@@ -34,6 +35,24 @@
 >
 	<div class="pb-12">
 		{#if audioTagSetup}
+			<div>
+				<Menubar.Root>
+					<Menubar.Menu>
+						<Menubar.Trigger>File</Menubar.Trigger>
+						<Menubar.Content>
+							<Menubar.Item>
+								New Tab
+							<Menubar.Shortcut>⌘T</Menubar.Shortcut>
+							</Menubar.Item>
+							<Menubar.Item>New Window</Menubar.Item>
+							<Menubar.Separator />
+							<Menubar.Item>Share</Menubar.Item>
+							<Menubar.Separator />
+							<Menubar.Item>Print</Menubar.Item>
+						</Menubar.Content>
+					</Menubar.Menu>
+				</Menubar.Root>
+			</div>
 			{@render children()}
 		{:else}
 			<ClickTrap />
