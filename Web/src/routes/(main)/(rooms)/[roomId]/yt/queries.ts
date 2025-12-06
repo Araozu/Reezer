@@ -1,4 +1,4 @@
-import { createQuery } from "@tanstack/svelte-query";
+import { createMutation, createQuery, useQueryClient } from "@tanstack/svelte-query";
 import { api, sv, type components } from "~/api";
 import { derived, type Readable } from "svelte/store";
 
@@ -20,4 +20,29 @@ export function useYtSongs(
 		staleTime: 5 * 60 * 1000,
 		refetchOnWindowFocus: false,
 	})));
+}
+
+export function useAddYtSong()
+{
+	const queryClient = useQueryClient();
+	
+	return createMutation({
+		mutationFn: async (url: string) =>
+		{
+			const response = await api.POST("/api/Yt", {
+				body: { url },
+			});
+
+			if (response.error)
+			{
+				throw { message: response.error.detail ?? "Failed to add YouTube song" };
+			}
+
+			return response.data;
+		},
+		onSuccess: () =>
+		{
+			queryClient.invalidateQueries({ queryKey: ["ytSongs"] });
+		},
+	});
 }

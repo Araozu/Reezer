@@ -6,6 +6,7 @@
 	import YtSongRow from "./yt-song-row.svelte";
 	import YtSongRowSkeleton from "./yt-song-row-skeleton.svelte";
 	import BackButton from "$lib/components/back-button.svelte";
+	import AddYtSongDialog from "./add-yt-song-dialog.svelte";
 
 	const pageNumberQuery = Number.parseInt(page.url.searchParams.get("page") ?? "1", 10);
 
@@ -37,10 +38,13 @@
 	<title>Reezer - YouTube Songs</title>
 </svelte:head>
 
-<h1 class="font-display text-4xl font-semibold py-8 px-4 flex items-center gap-3">
-	<BackButton />
-	YouTube Songs
-</h1>
+<div class="flex items-center justify-between py-8 px-4">
+	<h1 class="font-display text-4xl font-semibold flex items-center gap-3">
+		<BackButton />
+		YouTube Songs
+	</h1>
+	<AddYtSongDialog />
+</div>
 
 <div class="px-4">
 	<YtPagination {totalCount} {pageSize} bind:requestPage />
