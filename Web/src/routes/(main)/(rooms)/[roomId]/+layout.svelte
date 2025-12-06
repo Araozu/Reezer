@@ -8,8 +8,11 @@
 	import type { IQueue } from "~/player2/interfaces/IQueue";
 	import { WebAudioBackend } from "~/player2/backends/WebAudioBackend";
 	import * as Menubar from "$lib/components/ui/menubar/index.js";
+	import {page} from "$app/state";
 
 	let { children } = $props();
+
+	const roomId = page.params.roomId;
 
 	// Setup music player
 	// FIXME: Remove context for audio backend, should use the IQueue instead
@@ -35,21 +38,19 @@
 >
 	<div class="pb-12">
 		{#if audioTagSetup}
-			<div>
+			<div class="sticky top-0 z-10">
 				<Menubar.Root>
+					<a href={`/${roomId}/`} class="font-display font-bold px-6 py-2">Reezer</a>
 					<Menubar.Menu>
-						<Menubar.Trigger>File</Menubar.Trigger>
-						<Menubar.Content>
-							<Menubar.Item>
-								New Tab
-							<Menubar.Shortcut>⌘T</Menubar.Shortcut>
-							</Menubar.Item>
-							<Menubar.Item>New Window</Menubar.Item>
-							<Menubar.Separator />
-							<Menubar.Item>Share</Menubar.Item>
-							<Menubar.Separator />
-							<Menubar.Item>Print</Menubar.Item>
-						</Menubar.Content>
+						<a href={`/${roomId}/albums`} class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors">
+							Albums
+						</a>
+						<a href={`/${roomId}/artists`} class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors">
+							Artists
+						</a>
+						<a href={`/${roomId}/yt`} class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors">
+							YouTube
+						</a>
 					</Menubar.Menu>
 				</Menubar.Root>
 			</div>
