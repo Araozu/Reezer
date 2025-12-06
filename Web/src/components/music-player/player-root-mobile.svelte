@@ -1,6 +1,7 @@
 <script lang="ts">
 	import * as Drawer from "$lib/components/ui/drawer/index.js";
-    import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
+	import * as Tabs from "$lib/components/ui/tabs/index.js";
+	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
 	import PlayerContentsCollapsedMobile from "./player-contents-collapsed-mobile.svelte";
 	import PlayerContentsPlaying from "./player-contents-playing.svelte";
 	import PlayerContentsQueue from "./player-contents-queue.svelte";
@@ -43,7 +44,22 @@
 <Drawer.Root bind:open>
 	<Drawer.Content class="h-90vh">
 		<div class="px-4 py-8">
-			<PlayerContentsPlaying bind:coverUrl {song} />
+			<Tabs.Root bind:value={currentTab} class="mb-6">
+				<Tabs.List class="grid w-full grid-cols-2">
+					<Tabs.Trigger value="playing">
+						Now Playing
+					</Tabs.Trigger>
+					<Tabs.Trigger value="queue">
+						Queue
+					</Tabs.Trigger>
+				</Tabs.List>
+			</Tabs.Root>
+			
+			{#if currentTab === "playing"}
+				<PlayerContentsPlaying bind:coverUrl {song} />
+			{:else if currentTab === "queue"}
+				<PlayerContentsQueue />
+			{/if}
 		</div>
 	</Drawer.Content>
 </Drawer.Root>
