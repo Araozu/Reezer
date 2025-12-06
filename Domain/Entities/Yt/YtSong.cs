@@ -6,6 +6,13 @@ public class YtSong
     public string Name { get; private set; }
     public string? CachedPath { get; private set; }
 
+    public YtSong(string ytId, string name)
+    {
+        YtId = ytId;
+        Name = name;
+        CachedPath = null;
+    }
+
     public void SetCachedPath(string cachedPath)
     {
         CachedPath = cachedPath;

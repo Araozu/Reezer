@@ -16,4 +16,14 @@ public interface IYtSongRepository
         string ytId,
         CancellationToken cancellationToken = default
     );
+
+    Task<OneOf<YtSong, InternalError>> AddAsync(
+        YtSong ytSong,
+        CancellationToken cancellationToken = default
+    );
+
+    Task<OneOf<YtSong, NotFound>> GetByIdAsync(
+        string ytId,
+        CancellationToken cancellationToken = default
+    );
 }

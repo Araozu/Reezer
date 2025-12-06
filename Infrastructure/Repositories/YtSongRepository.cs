@@ -105,4 +105,39 @@ public class YtSongRepository(
             songLock.Release();
         }
     }
+
+    public async Task<OneOf<YtSong, InternalError>> AddAsync(
+        YtSong ytSong,
+        CancellationToken cancellationToken = default
+    )
+    {
+        try
+        {
+            dbContext.YtSongs.Add(ytSong);
+            await dbContext.SaveChangesAsync(cancellationToken);
+            return ytSong;
+        }
+        catch (Exception ex)
+        {
+            return new InternalError($"Failed to add YouTube song: {ex.Message}");
+        }
+    }
+
+    public async Task<OneOf<YtSong, NotFound>> GetByIdAsync(
+        string ytId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var song = await dbContext.YtSongs.FirstOrDefaultAsync(
+            s => s.YtId == ytId,
+            cancellationToken
+        );
+
+        if (song is null)
+        {
+            return new NotFound($"YouTube song with ID {ytId} not found.");
+        }
+
+        return song;
+    }
 }
