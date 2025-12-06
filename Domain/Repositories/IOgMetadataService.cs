@@ -3,7 +3,12 @@ using OneOf;
 
 namespace Reezer.Domain.Repositories;
 
-public record OgMetadata(string Title, string? Description, string? ImageUrl);
+public record OgMetadata(
+    string Title,
+    string? Description,
+    string? ImageUrl,
+    string? ThumbnailPath
+);
 
 public interface IOgMetadataService
 {

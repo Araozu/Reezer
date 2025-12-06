@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { DropdownMenu as DropdownMenuPrimitive } from "bits-ui";
+	import { Menubar as MenubarPrimitive } from "bits-ui";
 	import CheckIcon from "@lucide/svelte/icons/check";
 	import MinusIcon from "@lucide/svelte/icons/minus";
 	import { cn, type WithoutChildrenOrChild } from "$lib/utils.js";
@@ -7,23 +7,23 @@
 
 	let {
 		ref = $bindable(null),
+		class: className,
 		checked = $bindable(false),
 		indeterminate = $bindable(false),
-		class: className,
 		children: childrenProp,
 		...restProps
-	}: WithoutChildrenOrChild<DropdownMenuPrimitive.CheckboxItemProps> & {
+	}: WithoutChildrenOrChild<MenubarPrimitive.CheckboxItemProps> & {
 		children?: Snippet;
 	} = $props();
 </script>
 
-<DropdownMenuPrimitive.CheckboxItem
+<MenubarPrimitive.CheckboxItem
 	bind:ref
 	bind:checked
 	bind:indeterminate
-	data-slot="dropdown-menu-checkbox-item"
+	data-slot="menubar-checkbox-item"
 	class={cn(
-		"focus:bg-glass-bg-hover focus:text-accent-foreground outline-hidden relative flex cursor-default select-none items-center gap-2 rounded-lg py-1.5 pe-2.5 ps-8 text-sm transition-all duration-150 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0 touch-action-manipulation [-webkit-tap-highlight-color:transparent]",
+		"focus:bg-accent focus:text-accent-foreground rounded-xs outline-hidden relative flex cursor-default select-none items-center gap-2 py-1.5 pe-2 ps-8 text-sm data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
 		className
 	)}
 	{...restProps}
@@ -40,4 +40,4 @@
 		</span>
 		{@render childrenProp?.()}
 	{/snippet}
-</DropdownMenuPrimitive.CheckboxItem>
+</MenubarPrimitive.CheckboxItem>

@@ -4,11 +4,15 @@
 	import { UrlAudioSource } from "~/player2/audio-sources/UrlAudioSource";
 	import type { IAudioBackend } from "~/player2/interfaces/IAudioBackend";
 	import { SetPlayerContext, SetQueueContext } from "~/player2/context/player-store";
-    import { GeneralPurposeQueue } from "~/player2/queues/GeneralPurposeQueue";
-    import type { IQueue } from "~/player2/interfaces/IQueue";
-    import { WebAudioBackend } from "~/player2/backends/WebAudioBackend";
+	import { GeneralPurposeQueue } from "~/player2/queues/GeneralPurposeQueue";
+	import type { IQueue } from "~/player2/interfaces/IQueue";
+	import { WebAudioBackend } from "~/player2/backends/WebAudioBackend";
+	import * as Menubar from "$lib/components/ui/menubar/index.js";
+	import {page} from "$app/state";
 
 	let { children } = $props();
+
+	const roomId = page.params.roomId;
 
 	// Setup music player
 	// FIXME: Remove context for audio backend, should use the IQueue instead
@@ -34,6 +38,22 @@
 >
 	<div class="pb-12">
 		{#if audioTagSetup}
+			<div class="sticky top-0 z-10">
+				<Menubar.Root>
+					<a href={`/${roomId}/`} class="font-display font-bold px-6 py-2">Reezer</a>
+					<Menubar.Menu>
+						<a href={`/${roomId}/albums`} class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors">
+							Albums
+						</a>
+						<a href={`/${roomId}/artists`} class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors">
+							Artists
+						</a>
+						<a href={`/${roomId}/yt`} class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors">
+							YouTube
+						</a>
+					</Menubar.Menu>
+				</Menubar.Root>
+			</div>
 			{@render children()}
 		{:else}
 			<ClickTrap />

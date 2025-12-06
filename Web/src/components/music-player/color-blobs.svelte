@@ -1,7 +1,21 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 
-	let { colors, weights = [] }: { colors: string[]; weights?: number[] } = $props();
+	let {
+		colors,
+		weights = [],
+		sizeMin = 200,
+		sizeMax = 500,
+		speedMin = 0.05,
+		speedMax = 0.25
+	}: {
+		colors: string[];
+		weights?: number[];
+		sizeMin?: number;
+		sizeMax?: number;
+		speedMin?: number;
+		speedMax?: number;
+	} = $props();
 
 	interface Blob {
 		x: number;
@@ -10,11 +24,6 @@
 		vy: number;
 		size: number;
 	}
-
-	const BLOB_SIZE_MIN = 200;
-	const BLOB_SIZE_MAX = 500;
-	const SPEED_MIN = 0.05;
-	const SPEED_MAX = 0.25;
 
 	let blobs = $state<Blob[]>([]);
 	let containerRef = $state<HTMLDivElement | null>(null);
@@ -30,16 +39,16 @@
 		blobs = colors.map((_, i) =>
 		{
 			const weight = weights[i] ?? 0.5;
-			const sizeRange = BLOB_SIZE_MAX - BLOB_SIZE_MIN;
-			const baseSize = BLOB_SIZE_MIN + (sizeRange * weight);
+			const sizeRange = sizeMax - sizeMin;
+			const baseSize = sizeMin + (sizeRange * weight);
 			const sizeVariation = randomInRange(-50, 50);
 
 			return {
 				x: Math.random() * 100,
 				y: Math.random() * 100,
-				vx: randomInRange(SPEED_MIN, SPEED_MAX) * (Math.random() > 0.5 ? 1 : -1),
-				vy: randomInRange(SPEED_MIN, SPEED_MAX) * (Math.random() > 0.5 ? 1 : -1),
-				size: Math.max(BLOB_SIZE_MIN, baseSize + sizeVariation),
+				vx: randomInRange(speedMin, speedMax) * (Math.random() > 0.5 ? 1 : -1),
+				vy: randomInRange(speedMin, speedMax) * (Math.random() > 0.5 ? 1 : -1),
+				size: Math.max(sizeMin, baseSize + sizeVariation),
 			};
 		});
 	}

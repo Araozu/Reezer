@@ -9,4 +9,9 @@ public interface IYtService
         string ytId,
         CancellationToken cancellationToken = default
     );
+
+    Task<OneOf<string, InternalError>> DownloadAndEncodeThumbnailAsync(
+        string ytId,
+        CancellationToken cancellationToken = default
+    );
 }

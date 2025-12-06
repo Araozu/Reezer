@@ -84,6 +84,19 @@ public class YtSongRepository(
 
             var downloadResult = await ytService.DownloadAndCacheAsync(ytId, cancellationToken);
 
+            var thumbnailResult = await ytService.DownloadAndEncodeThumbnailAsync(
+                ytId,
+                cancellationToken
+            );
+            thumbnailResult.Switch(
+                thumbnailPath =>
+                {
+                    song.SetThumbnailPath(thumbnailPath);
+                    dbContext.SaveChanges();
+                },
+                _ => { }
+            );
+
             return downloadResult.Match<
                 OneOf<(Stream Stream, string ContentType), NotFound, InternalError>
             >(
@@ -103,6 +116,37 @@ public class YtSongRepository(
         finally
         {
             songLock.Release();
+        }
+    }
+
+    public async Task<
+        OneOf<(Stream Stream, string ContentType), NotFound, InternalError>
+    > GetThumbnailStreamAsync(string ytId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var song = await dbContext
+                .YtSongs.AsNoTracking()
+                .FirstOrDefaultAsync(s => s.YtId == ytId, cancellationToken);
+
+            if (song is null)
+            {
+                return new NotFound($"YouTube song with ID {ytId} not found.");
+            }
+
+            if (string.IsNullOrEmpty(song.ThumbnailPath) || !File.Exists(song.ThumbnailPath))
+            {
+                return new NotFound($"Thumbnail not found for YouTube video {ytId}.");
+            }
+
+            return (
+                new FileStream(song.ThumbnailPath, FileMode.Open, FileAccess.Read, FileShare.Read),
+                "image/webp"
+            );
+        }
+        catch (Exception ex)
+        {
+            return new InternalError($"Failed to retrieve thumbnail: {ex.Message}");
         }
     }
 

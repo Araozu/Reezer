@@ -36,6 +36,11 @@ public partial class AddYtSongUseCase(
                 var title = TrimYouTubeSuffix(metadata.Title);
                 var ytSong = new YtSong(videoId, title);
 
+                if (!string.IsNullOrEmpty(metadata.ThumbnailPath))
+                {
+                    ytSong.SetThumbnailPath(metadata.ThumbnailPath);
+                }
+
                 var addResult = await ytSongRepository.AddAsync(ytSong, cancellationToken);
                 return addResult.Match<OneOf<YtSong, BadRequest, NotFound, InternalError>>(
                     song => song,

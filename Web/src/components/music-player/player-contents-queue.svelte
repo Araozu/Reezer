@@ -41,7 +41,7 @@
 			]}
 		>
 			<button
-				class="flex-1 min-w-0 text-left cursor-pointer rounded-lg p-3 transition-all duration-300"
+				class="flex-1 min-w-0 text-left cursor-pointer rounded-lg p-3 transition-all duration-300 touch-action-manipulation [-webkit-tap-highlight-color:transparent]"
 				onclick={() => queue.PlayAt(index)}
 			>
 				<p class="font-medium truncate">
@@ -55,7 +55,7 @@
 			</button>
 			<DropdownMenu.Root>
 				<DropdownMenu.Trigger
-					class="px-2 opacity-0 group-hover/queue-item:opacity-100 hover:bg-glass-bg-hover transition-all duration-300 active:scale-95 flex items-center cursor-pointer"
+					class="px-2 opacity-0 group-hover/queue-item:opacity-100 hover:bg-glass-bg-hover transition-all duration-300 active:scale-95 flex items-center cursor-pointer touch-action-manipulation [-webkit-tap-highlight-color:transparent]"
 					onclick={(e) => e.stopPropagation()}
 				>
 					<EllipsisVertical size={18} class="text-muted-foreground" />
@@ -70,7 +70,7 @@
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
 			<button
-				class="px-3 opacity-0 group-hover/queue-item:opacity-100 hover:bg-destructive/20 rounded-r-[11px] transition-all duration-300 active:scale-95 flex items-center"
+				class="px-3 opacity-0 group-hover/queue-item:opacity-100 hover:bg-destructive/20 rounded-r-[11px] transition-all duration-300 active:scale-95 flex items-center touch-action-manipulation [-webkit-tap-highlight-color:transparent]"
 				onclick={(e) =>
 				{
 					e.stopPropagation();

@@ -9,7 +9,8 @@ namespace Reezer.Api.Controllers.Yt;
 public class YtController(
     AddYtSongUseCase addYtSongUseCase,
     GetPaginatedYtSongsUseCase getPaginatedYtSongsUseCase,
-    StreamYtSongUseCase streamYtSongUseCase
+    StreamYtSongUseCase streamYtSongUseCase,
+    GetYtThumbnailUseCase getYtThumbnailUseCase
 ) : ControllerBase
 {
     public record AddYtSongRequest(string Url);
@@ -90,6 +91,26 @@ public class YtController(
                         Status = StatusCodes.Status500InternalServerError,
                     }
                 )
+        );
+    }
+
+    [EndpointSummary("Get YouTube video thumbnail by ID")]
+    [HttpGet("{ytId}/thumbnail")]
+    public async Task<IActionResult> GetYtThumbnail(
+        string ytId,
+        CancellationToken cancellationToken
+    )
+    {
+        var result = await getYtThumbnailUseCase.GetThumbnailAsync(ytId, cancellationToken);
+
+        return result.Match<IActionResult>(
+            success =>
+            {
+                Response.Headers.CacheControl = "public, max-age=2592000";
+                return File(success.Stream, success.ContentType);
+            },
+            notFound => NotFound(new ProblemDetails { Detail = notFound.Reason }),
+            internalError => StatusCode(500, new ProblemDetails { Detail = internalError.Reason })
         );
     }
 }
