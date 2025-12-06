@@ -123,7 +123,10 @@ public partial class OgMetadataService(
 
             if (File.Exists(webpPath))
             {
-                logger.LogDebug("Thumbnail already exists at {WebpPath}, skipping download", webpPath);
+                logger.LogDebug(
+                    "Thumbnail already exists at {WebpPath}, skipping download",
+                    webpPath
+                );
                 return webpPath;
             }
 
@@ -176,10 +179,7 @@ public partial class OgMetadataService(
 
             if (!File.Exists(webpPath))
             {
-                logger.LogError(
-                    "Thumbnail encoding completed but file not found for {YtId}",
-                    ytId
-                );
+                logger.LogError("Thumbnail encoding completed but file not found for {YtId}", ytId);
                 return new InternalError("Thumbnail encoding completed but file not found.");
             }
 

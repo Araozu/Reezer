@@ -17,6 +17,10 @@ public interface IYtSongRepository
         CancellationToken cancellationToken = default
     );
 
+    Task<
+        OneOf<(Stream Stream, string ContentType), NotFound, InternalError>
+    > GetThumbnailStreamAsync(string ytId, CancellationToken cancellationToken = default);
+
     Task<OneOf<YtSong, InternalError>> AddAsync(
         YtSong ytSong,
         CancellationToken cancellationToken = default

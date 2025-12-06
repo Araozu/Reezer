@@ -9,10 +9,8 @@ using Reezer.Infrastructure.Options;
 
 namespace Reezer.Infrastructure.Services;
 
-public class YtService(
-    IOptions<StorageOptions> storageOptions,
-    ILogger<YtService> logger
-) : IYtService
+public class YtService(IOptions<StorageOptions> storageOptions, ILogger<YtService> logger)
+    : IYtService
 {
     private StorageOptions StorageOptions => storageOptions.Value;
 
@@ -154,7 +152,11 @@ public class YtService(
             logger.LogDebug("Downloading thumbnail image from {ThumbnailUrl}", thumbnailUrl);
             var imageBytes = await httpClient.GetByteArrayAsync(thumbnailUrl, cancellationToken);
             await File.WriteAllBytesAsync(tempImagePath, imageBytes, cancellationToken);
-            logger.LogDebug("Downloaded {Bytes} bytes, saved to {TempPath}", imageBytes.Length, tempImagePath);
+            logger.LogDebug(
+                "Downloaded {Bytes} bytes, saved to {TempPath}",
+                imageBytes.Length,
+                tempImagePath
+            );
 
             var process = new Process
             {
@@ -195,7 +197,11 @@ public class YtService(
                 return new InternalError("Thumbnail encoding completed but file not found.");
             }
 
-            logger.LogInformation("Successfully downloaded and encoded thumbnail for {YtId} to {WebpPath}", ytId, webpPath);
+            logger.LogInformation(
+                "Successfully downloaded and encoded thumbnail for {YtId} to {WebpPath}",
+                ytId,
+                webpPath
+            );
             return webpPath;
         }
         catch (OperationCanceledException)
