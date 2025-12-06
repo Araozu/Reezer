@@ -7,7 +7,7 @@
 
 <button
 	class="
-		w-full flex items-center gap-4 p-3 rounded-xl
+		group w-full flex flex-col gap-3 rounded-xl
 		bg-glass-bg hover:bg-glass-bg-hover
 		border border-glass-border hover:border-glass-border-hover
 		backdrop-blur-xl
@@ -16,34 +16,31 @@
 		transition-all duration-300 ease-out
 		active:scale-[0.98]
 		touch-action-manipulation [-webkit-tap-highlight-color:transparent]
+		overflow-hidden
 	"
 	data-slot="button"
 >
 	<div class="
-		relative w-28 h-16 flex-shrink-0 rounded-lg overflow-hidden
-		bg-glass-bg border border-glass-border
+		relative w-full aspect-video flex-shrink-0 overflow-hidden
+		bg-glass-bg
 		flex items-center justify-center
 	">
-		{#if song.cachedPath}
-			<img 
-				src="/api/Yt/{song.ytId}/thumbnail" 
-				alt={song.name}
-				class="w-full h-full object-cover"
-			/>
-		{:else}
-			<div class="text-muted-foreground text-sm">No thumbnail</div>
-		{/if}
+		<img 
+			src="/api/Yt/{song.ytId}/thumbnail" 
+			alt={song.name}
+			class="w-full h-full object-cover"
+		/>
 		<div class="
-			absolute inset-0 bg-black/30 opacity-0 hover:opacity-100
+			absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100
 			transition-opacity duration-200
 			flex items-center justify-center
 		">
-			<Play class="w-8 h-8 text-white fill-white" />
+			<Play class="w-12 h-12 text-white fill-white" />
 		</div>
 	</div>
 
-	<div class="flex-1 text-left min-w-0">
-		<h3 class="font-medium truncate">{song.name}</h3>
-		<p class="text-sm text-muted-foreground truncate">YouTube Song</p>
+	<div class="px-3 pb-3 text-left w-full">
+		<h3 class="font-medium line-clamp-2 leading-snug">{song.name}</h3>
+		<p class="text-sm text-muted-foreground mt-1">YouTube Song</p>
 	</div>
 </button>

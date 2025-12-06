@@ -49,7 +49,7 @@
 <div class="px-4">
 	<YtPagination {totalCount} {pageSize} bind:requestPage />
 	
-	<div class="space-y-1">
+	<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
 		{#if $ytSongsQuery.data}
 			{#each $ytSongsQuery.data.items as song (song.ytId)}
 				<YtSongRow {song} />
