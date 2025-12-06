@@ -84,6 +84,19 @@ public class YtSongRepository(
 
             var downloadResult = await ytService.DownloadAndCacheAsync(ytId, cancellationToken);
 
+            var thumbnailResult = await ytService.DownloadAndEncodeThumbnailAsync(
+                ytId,
+                cancellationToken
+            );
+            thumbnailResult.Switch(
+                thumbnailPath =>
+                {
+                    song.SetThumbnailPath(thumbnailPath);
+                    dbContext.SaveChanges();
+                },
+                _ => { }
+            );
+
             return downloadResult.Match<
                 OneOf<(Stream Stream, string ContentType), NotFound, InternalError>
             >(
