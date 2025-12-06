@@ -1,3 +1,16 @@
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine3.22 AS runtime-base
+
+# Install minimal runtime dependencies
+# Needed for docker compose healthchecks
+RUN apk add --no-cache curl ffmpeg libwebp-tools krb5-libs python3 unzip
+
+# Install Deno
+RUN curl -L https://deno.land/install.sh | sh
+
+# Install yt-dlp
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && chmod +x /usr/local/bin/yt-dlp
+
+
 FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine3.22 AS build-env
 WORKDIR /app
 
@@ -34,19 +47,9 @@ RUN dotnet ef migrations bundle --project Api \
     -o /app/out/efbundle
 
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine3.22 AS runtime
+FROM runtime-base AS runtime
 WORKDIR /app
 
-# Install minimal runtime dependencies
-# Needed for docker compose healthchecks
-RUN apk add --no-cache curl ffmpeg libwebp-tools krb5-libs
-
-# Create non-root user for security
-RUN adduser -D -s /bin/sh appuser
-
-# Copy neccesary assets
-COPY --chown=appuser:appuser --from=build-env /app/out ./
-COPY --chown=appuser:appuser Web/build ./wwwroot
 COPY --chown=appuser:appuser +devops/docker/docker-entrypoint.sh ./
 
 # Make scripts executable
