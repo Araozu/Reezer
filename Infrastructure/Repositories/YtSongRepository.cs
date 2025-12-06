@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Acide.Perucontrol.Domain.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -9,9 +10,13 @@ using Reezer.Infrastructure.Options;
 
 namespace Reezer.Infrastructure.Repositories;
 
-public class YtSongRepository(ReezerDbContext dbContext, IOptions<StorageOptions> storageOptions)
-    : IYtSongRepository
+public class YtSongRepository(
+    ReezerDbContext dbContext,
+    IOptions<StorageOptions> storageOptions,
+    IYtService ytService
+) : IYtSongRepository
 {
+    private static readonly ConcurrentDictionary<string, SemaphoreSlim> SongLocks = new();
     private StorageOptions StorageOptions => storageOptions.Value;
 
     public async Task<OneOf<IEnumerable<YtSong>, InternalError>> GetPaginatedAsync(
@@ -41,6 +46,9 @@ public class YtSongRepository(ReezerDbContext dbContext, IOptions<StorageOptions
         OneOf<(Stream Stream, string ContentType), NotFound, InternalError>
     > GetSongStreamAsync(string ytId, CancellationToken cancellationToken = default)
     {
+        var songLock = SongLocks.GetOrAdd(ytId, _ => new SemaphoreSlim(1, 1));
+
+        await songLock.WaitAsync(cancellationToken);
         try
         {
             var song = await dbContext.YtSongs.FirstOrDefaultAsync(
@@ -63,22 +71,38 @@ public class YtSongRepository(ReezerDbContext dbContext, IOptions<StorageOptions
 
             var webmPath = Path.Combine(StorageOptions.LibraryYtPath, $"{ytId}.webm");
 
-            if (!File.Exists(webmPath))
+            if (File.Exists(webmPath))
             {
-                return new NotFound($"YouTube video file for {ytId} not found.");
+                song.SetCachedPath(webmPath);
+                await dbContext.SaveChangesAsync(cancellationToken);
+
+                return (
+                    new FileStream(webmPath, FileMode.Open, FileAccess.Read, FileShare.Read),
+                    "audio/webm"
+                );
             }
 
-            song.SetCachedPath(webmPath);
-            await dbContext.SaveChangesAsync(cancellationToken);
+            var downloadResult = await ytService.DownloadAndCacheAsync(ytId, cancellationToken);
 
-            return (
-                new FileStream(webmPath, FileMode.Open, FileAccess.Read, FileShare.Read),
-                "audio/webm"
+            return downloadResult.Match<
+                OneOf<(Stream Stream, string ContentType), NotFound, InternalError>
+            >(
+                cachedPath =>
+                {
+                    song.SetCachedPath(cachedPath);
+                    dbContext.SaveChanges();
+
+                    return (
+                        new FileStream(cachedPath, FileMode.Open, FileAccess.Read, FileShare.Read),
+                        "audio/webm"
+                    );
+                },
+                error => error
             );
         }
-        catch (Exception ex)
+        finally
         {
-            return new InternalError($"Failed to retrieve YouTube song stream: {ex.Message}");
+            songLock.Release();
         }
     }
 }
