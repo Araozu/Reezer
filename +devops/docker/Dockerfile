@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine3. 22 AS runtime-base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine3.22 AS runtime-base
 
 # Install minimal runtime dependencies
 # Needed for docker compose healthchecks
