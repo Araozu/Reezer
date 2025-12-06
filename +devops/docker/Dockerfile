@@ -5,7 +5,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine3.22 AS runtime-base
 RUN apk add --no-cache curl ffmpeg libwebp-tools krb5-libs python3 unzip
 
 # Install Deno
-RUN curl -L https://deno.land/install. sh | sh
+RUN curl -L https://deno.land/install.sh | sh
 
 # Install yt-dlp
 RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && chmod +x /usr/local/bin/yt-dlp
