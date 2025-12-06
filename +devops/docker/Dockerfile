@@ -50,6 +50,7 @@ RUN dotnet ef migrations bundle --project Api \
 FROM runtime-base AS runtime
 WORKDIR /app
 
+COPY --from=build-env --chown=appuser:appuser /app/out ./
 COPY --chown=appuser:appuser +devops/docker/docker-entrypoint.sh ./
 
 # Make scripts executable
