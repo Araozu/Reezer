@@ -32,6 +32,7 @@
 			variant: isActive ? "outline" : "ghost",
 			size,
 		}),
+		isActive ? "bg-primary/30" : "",
 		className,
 	)}
 	children={children || Fallback}

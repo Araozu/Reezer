@@ -45,12 +45,6 @@
             Loading user...
         </div>
     {:else if $userQuery.isSuccess}
-        <div
-            class="fixed top-0 w-screen bg-orange-600/50 text-white text-xs text-center"
-        >
-            Syncronizing...
-        </div>
-
         {@render children()}
     {:else if $userQuery.isError}
         <div
