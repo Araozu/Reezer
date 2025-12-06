@@ -21,7 +21,7 @@
 	{
 		if (isHovered && extractedColors.length === 0)
 		{
-			extractColorsFromImage(coverUrl, 3).then((result) =>
+			extractColorsFromImage(coverUrl, 4).then((result) =>
 			{
 				extractedColors = result.colors;
 				colorWeights = result.weights;
@@ -38,10 +38,11 @@
 	>
 		<div
 			class="absolute inset-0 transition-opacity duration-1000"
-			style:opacity={isHovered && extractedColors.length > 0 ? 0.4 : 0}
+		    style:opacity={isHovered && extractedColors.length > 0 ? 0.5 : 0}
 		>
 			{#if extractedColors.length > 0}
-				<ColorBlobs colors={extractedColors} weights={colorWeights} />
+				<ColorBlobs colors={extractedColors} weights={colorWeights}
+				/>
 			{/if}
 		</div>
 		<Card.Content class="relative z-10">
