@@ -43,10 +43,12 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAlbumRepository, AlbumRepository>();
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IMusicRoomRepository, MusicRoomRepository>();
+        services.AddScoped<IYtSongRepository, YtSongRepository>();
 
         // Register services
         services.AddScoped<ILibraryInitializationService, LibraryInitializationService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IYtService, YtService>();
         services.AddHostedService<LibraryInitializationHostedService>();
 
         return services;
