@@ -1,5 +1,8 @@
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine3.22 AS runtime-base
 
+# Create non-root user for security
+RUN adduser -D -s /bin/sh appuser
+
 # Install minimal runtime dependencies
 # Needed for docker compose healthchecks
 RUN apk add --no-cache curl ffmpeg libwebp-tools krb5-libs python3 unzip
@@ -50,9 +53,9 @@ RUN dotnet ef migrations bundle --project Api \
 FROM runtime-base AS runtime
 WORKDIR /app
 
-# Copy built application from build stage
-COPY --from=build-env --chown=appuser:appuser /app/out ./
-
+# Copy neccesary assets
+COPY --chown=appuser:appuser --from=build-env /app/out ./
+COPY --chown=appuser:appuser Web/build ./wwwroot
 COPY --chown=appuser:appuser +devops/docker/docker-entrypoint.sh ./
 
 # Make scripts executable
