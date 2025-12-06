@@ -1,11 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
+using Reezer.Application.DTOs;
 using Reezer.Application.UseCases;
 
 namespace Reezer.Api.Controllers.Yt;
 
 [ApiController]
 [Route("api/[controller]")]
-public class YtController(AddYtSongUseCase addYtSongUseCase) : ControllerBase
+public class YtController(
+    AddYtSongUseCase addYtSongUseCase,
+    GetPaginatedYtSongsUseCase getPaginatedYtSongsUseCase,
+    StreamYtSongUseCase streamYtSongUseCase
+) : ControllerBase
 {
     public record AddYtSongRequest(string Url);
 
@@ -25,6 +30,66 @@ public class YtController(AddYtSongUseCase addYtSongUseCase) : ControllerBase
             badRequest => BadRequest(new ProblemDetails { Detail = badRequest.Reason }),
             notFound => NotFound(new ProblemDetails { Detail = notFound.Reason }),
             error => StatusCode(500, new ProblemDetails { Detail = error.Reason })
+        );
+    }
+
+    [EndpointSummary("Get paginated YouTube songs")]
+    [HttpGet]
+    public async Task<ActionResult<PaginatedResult<YtSongDto>>> GetPaginatedYtSongs(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var result = await getPaginatedYtSongsUseCase.GetPaginatedAsync(
+            page,
+            pageSize,
+            cancellationToken
+        );
+
+        return result.Match<ActionResult<PaginatedResult<YtSongDto>>>(
+            songs => Ok(songs),
+            error =>
+                StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new ProblemDetails
+                    {
+                        Detail = error.Reason,
+                        Status = StatusCodes.Status500InternalServerError,
+                    }
+                )
+        );
+    }
+
+    [EndpointSummary("Stream a YouTube song by ID")]
+    [HttpGet("{ytId}/stream")]
+    public async Task<IActionResult> StreamYtSong(string ytId, CancellationToken cancellationToken)
+    {
+        var result = await streamYtSongUseCase.StreamYtSongAsync(ytId, cancellationToken);
+
+        return result.Match<IActionResult>(
+            success =>
+            {
+                Response.Headers.CacheControl = "public, max-age=2592000";
+                return File(success.Stream, success.ContentType, enableRangeProcessing: true);
+            },
+            notFound =>
+                NotFound(
+                    new ProblemDetails
+                    {
+                        Detail = notFound.Reason,
+                        Status = StatusCodes.Status404NotFound,
+                    }
+                ),
+            internalError =>
+                StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new ProblemDetails
+                    {
+                        Detail = internalError.Reason,
+                        Status = StatusCodes.Status500InternalServerError,
+                    }
+                )
         );
     }
 }
