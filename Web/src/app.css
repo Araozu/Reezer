@@ -153,6 +153,43 @@
   }
 }
 
+@layer components {
+  /* Touch feedback for mobile - removes tap delay and provides visual feedback */
+  .touch-target {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+}
+
+/* Mobile touch feedback: on touch devices, active state needs stronger visual feedback */
+@media (hover: none) and (pointer: coarse) {
+  /* Buttons and interactive elements get visible press state */
+  [data-slot="button"]:active,
+  [data-slot="tabs-trigger"]:active,
+  [data-slot="pagination-link"]:active,
+  [data-slot="dropdown-menu-item"]:active,
+  [data-slot="dropdown-menu-checkbox-item"]:active,
+  [data-slot="dropdown-menu-radio-item"]:active,
+  [data-slot="dropdown-menu-sub-trigger"]:active {
+    background-color: var(--glass-bg-active) !important;
+    transform: scale(0.97);
+    transition-duration: 50ms;
+  }
+
+  /* Song action buttons - special feedback */
+  [data-slot="song-action"]:active {
+    background-color: oklch(var(--primary) / 0.3) !important;
+    transform: scale(0.92);
+    transition-duration: 50ms;
+  }
+
+  /* Slider thumb needs touch feedback */
+  [data-slot="slider-thumb"]:active {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 6px oklch(var(--primary) / 0.2);
+  }
+}
+
 @theme {
   --font-display: var(--font-display);
   --font-body: var(--font-body);

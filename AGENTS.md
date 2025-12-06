@@ -76,6 +76,18 @@ shadow-[0_4px_24px_-4px_var(--glass-shadow),inset_0_1px_1px_var(--glass-highligh
 - **Active/Press**: Subtle scale down `active:scale-[0.98]` for tactile feedback
 - **Transitions**: Use `duration-300 ease-out` for fluid motion
 
+### Mobile Touch Feedback
+Touch devices don't have hover states and `:active` can be unreliable. Always include these for interactive elements:
+- **Remove tap highlight**: `[-webkit-tap-highlight-color:transparent]` removes the default blue/gray tap overlay
+- **Remove tap delay**: `touch-action-manipulation` eliminates the 300ms delay on touch
+- **Ensure visual feedback**: The global CSS in `app.css` applies visible active states for touch devices via `@media (hover: none) and (pointer: coarse)`
+- **Use data-slot attributes**: Interactive components should have `data-slot` attributes (e.g., `data-slot="button"`) so the global touch feedback rules can target them
+
+For custom interactive elements, add these classes:
+```
+touch-action-manipulation [-webkit-tap-highlight-color:transparent]
+```
+
 ### Color Tinting
 - Primary actions use `primary` color as tint (`bg-primary/20`, `border-primary/30`)
 - Destructive uses `destructive` color

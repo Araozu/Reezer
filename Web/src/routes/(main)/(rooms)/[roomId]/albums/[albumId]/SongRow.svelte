@@ -21,7 +21,7 @@
 
 <div class={`group/row grid grid-cols-[auto_2.5rem_2.5rem] rounded-xl transition-all duration-300 hover:bg-glass-bg-hover hover:backdrop-blur-lg hover:shadow-[inset_0_1px_1px_var(--glass-highlight)] ${currentSongClass}`}>
 	<button
-		class="cursor-pointer inline-block w-full text-left px-3 py-3"
+		class="cursor-pointer inline-block w-full text-left px-3 py-3 touch-action-manipulation [-webkit-tap-highlight-color:transparent]"
 		onclick={onPlay}
 	>
 		<div class="grid grid-cols-[2rem_auto] gap-4 items-center">
@@ -35,14 +35,16 @@
 		</div>
 	</button>
 	<button
-		class="cursor-pointer inline-flex items-center justify-center rounded-lg text-muted-foreground transition-all duration-300 hover:text-foreground hover:bg-primary/20 active:scale-95"
+		data-slot="song-action"
+		class="cursor-pointer inline-flex items-center justify-center rounded-lg text-muted-foreground transition-all duration-300 hover:text-foreground hover:bg-primary/20 active:scale-95 touch-action-manipulation [-webkit-tap-highlight-color:transparent]"
 		onclick={onAddLast}
 		title="Add to queue"
 	>
 		<Plus class="size-4" />
 	</button>
 	<button
-		class="cursor-pointer inline-flex items-center justify-center rounded-lg text-muted-foreground transition-all duration-300 hover:text-foreground hover:bg-primary/20 active:scale-95"
+		data-slot="song-action"
+		class="cursor-pointer inline-flex items-center justify-center rounded-lg text-muted-foreground transition-all duration-300 hover:text-foreground hover:bg-primary/20 active:scale-95 touch-action-manipulation [-webkit-tap-highlight-color:transparent]"
 		onclick={onAddNext}
 		title="Play next"
 	>

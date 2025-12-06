@@ -10,7 +10,7 @@
 	const roomId = page.params.roomId;
 </script>
 
-<a class="inline-block" href={`/${roomId}/albums/${album.id}`}>
+<a class="inline-block touch-action-manipulation [-webkit-tap-highlight-color:transparent]" href={`/${roomId}/albums/${album.id}`}>
 	<Card.Root
 		class="w-full hover:bg-glass-bg-hover hover:border-glass-border-hover transition-all duration-300"
 	>
@@ -23,6 +23,7 @@
 			</Card.Title>
 			<a
 				href={`/${roomId}/artists/${album.artistId}`}
+				class="touch-action-manipulation [-webkit-tap-highlight-color:transparent]"
 			>
 				<Card.Description class="truncate hover:text-foreground transition-colors">
 					<span>{album.artistName}</span>
