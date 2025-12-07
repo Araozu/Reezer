@@ -15,7 +15,14 @@
 	let song = $derived(svelteQueue.currentSong);
 	let currentTab = $state<"playing" | "queue">("playing");
 
-	let coverUrl = $derived(song ? `/api/Albums/${song.albumId}/cover` : "/vinyl.jpg");
+	let coverUrl = $derived.by(() =>
+	{
+		if (!currentSong) return "/vinyl.jpg";
+
+		if (currentSong.type === "regular") return `/api/Albums/${currentSong.albumId}/cover`;
+		else if (currentSong.type === "youtube") return `/api/Yt/${currentSong.id}/thumbnail`;
+		else return "/vinyl.jpg";
+	});
 
 	let open = $state(false);
 </script>
