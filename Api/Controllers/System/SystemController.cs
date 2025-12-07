@@ -16,10 +16,7 @@ public class SystemController(SetYtCookiesUseCase setYtCookiesUseCase) : Control
     {
         if (file == null || file.Length == 0)
         {
-            return BadRequest(new ProblemDetails
-            {
-                Detail = "No file uploaded or file is empty"
-            });
+            return BadRequest(new ProblemDetails { Detail = "No file uploaded or file is empty" });
         }
 
         await using var stream = file.OpenReadStream();

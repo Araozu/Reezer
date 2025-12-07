@@ -14,6 +14,22 @@ public class YtService(IOptions<StorageOptions> storageOptions, ILogger<YtServic
 {
     private StorageOptions StorageOptions => storageOptions.Value;
 
+    public async Task SaveCookiesAsync(Stream stream, CancellationToken cancellationToken = default)
+    {
+        var directory = Path.GetDirectoryName(StorageOptions.YtCookiesFile);
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        await using var fileStream = new FileStream(
+            StorageOptions.YtCookiesFile,
+            FileMode.Create,
+            FileAccess.Write
+        );
+        await stream.CopyToAsync(fileStream, cancellationToken);
+    }
+
     public async Task<OneOf<string, InternalError>> DownloadAndCacheAsync(
         string ytId,
         CancellationToken cancellationToken = default
