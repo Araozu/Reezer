@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,7 +32,11 @@ public static class ServiceCollectionExtensions
         });
 
         // Register options
-        services.Configure<StorageOptions>(configuration.GetSection("Storage"));
+        services
+            .AddOptions<StorageOptions>()
+            .Bind(configuration.GetSection("Storage"))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
 
         // Register HttpContextAccessor for authentication
         services.AddHttpContextAccessor();
@@ -49,6 +52,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILibraryInitializationService, LibraryInitializationService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IYtService, YtService>();
+        services.AddScoped<IYtCookiesService, YtCookiesService>();
         services.AddHttpClient<IOgMetadataService, OgMetadataService>();
         services.AddHostedService<LibraryInitializationHostedService>();
 

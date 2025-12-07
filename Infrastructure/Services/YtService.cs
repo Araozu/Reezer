@@ -36,7 +36,7 @@ public class YtService(IOptions<StorageOptions> storageOptions, ILogger<YtServic
             {
                 FileName = "yt-dlp",
                 Arguments =
-                    $"-f \"bestaudio[ext=webm]/bestaudio\" --extract-audio --audio-format opus -o \"{webmPath}\" \"{youtubeUrl}\"",
+                    $"-f \"bestaudio[ext=webm]/bestaudio\" --cookies {StorageOptions.YtCookiesFile} --extract-audio --audio-format opus -o \"{webmPath}\" \"{youtubeUrl}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
