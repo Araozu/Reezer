@@ -1,8 +1,5 @@
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble AS runtime-base
 
-# Create non-root user for security
-RUN useradd -m -s /bin/sh appuser
-
 # Install minimal runtime dependencies
 RUN apt-get update && apt-get install -y curl ffmpeg webp libkrb5-3 python3 unzip && rm -rf /var/lib/apt/lists/*
 
@@ -60,5 +57,4 @@ COPY --chown=appuser:appuser +devops/docker/docker-entrypoint.sh ./
 # Make scripts executable
 RUN chmod +x ./docker-entrypoint.sh ./efbundle
 
-USER appuser
 ENTRYPOINT ["./docker-entrypoint.sh"]

@@ -12,7 +12,7 @@ services:
       - .env.database
       - .env.full
     volumes:
-      - /mnt/fin-box-1/docker-volumes/navidrome/music/:/reezer-cache/music-init:ro
+      - /mnt/fin-box-1/docker-volumes/navidrome/music:/reezer-cache/music-init:ro
       - /mnt/fin-box-1/docker-volumes/reezer-cache:/reezer-cache
     networks:
       - proxy
