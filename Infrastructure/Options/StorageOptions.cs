@@ -17,8 +17,5 @@ public class StorageOptions
     public required string AlbumCoverPath { get; set; }
 
     [Required]
-    public required string YtThumbnailPath { get; set; }
-
-    [Required]
     public required string YtCookiesFile { get; set; }
 }

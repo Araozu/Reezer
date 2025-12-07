@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using System.Text.RegularExpressions;
+using System.Text.Json;
 using Acide.Perucontrol.Domain.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -30,18 +30,30 @@ public class YtService(IOptions<StorageOptions> storageOptions, ILogger<YtServic
         await stream.CopyToAsync(fileStream, cancellationToken);
     }
 
-    public async Task<OneOf<string, InternalError>> DownloadAndCacheAsync(
+    public async Task<OneOf<YtDownloadResult, InternalError>> DownloadAsync(
         string ytId,
         CancellationToken cancellationToken = default
     )
     {
+        logger.LogInformation("Starting download for YouTube video {YtId}", ytId);
+
         var webmPath = Path.Combine(StorageOptions.LibraryYtPath, $"{ytId}.webm");
+        var infoJsonPath = Path.Combine(StorageOptions.LibraryYtPath, $"{ytId}.info.json");
+        var webpPath = Path.Combine(StorageOptions.LibraryYtPath, $"{ytId}.webp");
 
         Directory.CreateDirectory(StorageOptions.LibraryYtPath);
 
         if (File.Exists(webmPath))
         {
             File.Delete(webmPath);
+        }
+        if (File.Exists(infoJsonPath))
+        {
+            File.Delete(infoJsonPath);
+        }
+        if (File.Exists(webpPath))
+        {
+            File.Delete(webpPath);
         }
 
         var youtubeUrl = $"https://www.youtube.com/watch?v={ytId}";
@@ -52,7 +64,14 @@ public class YtService(IOptions<StorageOptions> storageOptions, ILogger<YtServic
             {
                 FileName = "yt-dlp",
                 Arguments =
-                    $"-f \"bestaudio[ext=webm]/bestaudio\" --cookies {StorageOptions.YtCookiesFile} --extract-audio --audio-format opus -o \"{webmPath}\" \"{youtubeUrl}\"",
+                    $"-4 -f \"bestaudio[ext=webm]/bestaudio\" "
+                    + $"--cookies {StorageOptions.YtCookiesFile} "
+                    + $"--convert-thumbnails webp "
+                    + $"--write-thumbnail "
+                    + $"--write-info-json "
+                    + $"--extract-audio --audio-format opus "
+                    + $"-o \"{webmPath}\" "
+                    + $"\"{youtubeUrl}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -68,17 +87,15 @@ public class YtService(IOptions<StorageOptions> storageOptions, ILogger<YtServic
             if (process.ExitCode != 0)
             {
                 var error = await process.StandardError.ReadToEndAsync(cancellationToken);
-                if (File.Exists(webmPath))
-                {
-                    File.Delete(webmPath);
-                }
+                CleanupFiles(webmPath, infoJsonPath, webpPath);
                 return new InternalError($"yt-dlp failed: {error}");
             }
 
             var actualPath = FindDownloadedFile(webmPath, ytId);
             if (actualPath is null || !File.Exists(actualPath))
             {
-                return new InternalError("Download completed but file not found.");
+                CleanupFiles(webmPath, infoJsonPath, webpPath);
+                return new InternalError("Download completed but audio file not found.");
             }
 
             if (actualPath != webmPath && File.Exists(actualPath))
@@ -86,23 +103,46 @@ public class YtService(IOptions<StorageOptions> storageOptions, ILogger<YtServic
                 File.Move(actualPath, webmPath, true);
             }
 
-            return webmPath;
+            if (!File.Exists(infoJsonPath))
+            {
+                CleanupFiles(webmPath, infoJsonPath, webpPath);
+                return new InternalError("Info JSON file not found after download.");
+            }
+
+            if (!File.Exists(webpPath))
+            {
+                CleanupFiles(webmPath, infoJsonPath, webpPath);
+                return new InternalError("Thumbnail file not found after download.");
+            }
+
+            var title = await ExtractTitleFromInfoJson(infoJsonPath, cancellationToken);
+            if (title is null)
+            {
+                CleanupFiles(webmPath, infoJsonPath, webpPath);
+                return new InternalError("Failed to extract title from info.json.");
+            }
+
+            logger.LogInformation(
+                "Successfully downloaded YouTube video {YtId} with title '{Title}'",
+                ytId,
+                title
+            );
+
+            return new YtDownloadResult(title, webmPath, webpPath);
         }
         catch (OperationCanceledException)
         {
-            if (File.Exists(webmPath))
-            {
-                File.Delete(webmPath);
-            }
+            CleanupFiles(webmPath, infoJsonPath, webpPath);
             throw;
         }
         catch (Exception ex)
         {
-            if (File.Exists(webmPath))
-            {
-                File.Delete(webmPath);
-            }
+            CleanupFiles(webmPath, infoJsonPath, webpPath);
             return new InternalError($"Failed to download: {ex.Message}");
+        }
+        finally
+        {
+            CleanupFiles(infoJsonPath);
         }
     }
 
@@ -124,111 +164,45 @@ public class YtService(IOptions<StorageOptions> storageOptions, ILogger<YtServic
         return null;
     }
 
-    public async Task<OneOf<string, InternalError>> DownloadAndEncodeThumbnailAsync(
-        string ytId,
-        CancellationToken cancellationToken = default
+    private async Task<string?> ExtractTitleFromInfoJson(
+        string infoJsonPath,
+        CancellationToken cancellationToken
     )
     {
-        logger.LogInformation("Starting thumbnail download for YouTube video {YtId}", ytId);
         try
         {
-            var youtubeUrl = $"https://www.youtube.com/watch?v={ytId}";
-
-            using var httpClient = new HttpClient();
-            logger.LogDebug("Fetching YouTube page HTML for {YtId}", ytId);
-            var pageHtml = await httpClient.GetStringAsync(youtubeUrl, cancellationToken);
-
-            var match = Regex.Match(
-                pageHtml,
-                @"<meta\s+property=""og:image""\s+content=""([^""]+)"""
-            );
-            if (!match.Success)
-            {
-                logger.LogWarning("Thumbnail URL not found in page metadata for {YtId}", ytId);
-                return new InternalError("Thumbnail URL not found in page metadata.");
-            }
-
-            var thumbnailUrl = match.Groups[1].Value;
-            logger.LogDebug("Found thumbnail URL: {ThumbnailUrl}", thumbnailUrl);
-
-            var tempImagePath = Path.Combine(StorageOptions.YtThumbnailPath, $"{ytId}_temp.jpg");
-            var webpPath = Path.Combine(StorageOptions.YtThumbnailPath, $"{ytId}.webp");
-
-            Directory.CreateDirectory(StorageOptions.YtThumbnailPath);
-
-            if (File.Exists(tempImagePath))
-            {
-                File.Delete(tempImagePath);
-            }
-            if (File.Exists(webpPath))
-            {
-                File.Delete(webpPath);
-            }
-
-            logger.LogDebug("Downloading thumbnail image from {ThumbnailUrl}", thumbnailUrl);
-            var imageBytes = await httpClient.GetByteArrayAsync(thumbnailUrl, cancellationToken);
-            await File.WriteAllBytesAsync(tempImagePath, imageBytes, cancellationToken);
-            logger.LogDebug(
-                "Downloaded {Bytes} bytes, saved to {TempPath}",
-                imageBytes.Length,
-                tempImagePath
+            await using var fileStream = File.OpenRead(infoJsonPath);
+            var jsonDoc = await JsonDocument.ParseAsync(
+                fileStream,
+                cancellationToken: cancellationToken
             );
 
-            var process = new Process
+            if (jsonDoc.RootElement.TryGetProperty("title", out var titleElement))
             {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "cwebp",
-                    Arguments = $"-q 70 -resize 600 0 \"{tempImagePath}\" -o \"{webpPath}\"",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                },
-            };
-
-            logger.LogDebug("Starting cwebp encoding process for {YtId}", ytId);
-            process.Start();
-            await process.WaitForExitAsync(cancellationToken);
-
-            if (File.Exists(tempImagePath))
-            {
-                File.Delete(tempImagePath);
+                return titleElement.GetString();
             }
 
-            if (process.ExitCode != 0)
-            {
-                var error = await process.StandardError.ReadToEndAsync(cancellationToken);
-                logger.LogError("cwebp encoding failed for {YtId}: {Error}", ytId, error);
-                if (File.Exists(webpPath))
-                {
-                    File.Delete(webpPath);
-                }
-                return new InternalError($"cwebp failed: {error}");
-            }
-
-            if (!File.Exists(webpPath))
-            {
-                logger.LogError("Thumbnail encoding completed but file not found for {YtId}", ytId);
-                return new InternalError("Thumbnail encoding completed but file not found.");
-            }
-
-            logger.LogInformation(
-                "Successfully downloaded and encoded thumbnail for {YtId} to {WebpPath}",
-                ytId,
-                webpPath
-            );
-            return webpPath;
-        }
-        catch (OperationCanceledException)
-        {
-            logger.LogWarning("Thumbnail download cancelled for {YtId}", ytId);
-            throw;
+            return null;
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to download thumbnail for {YtId}", ytId);
-            return new InternalError($"Failed to download thumbnail: {ex.Message}");
+            logger.LogError(ex, "Failed to parse info.json at {Path}", infoJsonPath);
+            return null;
+        }
+    }
+
+    private static void CleanupFiles(params string[] paths)
+    {
+        foreach (var path in paths)
+        {
+            if (File.Exists(path))
+            {
+                try
+                {
+                    File.Delete(path);
+                }
+                catch { }
+            }
         }
     }
 }
