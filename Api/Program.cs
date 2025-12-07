@@ -24,7 +24,20 @@ builder.Services.AddControllers();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplicationServices();
 builder.Services.AddSignalR();
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer(
+        (document, context, cancellationToken) =>
+        {
+            document.Servers =
+            [
+                new() { Url = "http://localhost:5678", Description = "Local development" },
+                new() { Url = "https://reezer.araozu.dev", Description = "Dev server" },
+            ];
+            return Task.CompletedTask;
+        }
+    );
+});
 
 builder.Services.AddMediatR(cfg =>
 {

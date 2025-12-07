@@ -8,7 +8,7 @@ public class YtCookiesService(IOptions<StorageOptions> storageOptions) : IYtCook
 {
     private readonly StorageOptions _storageOptions = storageOptions.Value;
 
-    public async Task SaveCookiesAsync(string text, CancellationToken cancellationToken = default)
+    public async Task SaveCookiesAsync(Stream stream, CancellationToken cancellationToken = default)
     {
         var directory = Path.GetDirectoryName(_storageOptions.YtCookiesFile);
         if (!string.IsNullOrEmpty(directory))
@@ -16,6 +16,7 @@ public class YtCookiesService(IOptions<StorageOptions> storageOptions) : IYtCook
             Directory.CreateDirectory(directory);
         }
 
-        await File.WriteAllTextAsync(_storageOptions.YtCookiesFile, text, cancellationToken);
+        await using var fileStream = new FileStream(_storageOptions.YtCookiesFile, FileMode.Create, FileAccess.Write);
+        await stream.CopyToAsync(fileStream, cancellationToken);
     }
 }

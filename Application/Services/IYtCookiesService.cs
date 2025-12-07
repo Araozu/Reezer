@@ -2,5 +2,5 @@ namespace Reezer.Application.Services;
 
 public interface IYtCookiesService
 {
-    Task SaveCookiesAsync(string text, CancellationToken cancellationToken = default);
+    Task SaveCookiesAsync(Stream stream, CancellationToken cancellationToken = default);
 }
