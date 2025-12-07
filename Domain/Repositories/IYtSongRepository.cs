@@ -30,4 +30,9 @@ public interface IYtSongRepository
         string ytId,
         CancellationToken cancellationToken = default
     );
+
+    Task<OneOf<YtSong, InternalError>> UpdateAsync(
+        YtSong ytSong,
+        CancellationToken cancellationToken = default
+    );
 }

@@ -177,4 +177,21 @@ public class YtSongRepository(
 
         return song;
     }
+
+    public async Task<OneOf<YtSong, InternalError>> UpdateAsync(
+        YtSong ytSong,
+        CancellationToken cancellationToken = default
+    )
+    {
+        try
+        {
+            dbContext.YtSongs.Update(ytSong);
+            await dbContext.SaveChangesAsync(cancellationToken);
+            return ytSong;
+        }
+        catch (Exception ex)
+        {
+            return new InternalError($"Failed to update YouTube song: {ex.Message}");
+        }
+    }
 }

@@ -51,7 +51,7 @@
 <div class="px-4">
 	<YtPagination {totalCount} {pageSize} bind:requestPage />
 
-	<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+	<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 		{#if annotatedYtSongsQuery}
 			{#each annotatedYtSongsQuery as song (song.id)}
 				<YtSongRow {song} />
