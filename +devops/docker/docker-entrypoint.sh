@@ -52,16 +52,6 @@ start_application() {
     exec ./Reezer.Api
 }
 
-# Graceful shutdown handler
-cleanup() {
-    log_info "Received shutdown signal, cleaning up..."
-    # Add any cleanup logic here
-    exit 0
-}
-
-# Set up signal handlers
-trap cleanup SIGTERM SIGINT
-
 # Main execution
 main() {
     log_info "Starting container..."
