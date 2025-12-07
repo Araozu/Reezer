@@ -7,16 +7,23 @@ namespace Reezer.Api.Controllers.System;
 [Route("api/[controller]")]
 public class SystemController(SetYtCookiesUseCase setYtCookiesUseCase) : ControllerBase
 {
-    public record SetYtCookiesRequest(string Text);
-
-    [EndpointSummary("Store YouTube cookies text")]
+    [EndpointSummary("Store YouTube cookies file")]
     [HttpPost("yt-cookies")]
     public async Task<ActionResult> SetYtCookies(
-        [FromBody] SetYtCookiesRequest request,
+        IFormFile file,
         CancellationToken cancellationToken
     )
     {
-        await setYtCookiesUseCase.ExecuteAsync(request.Text, cancellationToken);
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest(new ProblemDetails
+            {
+                Detail = "No file uploaded or file is empty"
+            });
+        }
+
+        await using var stream = file.OpenReadStream();
+        await setYtCookiesUseCase.ExecuteAsync(stream, cancellationToken);
         return Ok();
     }
 }

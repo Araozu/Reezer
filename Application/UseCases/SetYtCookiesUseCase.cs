@@ -4,8 +4,8 @@ namespace Reezer.Application.UseCases;
 
 public class SetYtCookiesUseCase(IYtCookiesService ytCookiesService)
 {
-    public async Task ExecuteAsync(string text, CancellationToken cancellationToken = default)
+    public async Task ExecuteAsync(Stream stream, CancellationToken cancellationToken = default)
     {
-        await ytCookiesService.SaveCookiesAsync(text, cancellationToken);
+        await ytCookiesService.SaveCookiesAsync(stream, cancellationToken);
     }
 }
