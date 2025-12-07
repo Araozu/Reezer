@@ -1,8 +1,11 @@
 <script lang="ts">
-	import type { YtSongDto } from "./queries";
+	import type { ISong } from "~/providers";
 	import { Play } from "lucide-svelte";
+	import { GetQueueContext } from "~/player2/context/player-store";
 
-	let { song }: { song: YtSongDto } = $props();
+	let { song }: { song: ISong } = $props();
+
+	const queue = GetQueueContext();
 </script>
 
 <button
@@ -19,14 +22,15 @@
 		overflow-hidden
 	"
 	data-slot="button"
+	onclick={() => queue.PlaySong(song)}
 >
 	<div class="
-		relative w-full aspect-video flex-shrink-0 overflow-hidden
+		relative w-full aspect-video shrink-0 overflow-hidden
 		bg-glass-bg
 		flex items-center justify-center
 	">
-		<img 
-			src="/api/Yt/{song.ytId}/thumbnail" 
+		<img
+			src="/api/Yt/{song.id}/thumbnail"
 			alt={song.name}
 			class="w-full h-full object-cover"
 		/>
