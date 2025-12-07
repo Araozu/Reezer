@@ -3,16 +3,13 @@ using OneOf;
 
 namespace Reezer.Domain.Repositories;
 
+public record YtDownloadResult(string Title, string AudioPath, string ThumbnailPath);
+
 public interface IYtService
 {
     Task SaveCookiesAsync(Stream stream, CancellationToken cancellationToken = default);
 
-    Task<OneOf<string, InternalError>> DownloadAndCacheAsync(
-        string ytId,
-        CancellationToken cancellationToken = default
-    );
-
-    Task<OneOf<string, InternalError>> DownloadAndEncodeThumbnailAsync(
+    Task<OneOf<YtDownloadResult, InternalError>> DownloadAsync(
         string ytId,
         CancellationToken cancellationToken = default
     );

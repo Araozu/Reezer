@@ -6,10 +6,7 @@ using Reezer.Domain.Repositories;
 
 namespace Reezer.Application.UseCases;
 
-public partial class AddYtSongUseCase(
-    IOgMetadataService ogMetadataService,
-    IYtSongRepository ytSongRepository
-)
+public partial class AddYtSongUseCase(IYtService ytService, IYtSongRepository ytSongRepository)
 {
     public async Task<OneOf<YtSong, BadRequest, NotFound, InternalError>> ExecuteAsync(
         string ytUrl,
@@ -28,18 +25,14 @@ public partial class AddYtSongUseCase(
             return existingResult.AsT0;
         }
 
-        var metadataResult = await ogMetadataService.GetMetadataAsync(ytUrl, cancellationToken);
+        var downloadResult = await ytService.DownloadAsync(videoId, cancellationToken);
 
-        return await metadataResult.Match(
-            async metadata =>
+        return await downloadResult.Match(
+            async result =>
             {
-                var title = TrimYouTubeSuffix(metadata.Title);
-                var ytSong = new YtSong(videoId, title);
-
-                if (!string.IsNullOrEmpty(metadata.ThumbnailPath))
-                {
-                    ytSong.SetThumbnailPath(metadata.ThumbnailPath);
-                }
+                var ytSong = new YtSong(videoId, result.Title);
+                ytSong.SetCachedPath(result.AudioPath);
+                ytSong.SetThumbnailPath(result.ThumbnailPath);
 
                 var addResult = await ytSongRepository.AddAsync(ytSong, cancellationToken);
                 return addResult.Match<OneOf<YtSong, BadRequest, NotFound, InternalError>>(
@@ -47,8 +40,6 @@ public partial class AddYtSongUseCase(
                     error => error
                 );
             },
-            notFound =>
-                Task.FromResult<OneOf<YtSong, BadRequest, NotFound, InternalError>>(notFound),
             error => Task.FromResult<OneOf<YtSong, BadRequest, NotFound, InternalError>>(error)
         );
     }
@@ -59,18 +50,9 @@ public partial class AddYtSongUseCase(
         return match.Success ? match.Groups["id"].Value : null;
     }
 
-    private static string TrimYouTubeSuffix(string title)
-    {
-        var suffixPattern = YouTubeSuffixPattern();
-        return suffixPattern.Replace(title, "").Trim();
-    }
-
     [GeneratedRegex(
         @"(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/)(?<id>[a-zA-Z0-9_-]{11})",
         RegexOptions.IgnoreCase
     )]
     private static partial Regex YoutubeVideoIdPattern();
-
-    [GeneratedRegex(@"\s*-\s*YouTube\s*$", RegexOptions.IgnoreCase)]
-    private static partial Regex YouTubeSuffixPattern();
 }

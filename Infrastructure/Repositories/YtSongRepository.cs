@@ -82,31 +82,24 @@ public class YtSongRepository(
                 );
             }
 
-            var downloadResult = await ytService.DownloadAndCacheAsync(ytId, cancellationToken);
-
-            var thumbnailResult = await ytService.DownloadAndEncodeThumbnailAsync(
-                ytId,
-                cancellationToken
-            );
-            thumbnailResult.Switch(
-                thumbnailPath =>
-                {
-                    song.SetThumbnailPath(thumbnailPath);
-                    dbContext.SaveChanges();
-                },
-                _ => { }
-            );
+            var downloadResult = await ytService.DownloadAsync(ytId, cancellationToken);
 
             return downloadResult.Match<
                 OneOf<(Stream Stream, string ContentType), NotFound, InternalError>
             >(
-                cachedPath =>
+                result =>
                 {
-                    song.SetCachedPath(cachedPath);
+                    song.SetCachedPath(result.AudioPath);
+                    song.SetThumbnailPath(result.ThumbnailPath);
                     dbContext.SaveChanges();
 
                     return (
-                        new FileStream(cachedPath, FileMode.Open, FileAccess.Read, FileShare.Read),
+                        new FileStream(
+                            result.AudioPath,
+                            FileMode.Open,
+                            FileAccess.Read,
+                            FileShare.Read
+                        ),
                         "audio/webm"
                     );
                 },
