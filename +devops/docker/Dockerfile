@@ -1,14 +1,15 @@
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble AS runtime-base
 
 # Create non-root user for security
-RUN adduser -D -s /bin/sh appuser
+RUN useradd -m -s /bin/sh appuser
 
 # Install minimal runtime dependencies
-
-RUN apt-get update && apt-get install -y curl ffmpeg webp libkrb5-3 python3 unzip
+RUN apt-get update && apt-get install -y curl ffmpeg webp libkrb5-3 python3 unzip && rm -rf /var/lib/apt/lists/*
 
 # Install Deno
 RUN curl -L https://deno.land/install.sh | sh
+ENV DENO_INSTALL="/root/.deno"
+ENV PATH="$DENO_INSTALL/bin:$PATH"
 
 # Install yt-dlp
 RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && chmod +x /usr/local/bin/yt-dlp
