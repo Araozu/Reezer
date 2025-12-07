@@ -1,11 +1,11 @@
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine3.22 AS runtime-base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-noble AS runtime-base
 
 # Create non-root user for security
 RUN adduser -D -s /bin/sh appuser
 
 # Install minimal runtime dependencies
-# Needed for docker compose healthchecks
-RUN apk add --no-cache curl ffmpeg libwebp-tools krb5-libs python3 unzip
+
+RUN apt-get update && apt-get install -y curl ffmpeg webp libkrb5-3 python3 unzip
 
 # Install Deno
 RUN curl -L https://deno.land/install.sh | sh
@@ -14,7 +14,7 @@ RUN curl -L https://deno.land/install.sh | sh
 RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && chmod +x /usr/local/bin/yt-dlp
 
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine3.22 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:10.0-noble AS build-env
 WORKDIR /app
 
 COPY *.sln ./
@@ -28,9 +28,7 @@ COPY Application/*.csproj ./Application/
 COPY Domain/*.csproj ./Domain/
 COPY Infrastructure/*.csproj ./Infrastructure/
 
-
-# Restore packages for the target runtime - this layer gets cached unless project files change
-RUN dotnet restore -r linux-musl-x64
+RUN dotnet restore -r linux-x64
 
 # Copy source code
 COPY Api/ ./Api
@@ -39,13 +37,13 @@ COPY Domain/ ./Domain
 COPY Infrastructure/ ./Infrastructure
 
 # Build and publish the application
-RUN dotnet publish Api -c Release -r linux-musl-x64 \
+RUN dotnet publish Api -c Release -r linux-x64 \
     -o /app/out
 
 # Create EF migrations bundle (self-contained)
 ENV ConnectionStrings__DefaultConnection=Host=localhost;Database=reezer;Username=root;Password=root
 RUN dotnet ef migrations bundle --project Api \
-    -r linux-musl-x64 \
+    -r linux-x64 \
     --configuration Release \
     -o /app/out/efbundle
 
