@@ -1,5 +1,6 @@
 import type { Result } from "neverthrow";
+import type { ISong } from "~/providers";
 
 export interface IAudioSource {
-	GetTrack(id: string): Promise<Result<string, unknown>>
+	GetTrack(track: ISong): Promise<Result<string, unknown>>
 }

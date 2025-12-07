@@ -1,3 +1,4 @@
+import type { ISong } from "~/providers";
 import type { IAudioBackend, PlayState } from "../interfaces/IAudioBackend";
 import type { IAudioSource } from "../interfaces/IAudioSource";
 
@@ -66,8 +67,9 @@ export class WebAudioBackend implements IAudioBackend
 		return this.currentBuffer ? this.currentBuffer.duration : null;
 	}
 
-	async Play(id: string): Promise<void>
+	async Play(track: ISong): Promise<void>
 	{
+		const id = track.id;
 		if (!this.audioContext || !this.gainNode)
 		{
 			console.error("WebAudioBackend not initialized");
@@ -113,7 +115,7 @@ export class WebAudioBackend implements IAudioBackend
 		{
 			await this.ensureAudioContextResumed();
 
-			const mediaUrlResult = await this.audioSource.GetTrack(id);
+			const mediaUrlResult = await this.audioSource.GetTrack(track);
 			await mediaUrlResult.match(
 				async(mediaUrl) =>
 				{
@@ -186,8 +188,9 @@ export class WebAudioBackend implements IAudioBackend
 		}
 	}
 
-	async Prefetch(id: string): Promise<void>
+	async Prefetch(track: ISong): Promise<void>
 	{
+		const id = track.id;
 		if (!this.audioContext)
 		{
 			return;
@@ -199,7 +202,7 @@ export class WebAudioBackend implements IAudioBackend
 			return;
 		}
 
-		const mediaUrlResult = await this.audioSource.GetTrack(id);
+		const mediaUrlResult = await this.audioSource.GetTrack(track);
 		await mediaUrlResult.match(
 			async(mediaUrl) =>
 			{

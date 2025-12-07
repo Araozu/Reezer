@@ -8,8 +8,8 @@
 	import AlbumDesktopView from "./AlbumDesktopView.svelte";
 	import AlbumMobileSkeleton from "./AlbumMobileSkeleton.svelte";
 	import AlbumDesktopSkeleton from "./AlbumDesktopSkeleton.svelte";
+	import type { RegularSong } from "./queries";
 
-	type SongDto = components["schemas"]["SongDto"];
 	type AlbumWithTracklistDto = components["schemas"]["AlbumWithTracklistDto"];
 
 	let { data }: PageProps = $props();
@@ -27,38 +27,41 @@
 		return albumData.name ?? "";
 	}
 
-	function getSongs(albumData: AlbumWithTracklistDto): SongDto[]
+	function getSongs(albumData: AlbumWithTracklistDto): RegularSong[]
 	{
-		return albumData.songs ?? [];
+		return (albumData.songs ?? []).map((s) => ({
+			...s,
+			type: "regular",
+		}));
 	}
 
-	function getArtistId(songs: SongDto[]): string
+	function getArtistId(songs: RegularSong[]): string
 	{
 		return songs[0]?.artistId ?? "";
 	}
 
-	function getArtistName(songs: SongDto[]): string
+	function getArtistName(songs: RegularSong[]): string
 	{
 		return songs[0]?.artist ?? "";
 	}
 
-	function getUniqueDiscs(songs: SongDto[]): number[]
+	function getUniqueDiscs(songs: RegularSong[]): number[]
 	{
 		const discs = new Set(songs.map((s) => Number(s.discNumber ?? 1)));
 		return Array.from(discs).sort((a, b) => a - b);
 	}
 
-	function getSongsForDisc(songs: SongDto[], discNumber: number): SongDto[]
+	function getSongsForDisc(songs: RegularSong[], discNumber: number): RegularSong[]
 	{
 		return songs.filter((s) => Number(s.discNumber ?? 1) === discNumber);
 	}
 
-	function getSongIndex(songs: SongDto[], song: SongDto): number
+	function getSongIndex(songs: RegularSong[], song: RegularSong): number
 	{
 		return songs.findIndex((s) => s.id === song.id);
 	}
 
-	function playFromSong(songs: SongDto[], index: number)
+	function playFromSong(songs: RegularSong[], index: number)
 	{
 		queue.PlaySongList(songs.slice(index));
 	}
@@ -123,6 +126,6 @@
 {:catch error}
 	<div class="flex flex-col items-center justify-center h-64 gap-4">
 		<p class="text-destructive">Error loading album</p>
-		<p class="text-muted-foreground text-sm">{error?.message ?? 'Unknown error'}</p>
+		<p class="text-muted-foreground text-sm">{error?.message ?? "Unknown error"}</p>
 	</div>
 {/await}

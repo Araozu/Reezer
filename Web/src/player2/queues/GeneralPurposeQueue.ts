@@ -18,7 +18,7 @@ export class GeneralPurposeQueue implements IQueue
 		this.audioBackend.OnSongEnd(this.onSongEnd);
 	}
 
-	private onSongEnd = (_endedSongId: string) =>
+	private onSongEnd = () =>
 	{
 		// Move to next song if available
 		if (this._currentIdx < this._queueState.length - 1)
@@ -195,8 +195,8 @@ export class GeneralPurposeQueue implements IQueue
 		const currentSong = this._queueState[this._currentIdx];
 		const nextSong: ISong | null = this._queueState[this._currentIdx + 1] ?? null;
 
-		this.audioBackend.Play(currentSong.id);
-		if (nextSong) this.audioBackend.Prefetch(nextSong.id);
+		this.audioBackend.Play(currentSong);
+		if (nextSong) this.audioBackend.Prefetch(nextSong);
 	}
 
 	/**
@@ -208,7 +208,7 @@ export class GeneralPurposeQueue implements IQueue
 
 		const nextSong: ISong | null = this._queueState[this._currentIdx + 1] ?? null;
 
-		if (nextSong) this.audioBackend.Prefetch(nextSong.id);
+		if (nextSong) this.audioBackend.Prefetch(nextSong);
 		else this.audioBackend.ClearPrefetch();
 	}
 

@@ -1,3 +1,4 @@
+import type { ISong } from "~/providers";
 import type { IAudioBackend, PlayState } from "../interfaces/IAudioBackend";
 import type { IAudioSource } from "../interfaces/IAudioSource";
 
@@ -56,8 +57,9 @@ export class DualAudioBackend implements IAudioBackend
 		this._volume = value;
 	}
 
-	async Play(id: string): Promise<void>
+	async Play(track: ISong): Promise<void>
 	{
+		const id = track.id;
 		const currentSongId = this.GetCurrentSongId();
 		const timeSinceSongStart = Date.now() - this.currentSongStartTime;
 
@@ -72,7 +74,7 @@ export class DualAudioBackend implements IAudioBackend
 		player.pause();
 		this.notifyPlayStateChange("buffering");
 
-		const mediaUrlResult = await this.audioSource.GetTrack(id);
+		const mediaUrlResult = await this.audioSource.GetTrack(track);
 		mediaUrlResult.match(
 			(mediaUrl) =>
 			{
@@ -113,15 +115,15 @@ export class DualAudioBackend implements IAudioBackend
 		player.currentTime = position;
 	}
 
-	async Prefetch(id: string): Promise<void>
+	async Prefetch(track: ISong): Promise<void>
 	{
 		const nextPlayer = this.GetNextPlayer();
-		const mediaUrlResult = await this.audioSource.GetTrack(id);
+		const mediaUrlResult = await this.audioSource.GetTrack(track);
 		mediaUrlResult.match(
 			(mediaUrl) =>
 			{
 				nextPlayer.src = mediaUrl;
-				this.SetNextSongId(id);
+				this.SetNextSongId(track.id);
 				this.hasPrefetch = true;
 			},
 			(e) =>

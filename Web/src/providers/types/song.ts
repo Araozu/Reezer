@@ -8,5 +8,8 @@ export interface ISong {
     album?: string;
     artistId?: string;
     albumId?: string;
+    type: SongType;
 }
+
+export type SongType = "regular" | "youtube"
 
