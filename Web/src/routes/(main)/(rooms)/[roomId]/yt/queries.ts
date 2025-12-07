@@ -1,5 +1,5 @@
 import { createMutation, createQuery, useQueryClient } from "@tanstack/svelte-query";
-import { api, sv, type components } from "~/api";
+import { api, sv, type components, type WithProblemDetails } from "~/api";
 import { derived, type Readable } from "svelte/store";
 
 export type YtSongDto = components["schemas"]["YtSongDto"];
@@ -25,24 +25,18 @@ export function useYtSongs(
 export function useAddYtSong()
 {
 	const queryClient = useQueryClient();
-	
-	return createMutation({
-		mutationFn: async (url: string) =>
-		{
-			const response = await api.POST("/api/Yt", {
-				body: { url },
-			});
 
-			if (response.error)
-			{
-				throw { message: response.error.detail ?? "Failed to add YouTube song" };
-			}
-
-			return response.data;
-		},
+	const mutation = createMutation({
+		mutationFn: (url: string) => api.POST("/api/Yt", {
+			body: {
+				url,
+			},
+		}),
 		onSuccess: () =>
 		{
 			queryClient.invalidateQueries({ queryKey: ["ytSongs"] });
 		},
 	});
+
+	return mutation as unknown as WithProblemDetails<typeof mutation>;
 }
