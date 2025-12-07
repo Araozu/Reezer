@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { ISong } from "~/providers";
-	import { Play, ListPlus, SkipForward, EllipsisVertical } from "lucide-svelte";
+	import { Play, ListPlus, SkipForward, EllipsisVertical, ExternalLink } from "lucide-svelte";
 	import { GetQueueContext } from "~/player2/context/player-store";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 
@@ -11,7 +11,7 @@
 
 <div
 	class="
-		group w-full flex flex-col gap-3 rounded-xl
+		w-full flex flex-col gap-3 rounded-xl
 		bg-glass-bg hover:bg-glass-bg-hover
 		border border-glass-border hover:border-glass-border-hover
 		backdrop-blur-xl
@@ -23,7 +23,7 @@
 >
 	<button
 		class="
-			relative w-full aspect-video shrink-0 overflow-hidden
+			group relative w-full aspect-video shrink-0 overflow-hidden
 			bg-glass-bg
 			flex items-center justify-center
 			cursor-pointer
@@ -79,6 +79,12 @@
 					<ListPlus size={16} class="mr-2" />
 					Add to Queue
 				</DropdownMenu.Item>
+				<a href={`https://www.youtube.com/watch?v=${song.id}`} target="_blank" rel="noopener noreferrer">
+					<DropdownMenu.Item>
+							<ExternalLink size={16} class="mr-2" />
+							See in YouTube
+					</DropdownMenu.Item>
+				</a>
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
 	</div>
