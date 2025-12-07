@@ -34,7 +34,8 @@
 <div class="flex justify-center">
 	<img
 		class={[
-			"shadow-lg aspect-square object-cover",
+			"shadow-lg aspect-square",
+			song?.type === "youtube" ? "object-contain" : "object-cover",
 			"rounded-2xl h-full w-full",
 			"max-h-60 max-w-60 md:max-w-120 md:max-h-120",
 		]}

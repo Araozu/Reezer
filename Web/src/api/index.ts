@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { paths } from "./api";
 import createClient from "openapi-fetch";
 import type { CreateMutationResult, CreateQueryResult } from "@tanstack/svelte-query";
@@ -32,11 +34,11 @@ export type ProblemDetails = {
  */
 export type WithProblemDetails<T> = T extends CreateQueryResult<
 	infer ResultType,
-	unknown
+	any
 >
 	? CreateQueryResult<ResultType, ProblemDetails>
-	: T extends CreateMutationResult<infer ResutType, unknown, infer FetchOptionsType>
-		? CreateMutationResult<ResutType, ProblemDetails, FetchOptionsType>
+	: T extends CreateMutationResult<infer ResutType, any, infer FetchOptionsType, infer T3>
+		? CreateMutationResult<ResutType, ProblemDetails, FetchOptionsType, T3>
 		: T;
 
 /**
@@ -138,9 +140,9 @@ type FetchResult<A, B> = {
 };
 
 export const sv =
-	<Data, Error>(fn: () => Promise<FetchResult<Data, Error>>) => async(): Promise<Data> =>
+	<Data, Error, InData>(fn: (t?: InData) => Promise<FetchResult<Data, Error>>) => async(t?: InData): Promise<Data> =>
 	{
-		const data = await fn();
+		const data = await fn(t);
 		if (data.response.ok) return data.data!;
 		else throw data.error;
 	};

@@ -1,23 +1,21 @@
 <script lang="ts">
-	import type { components } from "~/api";
 	import { Disc, ListEnd, Play } from "lucide-svelte";
 	import AlbumCover from "~/components/album-cover.svelte";
 	import SongRow from "./SongRow.svelte";
-    import { Button } from "~/lib/components/ui/button";
-
-	type SongDto = components["schemas"]["SongDto"];
+	import { Button } from "~/lib/components/ui/button";
+	import type { RegularSong } from "./queries";
 
 	interface Props {
 		albumId: string;
 		albumName: string;
-		songs: SongDto[];
+		songs: RegularSong[];
 		currentSongId: string | null;
 		uniqueDiscs: number[];
-		getSongsForDisc: (discNumber: number) => SongDto[];
-		getSongIndex: (song: SongDto) => number;
+		getSongsForDisc: (discNumber: number) => RegularSong[];
+		getSongIndex: (song: RegularSong) => number;
 		onPlayFromSong: (index: number) => void;
-		onAddLastSong: (song: SongDto) => void;
-		onAddNextSong: (song: SongDto) => void;
+		onAddLastSong: (song: RegularSong) => void;
+		onAddNextSong: (song: RegularSong) => void;
 		onPlayAll: () => void;
 		onAddAllToQueue: () => void;
 		roomId: string;

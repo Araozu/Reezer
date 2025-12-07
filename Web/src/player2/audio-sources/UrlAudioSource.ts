@@ -1,5 +1,6 @@
 import {ok,type  Result} from "neverthrow";
 import type { IAudioSource } from "../interfaces/IAudioSource";
+import type { ISong } from "~/providers";
 
 type UrlAudioError = "NotFound" | "Other"
 
@@ -13,11 +14,13 @@ export class UrlAudioSource implements IAudioSource
 {
 	private static baseUrl = import.meta.env.VITE_PUBLIC_BACKEND_URL;
 
-	async GetTrack(id: string): Promise<Result<string, UrlAudioError>>
+	async GetTrack(track: ISong): Promise<Result<string, UrlAudioError>>
 	{
 		// This one really does nothing, but there will be
 		// a different implementation that deals with auth
 		// & signed URLs.
-		return ok(`${UrlAudioSource.baseUrl}/api/Songs/${id}/stream`);
+		if (track.type === "regular") return ok(`${UrlAudioSource.baseUrl}/api/Songs/${track.id}/stream`);
+		else if (track.type === "youtube") return ok(`${UrlAudioSource.baseUrl}/api/Yt/${track.id}/stream`);
+		else throw new Error("Unreachable: Unsupported song type");
 	}
 }

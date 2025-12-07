@@ -21,11 +21,12 @@ export function useCreateRoom()
 	const queryClient = useQueryClient();
 
 	const mutation = createMutation({
-		mutationFn: sv(() => api.POST("/api/MusicRooms")),
+		mutationFn: () => api.POST("/api/MusicRooms"),
 		onSuccess: () =>
 		{
 			queryClient.invalidateQueries({ queryKey: ["musicrooms"] });
 		},
 	});
-	return mutation as WithProblemDetails<typeof mutation>;
+
+	return mutation as unknown as WithProblemDetails<typeof mutation>;
 }

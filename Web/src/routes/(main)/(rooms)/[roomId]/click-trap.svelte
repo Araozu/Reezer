@@ -8,7 +8,7 @@
 	const audioBackend: IAudioBackend = getContext("audio");
 </script>
 
-<div
+<button
 	class="h-screen flex items-center justify-center"
 	onclick={() => audioBackend.Init()}
 >
@@ -20,4 +20,4 @@
 			</Button>
 		</CardContent>
 	</Card>
-</div>
+</button>

@@ -1,3 +1,4 @@
+import type { ISong } from "~/providers";
 
 export type PlayState = "playing" | "paused" | "buffering";
 
@@ -18,7 +19,7 @@ export interface IAudioBackend {
 	/**
 	 * Plays the audio track with the given id.
 	 */
-	Play(id: string): Promise<void>
+	Play(track: ISong): Promise<void>
 
 	/**
 	 * Pauses or resumes playback.
@@ -26,7 +27,7 @@ export interface IAudioBackend {
 	TogglePlayPause(): void
 	Seek(position: number): void
 
-	Prefetch(id: string): Promise<void>
+	Prefetch(track: ISong): Promise<void>
 	ClearPrefetch(): void;
 
 	/**

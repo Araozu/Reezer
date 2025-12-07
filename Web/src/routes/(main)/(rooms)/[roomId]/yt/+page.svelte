@@ -7,6 +7,7 @@
 	import YtSongRowSkeleton from "./yt-song-row-skeleton.svelte";
 	import BackButton from "$lib/components/back-button.svelte";
 	import AddYtSongDialog from "./add-yt-song-dialog.svelte";
+    import type { ISong } from "~/providers";
 
 	const pageNumberQuery = Number.parseInt(page.url.searchParams.get("page") ?? "1", 10);
 
@@ -20,6 +21,7 @@
 		toStore(() => requestPage),
 		toStore(() => requestPageSize),
 	);
+	const annotatedYtSongsQuery = $derived($ytSongsQuery.data ? $ytSongsQuery.data.items.map((t): ISong => ({...t, id: t.ytId, type: "youtube"})) : null);
 
 	$effect(() =>
 	{
@@ -48,10 +50,10 @@
 
 <div class="px-4">
 	<YtPagination {totalCount} {pageSize} bind:requestPage />
-	
+
 	<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-		{#if $ytSongsQuery.data}
-			{#each $ytSongsQuery.data.items as song (song.ytId)}
+		{#if annotatedYtSongsQuery}
+			{#each annotatedYtSongsQuery as song (song.id)}
 				<YtSongRow {song} />
 			{/each}
 		{:else}
