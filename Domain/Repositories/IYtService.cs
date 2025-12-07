@@ -5,6 +5,8 @@ namespace Reezer.Domain.Repositories;
 
 public interface IYtService
 {
+    Task SaveCookiesAsync(Stream stream, CancellationToken cancellationToken = default);
+
     Task<OneOf<string, InternalError>> DownloadAndCacheAsync(
         string ytId,
         CancellationToken cancellationToken = default

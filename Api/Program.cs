@@ -32,8 +32,15 @@ builder.Services.AddOpenApi(options =>
             document.Servers =
             [
                 new() { Url = "http://localhost:5678", Description = "Local development" },
-                new() { Url = "https://reezer.araozu.dev", Description = "Dev server" },
+                new() { Url = "https://reezer.araoz.dev", Description = "Dev server" },
             ];
+
+            // Sort tags alphabetically
+            if (document.Tags is not null)
+            {
+                document.Tags = document.Tags.OrderBy(tag => tag.Name).ToHashSet();
+            }
+
             return Task.CompletedTask;
         }
     );

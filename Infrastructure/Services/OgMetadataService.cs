@@ -24,7 +24,21 @@ public partial class OgMetadataService(
     {
         try
         {
-            var response = await httpClient.GetAsync(url, cancellationToken);
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+
+            if (File.Exists(StorageOptions.YtCookiesFile))
+            {
+                var cookies = await ReadMozillaCookiesAsync(
+                    StorageOptions.YtCookiesFile,
+                    cancellationToken
+                );
+                if (!string.IsNullOrEmpty(cookies))
+                {
+                    request.Headers.Add("Cookie", cookies);
+                }
+            }
+
+            var response = await httpClient.SendAsync(request, cancellationToken);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -194,6 +208,38 @@ public partial class OgMetadataService(
         {
             logger.LogError(ex, "Failed to download thumbnail for {YtId}", ytId);
             return new InternalError($"Failed to download thumbnail: {ex.Message}");
+        }
+    }
+
+    private static async Task<string?> ReadMozillaCookiesAsync(
+        string cookieFilePath,
+        CancellationToken cancellationToken
+    )
+    {
+        try
+        {
+            var lines = await File.ReadAllLinesAsync(cookieFilePath, cancellationToken);
+            var cookies = new List<string>();
+
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
+                    continue;
+
+                var parts = line.Split('\t');
+                if (parts.Length >= 7)
+                {
+                    var name = parts[5];
+                    var value = parts[6];
+                    cookies.Add($"{name}={value}");
+                }
+            }
+
+            return cookies.Count > 0 ? string.Join("; ", cookies) : null;
+        }
+        catch
+        {
+            return null;
         }
     }
 }

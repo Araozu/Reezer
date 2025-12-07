@@ -1,11 +1,11 @@
-using Reezer.Application.Services;
+using Reezer.Domain.Repositories;
 
 namespace Reezer.Application.UseCases;
 
-public class SetYtCookiesUseCase(IYtCookiesService ytCookiesService)
+public class SetYtCookiesUseCase(IYtService ytService)
 {
     public async Task ExecuteAsync(Stream stream, CancellationToken cancellationToken = default)
     {
-        await ytCookiesService.SaveCookiesAsync(stream, cancellationToken);
+        await ytService.SaveCookiesAsync(stream, cancellationToken);
     }
 }

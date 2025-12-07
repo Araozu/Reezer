@@ -52,7 +52,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILibraryInitializationService, LibraryInitializationService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IYtService, YtService>();
-        services.AddScoped<IYtCookiesService, YtCookiesService>();
         services.AddHttpClient<IOgMetadataService, OgMetadataService>();
         services.AddHostedService<LibraryInitializationHostedService>();
 
