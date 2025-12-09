@@ -9,7 +9,7 @@
 </script>
 
 <button
-	class="h-screen flex items-center justify-center"
+	class="h-screen w-screen flex items-center justify-center"
 	onclick={() => audioBackend.Init()}
 >
 	<Card>

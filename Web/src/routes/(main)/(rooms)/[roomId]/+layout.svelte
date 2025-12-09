@@ -9,6 +9,7 @@
 	import { WebAudioBackend } from "~/player2/backends/WebAudioBackend";
 	import * as Menubar from "$lib/components/ui/menubar/index.js";
 	import {page} from "$app/state";
+    import YtQueue from "./yt-queue.svelte";
 
 	let { children } = $props();
 
@@ -59,6 +60,7 @@
 			</div>
 		{:else}
 			<ClickTrap />
+			<YtQueue />
 		{/if}
 	</div>
 	{#if audioTagSetup}

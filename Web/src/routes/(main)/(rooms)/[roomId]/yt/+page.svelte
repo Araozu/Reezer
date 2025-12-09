@@ -7,7 +7,7 @@
 	import YtSongRowSkeleton from "./yt-song-row-skeleton.svelte";
 	import BackButton from "$lib/components/back-button.svelte";
 	import AddYtSongDialog from "./add-yt-song-dialog.svelte";
-    import type { ISong } from "~/providers";
+	import type { ISong } from "~/providers";
 
 	const pageNumberQuery = Number.parseInt(page.url.searchParams.get("page") ?? "1", 10);
 
