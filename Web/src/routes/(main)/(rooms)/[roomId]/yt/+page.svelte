@@ -6,8 +6,9 @@
 	import YtSongRow from "./yt-song-row.svelte";
 	import YtSongRowSkeleton from "./yt-song-row-skeleton.svelte";
 	import BackButton from "$lib/components/back-button.svelte";
-	import AddYtSongDialog from "./add-yt-song-dialog.svelte";
 	import type { ISong } from "~/providers";
+    import Button from "~/lib/components/ui/button/button.svelte";
+    import { openYtQueue } from "../yt-queue.impl.svelte";
 
 	const pageNumberQuery = Number.parseInt(page.url.searchParams.get("page") ?? "1", 10);
 
@@ -45,7 +46,13 @@
 		<BackButton />
 		YouTube Songs
 	</h1>
-	<AddYtSongDialog />
+	<Button
+	onclick={() => {
+		openYtQueue()
+	}}
+	>
+		Add YouTube Song
+	</Button>
 </div>
 
 <div class="px-4">

@@ -23,6 +23,7 @@ export type ProblemDetails = {
 	type: string;
 	title: string;
 	status: number;
+	/** A human-readable explanation specific to this occurrence */
 	detail: string;
 	instance: string | null;
 	[key: string]: unknown; // Extension members

@@ -1,32 +1,33 @@
 <script lang="ts">
-	import MusicPlayer from "~/components/music-player/index.svelte";
-	import ClickTrap from "./click-trap.svelte";
-	import { UrlAudioSource } from "~/player2/audio-sources/UrlAudioSource";
-	import type { IAudioBackend } from "~/player2/interfaces/IAudioBackend";
-	import { SetPlayerContext, SetQueueContext } from "~/player2/context/player-store";
-	import { GeneralPurposeQueue } from "~/player2/queues/GeneralPurposeQueue";
-	import type { IQueue } from "~/player2/interfaces/IQueue";
-	import { WebAudioBackend } from "~/player2/backends/WebAudioBackend";
-	import * as Menubar from "$lib/components/ui/menubar/index.js";
-	import {page} from "$app/state";
-    import YtQueue from "./yt-queue.svelte";
+import MusicPlayer from "~/components/music-player/index.svelte";
+import ClickTrap from "./click-trap.svelte";
+import { UrlAudioSource } from "~/player2/audio-sources/UrlAudioSource";
+import type { IAudioBackend } from "~/player2/interfaces/IAudioBackend";
+import { SetPlayerContext, SetQueueContext } from "~/player2/context/player-store";
+import { GeneralPurposeQueue } from "~/player2/queues/GeneralPurposeQueue";
+import type { IQueue } from "~/player2/interfaces/IQueue";
+import { WebAudioBackend } from "~/player2/backends/WebAudioBackend";
+import * as Menubar from "$lib/components/ui/menubar/index.js";
+import {page} from "$app/state";
+import YtQueue from "./yt-queue.svelte";
+    import { createContext } from "svelte";
 
-	let { children } = $props();
+let { children } = $props();
 
-	const roomId = page.params.roomId;
+const roomId = page.params.roomId;
 
-	// Setup music player
-	// FIXME: Remove context for audio backend, should use the IQueue instead
-	const audioBackend: IAudioBackend = new WebAudioBackend(new UrlAudioSource());
-	SetPlayerContext(audioBackend);
+// Setup music player
+// FIXME: Remove context for audio backend, should use the IQueue instead
+const audioBackend: IAudioBackend = new WebAudioBackend(new UrlAudioSource());
+SetPlayerContext(audioBackend);
 
-	const queue: IQueue = new GeneralPurposeQueue(audioBackend);
-	SetQueueContext(queue);
+const queue: IQueue = new GeneralPurposeQueue(audioBackend);
+SetQueueContext(queue);
 
-	let audioTagSetup = $state(false);
-	let playerCollapsed = $state(true);
+let audioTagSetup = $state(false);
+let playerCollapsed = $state(true);
 
-	audioBackend.OnReady(() => (audioTagSetup = true));
+audioBackend.OnReady(() => (audioTagSetup = true));
 </script>
 
 <div
@@ -57,10 +58,10 @@
 			</div>
 			<div class="pt-8">
 				{@render children()}
+				<YtQueue />
 			</div>
 		{:else}
 			<ClickTrap />
-			<YtQueue />
 		{/if}
 	</div>
 	{#if audioTagSetup}

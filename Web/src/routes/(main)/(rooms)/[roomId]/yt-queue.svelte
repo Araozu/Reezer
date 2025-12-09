@@ -4,8 +4,10 @@ import { Button } from "$lib/components/ui/button";
 import { Label } from "$lib/components/ui/label";
 import * as Dialog from "$lib/components/ui/dialog";
 import * as Card from "$lib/components/ui/card";
+import YtQueueItem from "./yt-queue-item.svelte";
+import {ytOpenState } from "./yt-queue.impl.svelte";
 
-let open = true;
+let open = $derived(ytOpenState.open);
 let url = $state("");
 let errorMessage = $state<string | null>(null);
 
@@ -63,8 +65,8 @@ async function handleSubmit(e: Event)
 					<Card.Title>Ongoing downloads</Card.Title>
 				</Card.Header>
 				<Card.Content>
-					{#each queuedDownloads as [id, downloadUrl] (id)}
-						<p class="mb-2">[{id}] {downloadUrl}</p>
+					{#each queuedDownloads as [id, ytUrl] (id)}
+						<YtQueueItem {ytUrl} />
 					{/each}
 				</Card.Content>
 			</Card.Root>
