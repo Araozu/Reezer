@@ -36,9 +36,9 @@
 			: "md:grid-cols-[auto_30rem]",
 	]}
 >
-	<div class="pb-12">
+	<div>
 		{#if audioTagSetup}
-			<div class="sticky top-0 z-10">
+			<div class="fixed top-0 z-10 w-full">
 				<Menubar.Root>
 					<a href={`/${roomId}/`} class="font-display font-bold px-6 py-2">Reezer</a>
 					<Menubar.Menu>
@@ -54,7 +54,9 @@
 					</Menubar.Menu>
 				</Menubar.Root>
 			</div>
-			{@render children()}
+			<div class="pt-8">
+				{@render children()}
+			</div>
 		{:else}
 			<ClickTrap />
 		{/if}
