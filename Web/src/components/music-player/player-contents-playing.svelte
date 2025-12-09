@@ -29,6 +29,24 @@
 	// FIXME: regression
 	let isPaused = false;
 	let isBuffering = false;
+
+	let artistName = $derived.by(() =>
+	{
+		if (!song) return "-";
+
+		if (song.type === "regular") return song.artist;
+		else if (song.type === "youtube") return "YouTube";
+		else return "-";
+	});
+	let artistLink = $derived.by(() =>
+	{
+		if (!song) return "#";
+
+		if (song.type === "regular") return `/${roomId}/artists/${song.artistId}`;
+		else if (song.type === "youtube") return `/${roomId}/yt`;
+		else return "#";
+	});
+
 </script>
 
 <div class="flex justify-center">
@@ -48,11 +66,11 @@
 		{song?.name ?? "-"}
 	</p>
 	<p class="font-medium text-muted-foreground">
-		<a class="hover:text-foreground transition-colors" href={`/${roomId}/artists/${song?.artistId ?? ""}`}>
-			{song?.artist ?? "-"}
+		<a class="hover:text-foreground transition-colors" href={artistLink}>
+			{artistName}
 		</a>
 		•
-		<a class="hover:text-foreground transition-colors" href={`/${roomId}/albums/${song?.albumId}`}>
+		<a class="hover:text-foreground transition-colors" href={`/${roomId}/albums/${song?.albumId ?? ""}`}>
 			{song?.album ?? "-"}
 		</a>
 	</p>

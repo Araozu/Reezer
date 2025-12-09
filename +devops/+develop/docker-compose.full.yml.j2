@@ -22,7 +22,7 @@ services:
       - "traefik.http.routers.reezer-full-develop.rule=Host(`reezer.araoz.dev`)"
       - "traefik.http.routers.reezer-full-develop.entrypoints=websecure"
       - "traefik.http.routers.reezer-full-develop.tls=true"
-      - "traefik.http.routers.reezer-full-develop.tls.certresolver=dns-cloudflare"
+      - "traefik.http.routers.reezer-full-develop.tls.certresolver=araoz-wildcard"
       - "traefik.http.routers.reezer-full-develop.tls.domains[0].main=araoz.dev"
       - "traefik.http.routers.reezer-full-develop.tls.domains[0].sans=*.araoz.dev"
       - "traefik.http.services.reezer-full-develop.loadbalancer.server.port=8080"

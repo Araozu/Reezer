@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { ISong } from "~/providers";
-	import { Play, ListPlus, SkipForward, EllipsisVertical, ExternalLink } from "lucide-svelte";
+	import { Play, EllipsisVertical, ExternalLink, Plus, ListStart } from "lucide-svelte";
 	import { GetQueueContext } from "~/player2/context/player-store";
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 
@@ -67,16 +67,12 @@
 				<EllipsisVertical size={20} class="text-muted-foreground" />
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content>
-				<DropdownMenu.Item onclick={() => queue.PlaySong(song)}>
-					<Play size={16} class="mr-2" />
-					Play Now
-				</DropdownMenu.Item>
 				<DropdownMenu.Item onclick={() => queue.AddNextSong(song)}>
-					<SkipForward size={16} class="mr-2" />
+					<Plus size={16} class="mr-2" />
 					Play Next
 				</DropdownMenu.Item>
 				<DropdownMenu.Item onclick={() => queue.AddLastSong(song)}>
-					<ListPlus size={16} class="mr-2" />
+					<ListStart size={16} class="mr-2" />
 					Add to Queue
 				</DropdownMenu.Item>
 				<a href={`https://www.youtube.com/watch?v=${song.id}`} target="_blank" rel="noopener noreferrer">

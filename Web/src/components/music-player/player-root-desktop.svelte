@@ -43,7 +43,7 @@
 	});
 </script>
 
-<div class={["p-1", "h-screen sticky top-0 w-auto"]}>
+<div class={["p-1", "h-screen sticky top-0 w-auto z-20"]}>
 	<ColorBlobs colors={extractedColors} weights={colorWeights} />
 	<Card.Root class="h-full py-6 rounded-2xl relative z-10">
 		<Card.Header class={collapsed ? "px-0" : ""}>
