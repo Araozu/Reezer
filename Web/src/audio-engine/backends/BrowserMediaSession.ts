@@ -5,6 +5,8 @@ import type { IQueue } from "../interfaces/IQueue";
 
 export class BrowserMediaSession implements IMediaSession
 {
+	private lastPosition = 0;
+
 	constructor(
 		private queue: IQueue,
 		private backend: IAudioBackend,
@@ -13,7 +15,7 @@ export class BrowserMediaSession implements IMediaSession
 
 	Init(): void
 	{
-		if (!("mediaSession" in navigator))
+		if (typeof navigator === "undefined" || !("mediaSession" in navigator))
 		{
 			console.warn("MediaSession API not supported");
 			return;
@@ -67,6 +69,7 @@ export class BrowserMediaSession implements IMediaSession
 
 		this.backend.OnPositionUpdate((position) =>
 		{
+			this.lastPosition = position;
 			const duration = this.backend.duration;
 			if (duration !== null)
 			{
@@ -76,22 +79,31 @@ export class BrowserMediaSession implements IMediaSession
 
 		this.backend.OnDurationChange((duration) =>
 		{
-			this.UpdatePosition(0, duration);
+			this.UpdatePosition(this.lastPosition, duration);
 		});
 	}
 
 	UpdateMetadata(song: ISong, artwork?: string): void
 	{
-		if (!("mediaSession" in navigator)) return;
+		if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
 
-		const artworkArray = artwork
+		let finalArtwork = artwork;
+		if (!finalArtwork)
+		{
+			if (song.type === "regular" && song.albumId)
+			{
+				finalArtwork = `/api/Albums/${song.albumId}/cover`;
+			}
+		}
+
+		const artworkArray = finalArtwork
 			? [
-				{ src: artwork, sizes: "96x96", type: "image/jpeg" },
-				{ src: artwork, sizes: "128x128", type: "image/jpeg" },
-				{ src: artwork, sizes: "192x192", type: "image/jpeg" },
-				{ src: artwork, sizes: "256x256", type: "image/jpeg" },
-				{ src: artwork, sizes: "384x384", type: "image/jpeg" },
-				{ src: artwork, sizes: "512x512", type: "image/jpeg" },
+				{ src: finalArtwork, sizes: "96x96", type: "image/jpeg" },
+				{ src: finalArtwork, sizes: "128x128", type: "image/jpeg" },
+				{ src: finalArtwork, sizes: "192x192", type: "image/jpeg" },
+				{ src: finalArtwork, sizes: "256x256", type: "image/jpeg" },
+				{ src: finalArtwork, sizes: "384x384", type: "image/jpeg" },
+				{ src: finalArtwork, sizes: "512x512", type: "image/jpeg" },
 			  ]
 			: [];
 
@@ -105,7 +117,7 @@ export class BrowserMediaSession implements IMediaSession
 
 	UpdatePlaybackState(state: PlayState): void
 	{
-		if (!("mediaSession" in navigator)) return;
+		if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
 
 		if (state === "playing")
 		{
@@ -123,7 +135,7 @@ export class BrowserMediaSession implements IMediaSession
 
 	UpdatePosition(position: number, duration: number): void
 	{
-		if (!("mediaSession" in navigator)) return;
+		if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
 		if (!("setPositionState" in navigator.mediaSession)) return;
 
 		try
@@ -141,7 +153,7 @@ export class BrowserMediaSession implements IMediaSession
 	}
 	ClearMetadata(): void
 	{
-		if (!("mediaSession" in navigator)) return;
+		if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
 		navigator.mediaSession.metadata = null;
 	}
 }

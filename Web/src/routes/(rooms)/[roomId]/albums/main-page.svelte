@@ -6,6 +6,7 @@
 	import { page } from "$app/state";
 	import AlbumCard from "~/components/album-card.svelte";
 	import AlbumCardSkeleton from "~/components/album-card-skeleton.svelte";
+	import { goto } from "$app/navigation";
 
 	const pageNumberQuery = Number.parseInt(page.url.searchParams.get("page") ?? "1", 10);
 	const searchQuery = page.url.searchParams.get("search") ?? "";
@@ -49,6 +50,10 @@
 
 		debounceTimeout = setTimeout(() =>
 		{
+			let query = page.url.searchParams;
+			query.set("search", searchTerm);
+			goto(`?${query.toString()}`);
+
 			debouncedSearchTerm = searchTerm;
 			requestPage = 1;
 		}, 300);
