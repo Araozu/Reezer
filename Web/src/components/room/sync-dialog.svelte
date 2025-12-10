@@ -1,6 +1,6 @@
 <script lang="ts">
 import * as Dialog from "$lib/components/ui/dialog";
-import { GetSyncPlayerManagerContext } from "~/player2/context/player-store";
+import { GetSyncPlayerManagerContext } from "~/context/music-player-context";
 import { Activity, Clock, Gauge, Signal, Timer } from "lucide-svelte";
 
 let { open = $bindable(false) } = $props();

@@ -26,7 +26,6 @@
 	}
 
 	let blobs = $state<Blob[]>([]);
-	let containerRef = $state<HTMLDivElement | null>(null);
 	let animationId: number;
 
 	function randomInRange(min: number, max: number): number

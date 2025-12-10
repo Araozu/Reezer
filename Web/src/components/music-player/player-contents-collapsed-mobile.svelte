@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { GetPlayerContext } from "~/player2/context/player-store";
+    import { GetPlayerContext } from "~/context/music-player-context";
 	import type { ISong } from "../../providers";
 	import { Play, Pause, LoaderCircle } from "lucide-svelte";
 

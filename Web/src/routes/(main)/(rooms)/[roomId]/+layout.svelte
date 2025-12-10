@@ -3,7 +3,7 @@ import MusicPlayer from "~/components/music-player/index.svelte";
 import ClickTrap from "./click-trap.svelte";
 import { UrlAudioSource } from "~/player2/audio-sources/UrlAudioSource";
 import type { IAudioBackend } from "~/player2/interfaces/IAudioBackend";
-import { SetPlayerContext, SetQueueContext } from "~/player2/context/player-store";
+import { SetPlayerContext, SetQueueContext } from "~/context/music-player-context";
 import { GeneralPurposeQueue } from "~/player2/queues/GeneralPurposeQueue";
 import type { IQueue } from "~/player2/interfaces/IQueue";
 import { WebAudioBackend } from "~/player2/backends/WebAudioBackend";

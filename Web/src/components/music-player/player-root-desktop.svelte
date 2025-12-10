@@ -1,46 +1,46 @@
 <script lang="ts">
-	import * as Card from "$lib/components/ui/card/index.js";
-	import * as Tabs from "$lib/components/ui/tabs/index.js";
-	import { ChevronsRight, ChevronsLeft } from "lucide-svelte";
-	import PlayerContentsCollapsed from "./player-contents-collapsed.svelte";
-	import PlayerContentsPlaying from "./player-contents-playing.svelte";
-	import PlayerContentsQueue from "./player-contents-queue.svelte";
-	import ColorBlobs from "./color-blobs.svelte";
-	import { GetQueueContext } from "~/player2/context/player-store";
-	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
-	import { extractColorsFromImage } from "$lib/color-extractor";
+import * as Card from "$lib/components/ui/card/index.js";
+import * as Tabs from "$lib/components/ui/tabs/index.js";
+import { ChevronsRight, ChevronsLeft } from "lucide-svelte";
+import PlayerContentsCollapsed from "./player-contents-collapsed.svelte";
+import PlayerContentsPlaying from "./player-contents-playing.svelte";
+import PlayerContentsQueue from "./player-contents-queue.svelte";
+import ColorBlobs from "./color-blobs.svelte";
+import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
+import { extractColorsFromImage } from "$lib/color-extractor";
+import { GetQueueContext } from "~/context/music-player-context";
 
-	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
+let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
-	let queue = GetQueueContext();
-	let svelteQueue = new SvelteRuneQueue(queue);
+let queue = GetQueueContext();
+let svelteQueue = new SvelteRuneQueue(queue);
 
-	let currentSong = $derived(svelteQueue.currentSong);
-	let currentTab = $state<"playing" | "queue">("playing");
+let currentSong = $derived(svelteQueue.currentSong);
+let currentTab = $state<"playing" | "queue">("playing");
 
-	let coverUrl = $derived.by(() =>
+let coverUrl = $derived.by(() =>
+{
+	if (!currentSong) return "/vinyl.jpg";
+
+	if (currentSong.type === "regular") return `/api/Albums/${currentSong.albumId}/cover`;
+	else if (currentSong.type === "youtube") return `/api/Yt/${currentSong.id}/thumbnail`;
+	else return "/vinyl.jpg";
+});
+
+let extractedColors = $state<string[]>([]);
+let colorWeights = $state<number[]>([]);
+
+$effect(() =>
+{
+	if (coverUrl)
 	{
-		if (!currentSong) return "/vinyl.jpg";
-
-		if (currentSong.type === "regular") return `/api/Albums/${currentSong.albumId}/cover`;
-		else if (currentSong.type === "youtube") return `/api/Yt/${currentSong.id}/thumbnail`;
-		else return "/vinyl.jpg";
-	});
-
-	let extractedColors = $state<string[]>([]);
-	let colorWeights = $state<number[]>([]);
-
-	$effect(() =>
-	{
-		if (coverUrl)
+		extractColorsFromImage(coverUrl, 6).then((result) =>
 		{
-			extractColorsFromImage(coverUrl, 6).then((result) =>
-			{
-				extractedColors = result.colors;
-				colorWeights = result.weights;
-			});
-		}
-	});
+			extractedColors = result.colors;
+			colorWeights = result.weights;
+		});
+	}
+});
 </script>
 
 <div class={["p-1", "h-screen sticky top-0 w-auto z-20"]}>

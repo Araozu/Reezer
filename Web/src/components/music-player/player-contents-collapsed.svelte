@@ -1,26 +1,26 @@
 <script lang="ts">
-	import {
-		Play,
-		Pause,
-		SkipForward,
-		SkipBack,
-		LoaderCircle,
-	} from "lucide-svelte";
-	import VolumeSlider from "./volume-slider.svelte";
-	import { GetPlayerContext, GetQueueContext } from "~/player2/context/player-store";
+import {
+	Play,
+	Pause,
+	SkipForward,
+	SkipBack,
+	LoaderCircle,
+} from "lucide-svelte";
+import VolumeSlider from "./volume-slider.svelte";
+import { GetPlayerContext, GetQueueContext } from "~/context/music-player-context";
 
-	let {
-		coverUrl = $bindable(),
-	}: {
-		coverUrl: string;
-	} = $props();
+let {
+	coverUrl = $bindable(),
+}: {
+	coverUrl: string;
+} = $props();
 
-	let player = GetPlayerContext();
-	let queue  = GetQueueContext();
+let player = GetPlayerContext();
+let queue  = GetQueueContext();
 
-	// FIXME: regression
-	let isPaused = false;
-	let isBuffering = false;
+// FIXME: regression
+let isPaused = false;
+let isBuffering = false;
 </script>
 
 <img

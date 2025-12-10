@@ -1,7 +1,7 @@
 <script lang="ts">
 import * as Card from "$lib/components/ui/card";
 import { SyncPlayerManager } from "~/player2/managers/SyncPlayerManager.svelte";
-import { SetSyncPlayerManagerContext } from "~/player2/context/player-store";
+import { SetSyncPlayerManagerContext } from "~/context/music-player-context";
 import { Disc3 } from "lucide-svelte";
 
 let { children } = $props();

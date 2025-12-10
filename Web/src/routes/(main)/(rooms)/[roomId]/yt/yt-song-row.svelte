@@ -1,35 +1,35 @@
 <script lang="ts">
-	import type { ISong } from "~/providers";
-	import { Play, EllipsisVertical, ExternalLink, Plus, ListStart } from "lucide-svelte";
-	import { GetQueueContext } from "~/player2/context/player-store";
-	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+import type { ISong } from "~/providers";
+import { Play, EllipsisVertical, ExternalLink, Plus, ListStart } from "lucide-svelte";
+import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+import { GetQueueContext } from "~/context/music-player-context";
 
-	let { song }: { song: ISong } = $props();
+let { song }: { song: ISong } = $props();
 
-	const queue = GetQueueContext();
+const queue = GetQueueContext();
 </script>
 
 <div
 	class="
-		w-full flex flex-col gap-3 rounded-xl
-		bg-glass-bg hover:bg-glass-bg-hover
-		border border-glass-border hover:border-glass-border-hover
-		backdrop-blur-xl
-		shadow-[0_2px_12px_-2px_var(--glass-shadow),inset_0_1px_1px_var(--glass-highlight)]
-		hover:shadow-[0_4px_16px_-2px_var(--glass-shadow-hover),inset_0_1px_1px_var(--glass-highlight)]
-		transition-all duration-300 ease-out
-		overflow-hidden
+	w-full flex flex-col gap-3 rounded-xl
+	bg-glass-bg hover:bg-glass-bg-hover
+	border border-glass-border hover:border-glass-border-hover
+	backdrop-blur-xl
+	shadow-[0_2px_12px_-2px_var(--glass-shadow),inset_0_1px_1px_var(--glass-highlight)]
+	hover:shadow-[0_4px_16px_-2px_var(--glass-shadow-hover),inset_0_1px_1px_var(--glass-highlight)]
+	transition-all duration-300 ease-out
+	overflow-hidden
 	"
 >
 	<button
 		class="
-			group relative w-full aspect-video shrink-0 overflow-hidden
-			bg-glass-bg
-			flex items-center justify-center
-			cursor-pointer
-			touch-action-manipulation [-webkit-tap-highlight-color:transparent]
-			active:scale-[0.98]
-			transition-transform duration-200
+		group relative w-full aspect-video shrink-0 overflow-hidden
+		bg-glass-bg
+		flex items-center justify-center
+		cursor-pointer
+		touch-action-manipulation [-webkit-tap-highlight-color:transparent]
+		active:scale-[0.98]
+		transition-transform duration-200
 		"
 		data-slot="button"
 		onclick={() => queue.PlaySong(song)}
@@ -43,7 +43,7 @@
 			absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100
 			transition-opacity duration-200
 			flex items-center justify-center
-		">
+			">
 			<Play class="w-12 h-12 text-white fill-white" />
 		</div>
 	</button>
@@ -56,11 +56,11 @@
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger
 				class="
-					shrink-0 p-1.5 rounded-lg
-					hover:bg-glass-bg-active
-					transition-all duration-200
-					active:scale-95
-					touch-action-manipulation [-webkit-tap-highlight-color:transparent]
+				shrink-0 p-1.5 rounded-lg
+				hover:bg-glass-bg-active
+				transition-all duration-200
+				active:scale-95
+				touch-action-manipulation [-webkit-tap-highlight-color:transparent]
 				"
 				onclick={(e) => e.stopPropagation()}
 			>
@@ -77,8 +77,8 @@
 				</DropdownMenu.Item>
 				<a href={`https://www.youtube.com/watch?v=${song.id}`} target="_blank" rel="noopener noreferrer">
 					<DropdownMenu.Item>
-							<ExternalLink size={16} class="mr-2" />
-							See in YouTube
+						<ExternalLink size={16} class="mr-2" />
+						See in YouTube
 					</DropdownMenu.Item>
 				</a>
 			</DropdownMenu.Content>
