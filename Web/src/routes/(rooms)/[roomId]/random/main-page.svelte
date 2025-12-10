@@ -9,6 +9,8 @@
 	import { goto } from "$app/navigation";
 	import { Shuffle } from "lucide-svelte";
 
+	const MAX_SEED_VALUE = 1000000;
+
 	const pageNumberQuery = Number.parseInt(page.url.searchParams.get("page") ?? "1", 10);
 	const seedQuery = page.url.searchParams.get("seed") ? Number.parseInt(page.url.searchParams.get("seed")!, 10) : undefined;
 
@@ -39,7 +41,7 @@
 
 	function handleShuffle()
 	{
-		const newSeed = Math.floor(Math.random() * 1000000);
+		const newSeed = Math.floor(Math.random() * MAX_SEED_VALUE);
 		seed = newSeed;
 		requestPage = 1;
 

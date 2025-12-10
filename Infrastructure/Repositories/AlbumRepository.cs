@@ -157,9 +157,11 @@ public class AlbumRepository(ReezerDbContext dbContext, IOptions<StorageOptions>
         CancellationToken cancellationToken = default
     )
     {
+        const int MaxSeedValue = 1000000;
+
         var totalCount = await dbContext.Albums.CountAsync(cancellationToken);
 
-        var normalizedSeed = (seed % 1000000) / 1000000.0;
+        var normalizedSeed = (seed % MaxSeedValue) / (double)MaxSeedValue;
         var offset = (page - 1) * pageSize;
 
         var albumIds = await dbContext.Database
@@ -183,7 +185,8 @@ public class AlbumRepository(ReezerDbContext dbContext, IOptions<StorageOptions>
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
-        var orderedAlbums = albumIds.Select(id => albums.First(a => a.Id == id)).ToList();
+        var albumsDict = albums.ToDictionary(a => a.Id);
+        var orderedAlbums = albumIds.Select(id => albumsDict[id]).ToList();
 
         return (orderedAlbums, totalCount);
     }
