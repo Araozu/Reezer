@@ -157,20 +157,33 @@ public class AlbumRepository(ReezerDbContext dbContext, IOptions<StorageOptions>
         CancellationToken cancellationToken = default
     )
     {
-        var query = dbContext.Albums.Include(a => a.Artist).AsNoTracking();
+        var totalCount = await dbContext.Albums.CountAsync(cancellationToken);
 
-        var totalCount = await query.CountAsync(cancellationToken);
+        var normalizedSeed = (seed % 1000000) / 1000000.0;
+        var offset = (page - 1) * pageSize;
 
-        var random = new Random(seed);
-        var skip = (page - 1) * pageSize;
+        var albumIds = await dbContext.Database
+            .SqlQuery<Guid>(
+                $"""
+                SELECT "Id"
+                FROM (
+                    SELECT setseed({normalizedSeed})
+                ) AS seed,
+                "Albums"
+                ORDER BY random()
+                OFFSET {offset}
+                LIMIT {pageSize}
+                """
+            )
+            .ToListAsync(cancellationToken);
 
-        var allAlbumIds = await query.Select(a => a.Id).ToListAsync(cancellationToken);
+        var albums = await dbContext.Albums
+            .Include(a => a.Artist)
+            .Where(a => albumIds.Contains(a.Id))
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
 
-        var shuffledIds = allAlbumIds.OrderBy(_ => random.Next()).Skip(skip).Take(pageSize).ToList();
-
-        var albums = await query.Where(a => shuffledIds.Contains(a.Id)).ToListAsync(cancellationToken);
-
-        var orderedAlbums = shuffledIds.Select(id => albums.First(a => a.Id == id)).ToList();
+        var orderedAlbums = albumIds.Select(id => albums.First(a => a.Id == id)).ToList();
 
         return (orderedAlbums, totalCount);
     }

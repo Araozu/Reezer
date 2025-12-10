@@ -43,7 +43,7 @@
 		seed = newSeed;
 		requestPage = 1;
 
-		let query = page.url.searchParams;
+		const query = new URLSearchParams(page.url.searchParams);
 		query.set("seed", newSeed.toString());
 		query.set("page", "1");
 		goto(`?${query.toString()}`);
