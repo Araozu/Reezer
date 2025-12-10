@@ -134,18 +134,21 @@ export class BrowserMediaSession implements IMediaSession
 	{
 		if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
 
-		if (state === "playing")
+		switch (state)
 		{
-			navigator.mediaSession.playbackState = "playing";
-		}
-		else if (state === "paused")
-		{
-			navigator.mediaSession.playbackState = "paused";
-		}
-		else if (state === "buffering")
-		{
-			// Don't update playback state while buffering to avoid confusing the Media Session API
-			// The state will be updated to "playing" once the audio actually starts
+			case "playing":
+				navigator.mediaSession.playbackState = "playing";
+				break;
+			case "paused":
+				navigator.mediaSession.playbackState = "paused";
+				break;
+			case "buffering":
+				// Don't update playback state while buffering to avoid confusing the Media Session API
+				// The state will be updated to "playing" once the audio actually starts
+				break;
+			default:
+				console.warn(`Unexpected play state: ${state}`);
+				break;
 		}
 	}
 
