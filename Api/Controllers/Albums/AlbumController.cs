@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Reezer.Application.DTOs;
 using Reezer.Application.UseCases;
@@ -5,6 +6,7 @@ using Reezer.Application.UseCases;
 namespace Reezer.Api.Controllers.Albums;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class AlbumsController(
     GetAlbumCoverUseCase getAlbumCoverUseCase,

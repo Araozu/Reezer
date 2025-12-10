@@ -7,10 +7,10 @@ using Reezer.Infrastructure.Identity;
 namespace Reezer.Api.Controllers.User;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class UserController(UserManager<Infrastructure.Identity.User> userManager) : ControllerBase
 {
-    [Authorize]
     [HttpGet("me")]
     [EndpointSummary("Get current user information")]
     public async Task<ActionResult<UserDto>> GetMe()
