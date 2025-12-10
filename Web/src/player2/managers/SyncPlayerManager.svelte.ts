@@ -1,6 +1,5 @@
 import * as SignalR from "@microsoft/signalr";
-import type { SyncResult } from "~/lib/sync-utils";
-import { CalculateVariance } from "~/lib/sync-utils";
+import { type SyncResult ,CalculateVariance } from "~/lib/sync-utils";
 
 type ConnectionStatus = "disconnected" | "connecting" | "clock_sync" | "connected" | "reconnecting";
 
@@ -32,6 +31,8 @@ export class SyncPlayerManager
 				try
 				{
 					this.syncResult = await this.syncClock();
+					console.log("Clock sync result:");
+					console.log(JSON.stringify(this.syncResult,null,4));
 					this.status = "connected";
 				}
 				catch (error)
@@ -55,17 +56,20 @@ export class SyncPlayerManager
 		for (let i = 0; i < sampleCount; i += 1)
 		{
 			const t0 = Date.now();
-			const serverT2 = await this.connection.invoke<number>("SyncClock", t0);
+			const serverT2 = await this.connection.invoke<number>("SyncClock");
 			const t3 = Date.now();
 
 			const rtt = t3 - t0;
-			const offset = (serverT2 - (t0 + t3)) / 2;
+			// Offset: serverTime - clientTime at midpoint of round trip
+			// Positive = server is ahead, negative = client is ahead
+			const clientMidpoint = (t0 + t3) / 2;
+			const offset = serverT2 - clientMidpoint;
 
 			samples.push({ rtt, offset });
 
 			if (i < sampleCount - 1)
 			{
-				await new Promise((resolve) => setTimeout(resolve, 150));
+				await new Promise((resolve) => setTimeout(resolve, 250));
 			}
 		}
 

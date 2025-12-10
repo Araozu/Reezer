@@ -15,4 +15,9 @@ public class MusicRoomHub(ILogger<MusicRoomHub> logger, ISender mediator) : Hub
         logger.LogInformation("Data received in MusicRoomHub.Hello: {Name}", name);
         await mediator.Send(new MusicRoomHelloCommand(name));
     }
+
+    public long SyncClock()
+    {
+        return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+    }
 }

@@ -1,6 +1,6 @@
 export interface SyncResult {
   roundTripTime: number; // in milliseconds
-  clockOffset: number; // in milliseconds (positive = client is ahead)
+  clockOffset: number; // in milliseconds (positive = server is ahead, negative = client is ahead)
   serverTime: number; // synchronized server time in milliseconds
   accuracy: "high" | "medium" | "low";
 }
@@ -13,17 +13,17 @@ export function CalculateVariance(values: number[]): number
 }
 
 /**
-   * Gets the current synchronized time
+   * Gets the current synchronized server time
    * @param syncResult Previous sync result to base calculation on
-   * @returns Current synchronized server time
+   * @returns Current synchronized server time in milliseconds
    */
 export function GetSynchronizedTime(syncResult?: SyncResult): number
 {
 	if (syncResult)
 	{
-		// Extrapolate from last sync
-		const timeSinceSync = Date.now() - (syncResult.serverTime - syncResult.clockOffset);
-		return syncResult.serverTime + timeSinceSync;
+		// Extrapolate from last sync: serverTime = clientTime + offset
+		const clientTime = Date.now();
+		return clientTime + syncResult.clockOffset;
 	}
 	// Fallback to local time if no sync result
 	return Date.now();
