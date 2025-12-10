@@ -7,7 +7,7 @@
 		sizeMin = 200,
 		sizeMax = 500,
 		speedMin = 0.05,
-		speedMax = 0.25
+		speedMax = 0.25,
 	}: {
 		colors: string[];
 		weights?: number[];

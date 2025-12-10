@@ -61,7 +61,7 @@
 					</Tabs.Trigger>
 				</Tabs.List>
 			</Tabs.Root>
-			
+
 			{#if currentTab === "playing"}
 				<PlayerContentsPlaying bind:coverUrl {song} />
 			{:else if currentTab === "queue"}

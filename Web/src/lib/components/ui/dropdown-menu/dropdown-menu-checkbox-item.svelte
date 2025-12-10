@@ -24,7 +24,7 @@
 	data-slot="dropdown-menu-checkbox-item"
 	class={cn(
 		"focus:bg-glass-bg-hover focus:text-accent-foreground outline-hidden relative flex cursor-default select-none items-center gap-2 rounded-lg py-1.5 pe-2.5 ps-8 text-sm transition-all duration-150 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0 touch-action-manipulation [-webkit-tap-highlight-color:transparent]",
-		className
+		className,
 	)}
 	{...restProps}
 >
