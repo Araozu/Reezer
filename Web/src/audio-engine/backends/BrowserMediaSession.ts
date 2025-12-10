@@ -96,14 +96,29 @@ export class BrowserMediaSession implements IMediaSession
 			}
 		}
 
-		const artworkArray = finalArtwork
+		// Convert relative URL to absolute URL for Media Session API
+		let absoluteArtwork: string | undefined;
+		if (finalArtwork)
+		{
+			if (finalArtwork.startsWith("http://") || finalArtwork.startsWith("https://"))
+			{
+				absoluteArtwork = finalArtwork;
+			}
+			else
+			{
+				// Convert relative URL to absolute URL using current origin
+				absoluteArtwork = new URL(finalArtwork, window.location.origin).href;
+			}
+		}
+
+		const artworkArray = absoluteArtwork
 			? [
-				{ src: finalArtwork, sizes: "96x96", type: "image/jpeg" },
-				{ src: finalArtwork, sizes: "128x128", type: "image/jpeg" },
-				{ src: finalArtwork, sizes: "192x192", type: "image/jpeg" },
-				{ src: finalArtwork, sizes: "256x256", type: "image/jpeg" },
-				{ src: finalArtwork, sizes: "384x384", type: "image/jpeg" },
-				{ src: finalArtwork, sizes: "512x512", type: "image/jpeg" },
+				{ src: absoluteArtwork, sizes: "96x96", type: "image/jpeg" },
+				{ src: absoluteArtwork, sizes: "128x128", type: "image/jpeg" },
+				{ src: absoluteArtwork, sizes: "192x192", type: "image/jpeg" },
+				{ src: absoluteArtwork, sizes: "256x256", type: "image/jpeg" },
+				{ src: absoluteArtwork, sizes: "384x384", type: "image/jpeg" },
+				{ src: absoluteArtwork, sizes: "512x512", type: "image/jpeg" },
 			  ]
 			: [];
 
@@ -127,9 +142,10 @@ export class BrowserMediaSession implements IMediaSession
 		{
 			navigator.mediaSession.playbackState = "paused";
 		}
-		else
+		else if (state === "buffering")
 		{
-			navigator.mediaSession.playbackState = "playing";
+			// Don't update playback state while buffering to avoid confusing the Media Session API
+			// The state will be updated to "playing" once the audio actually starts
 		}
 	}
 
