@@ -11,7 +11,8 @@ namespace Reezer.Api.Controllers.Albums;
 public class AlbumsController(
     GetAlbumCoverUseCase getAlbumCoverUseCase,
     GetPaginatedAlbumsUseCase getPaginatedAlbumsUseCase,
-    GetAlbumWithTracklistUseCase getAlbumWithTracklistUseCase
+    GetAlbumWithTracklistUseCase getAlbumWithTracklistUseCase,
+    GetRandomAlbumsUseCase getRandomAlbumsUseCase
 ) : ControllerBase
 {
     [EndpointSummary("Get paginated list of albums")]
@@ -84,5 +85,35 @@ public class AlbumsController(
             notFound => NotFound(new ProblemDetails { Detail = notFound.Reason }),
             internalError => StatusCode(500, new ProblemDetails { Detail = internalError.Reason })
         );
+    }
+
+    [EndpointSummary("Get random paginated list of albums")]
+    [HttpGet("random")]
+    public async Task<ActionResult<PaginatedResult<AlbumDto>>> GetRandomAlbums(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        [FromQuery] int? seed = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (page < 1)
+        {
+            page = 1;
+        }
+
+        if (pageSize is < 1 or > 100)
+        {
+            pageSize = 20;
+        }
+
+        var result = await getRandomAlbumsUseCase.GetRandomAlbumsAsync(
+            page,
+            pageSize,
+            seed,
+            cancellationToken
+        );
+
+        Response.Headers.CacheControl = "public, max-age=1800";
+        return Ok(result);
     }
 }
