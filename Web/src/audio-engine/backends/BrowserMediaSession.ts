@@ -100,7 +100,8 @@ export class BrowserMediaSession implements IMediaSession
 		let absoluteArtwork: string | undefined;
 		if (finalArtwork)
 		{
-			if (finalArtwork.startsWith("http://") || finalArtwork.startsWith("https://"))
+			// Check if URL is already absolute (http://, https://, or protocol-relative //)
+			if (finalArtwork.startsWith("http://") || finalArtwork.startsWith("https://") || finalArtwork.startsWith("//"))
 			{
 				absoluteArtwork = finalArtwork;
 			}
