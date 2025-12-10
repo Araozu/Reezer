@@ -1,23 +1,23 @@
 <script lang="ts">
-	import * as Card from "$lib/components/ui/card";
-	import Button from "$lib/components/ui/button/button.svelte";
-	import { Plus, Users } from "lucide-svelte";
-	import { useCreateRoom, useRooms } from "./queries";
+import * as Card from "$lib/components/ui/card";
+import Button from "$lib/components/ui/button/button.svelte";
+import { Plus, Users } from "lucide-svelte";
+import { useCreateRoom, useRooms } from "./queries";
 
-	const rooms = useRooms();
-	const createRoom = useCreateRoom();
+const rooms = useRooms();
+const createRoom = useCreateRoom();
 
-	const handleCreateRoom = () =>
-	{
-		$createRoom.mutate();
-	};
+const handleCreateRoom = () =>
+{
+	$createRoom.mutate();
+};
 </script>
 
 <Card.Root class="w-full max-w-md">
 	<Card.Header>
 		<Card.Title>Join a room</Card.Title>
 		<Card.Description
-			>Select a room from the list or create a new one</Card.Description
+		>Select a room from the list or create a new one</Card.Description
 		>
 	</Card.Header>
 	<Card.Content class="space-y-4">
@@ -47,7 +47,7 @@
 					Available rooms:
 				</p>
 				<div class="space-y-2">
-					{#each $rooms.data as room}
+					{#each $rooms.data as room (room.id)}
 						<Button
 							variant="outline"
 							class="w-full justify-between"
@@ -55,7 +55,7 @@
 						>
 							<span
 								class="font-mono font-semibold"
-								>{room.roomCode}</span
+							>{room.roomCode}</span
 							>
 							<span
 								class="text-muted-foreground flex items-center gap-1"

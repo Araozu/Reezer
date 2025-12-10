@@ -10,10 +10,12 @@ import { WebAudioBackend } from "~/player2/backends/WebAudioBackend";
 import * as Menubar from "$lib/components/ui/menubar/index.js";
 import {page} from "$app/state";
 import YtQueue from "./yt-queue.svelte";
+import SyncDialog from "~/components/room/sync-dialog.svelte";
 
 let { children } = $props();
 
 const roomId = page.params.roomId;
+let syncDialogOpen = $state(false);
 
 // Setup music player
 // FIXME: Remove context for audio backend, should use the IQueue instead
@@ -52,6 +54,12 @@ audioBackend.OnReady(() => (audioTagSetup = true));
 						<a href={`/${roomId}/yt`} class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors">
 							YouTube
 						</a>
+						<button
+							class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors"
+							onclick={() => (syncDialogOpen = true)}
+						>
+							Sync
+						</button>
 					</Menubar.Menu>
 				</Menubar.Root>
 			</div>
@@ -67,3 +75,6 @@ audioBackend.OnReady(() => (audioTagSetup = true));
 		<MusicPlayer bind:collapsed={playerCollapsed} />
 	{/if}
 </div>
+
+<SyncDialog bind:open={syncDialogOpen} />
+

@@ -27,7 +27,7 @@ export class SyncPlayerManager
 			console.log(`${JSON.stringify(user)}: ${message}`);
 		});
 
-		this.connection.onreconnected(async () =>
+		this.connection.onreconnected(async() =>
 		{
 			await this.performClockSync();
 			this.startResyncInterval();
@@ -77,7 +77,7 @@ export class SyncPlayerManager
 	private startResyncInterval(): void
 	{
 		this.stopResyncInterval();
-		this.resyncInterval = setInterval(async () =>
+		this.resyncInterval = setInterval(async() =>
 		{
 			if (this.status !== "connected") return;
 			try
