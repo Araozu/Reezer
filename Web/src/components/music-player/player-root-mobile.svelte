@@ -1,30 +1,30 @@
 <script lang="ts">
-	import * as Drawer from "$lib/components/ui/drawer/index.js";
-	import * as Tabs from "$lib/components/ui/tabs/index.js";
-	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
-	import PlayerContentsCollapsedMobile from "./player-contents-collapsed-mobile.svelte";
-	import PlayerContentsPlaying from "./player-contents-playing.svelte";
-	import PlayerContentsQueue from "./player-contents-queue.svelte";
-	import { GetQueueContext } from "~/player2/context/player-store";
+import * as Drawer from "$lib/components/ui/drawer/index.js";
+import * as Tabs from "$lib/components/ui/tabs/index.js";
+import { SvelteRuneQueue } from "~/audio-engine/queues/SvelteRuneQueue.svelte";
+import PlayerContentsCollapsedMobile from "./player-contents-collapsed-mobile.svelte";
+import PlayerContentsPlaying from "./player-contents-playing.svelte";
+import PlayerContentsQueue from "./player-contents-queue.svelte";
+import { GetQueueContext } from "~/context/music-player-context";
 
-	let { collapsed = $bindable() }: { collapsed: boolean } = $props();
+let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
-	let queue = GetQueueContext();
-	let svelteQueue = new SvelteRuneQueue(queue);
+let queue = GetQueueContext();
+let svelteQueue = new SvelteRuneQueue(queue);
 
-	let song = $derived(svelteQueue.currentSong);
-	let currentTab = $state<"playing" | "queue">("playing");
+let currentSong = $derived(svelteQueue.currentSong);
+let currentTab = $state<"playing" | "queue">("playing");
 
-	let coverUrl = $derived.by(() =>
-	{
-		if (!currentSong) return "/vinyl.jpg";
+let coverUrl = $derived.by(() =>
+{
+	if (!currentSong) return "/vinyl.jpg";
 
-		if (currentSong.type === "regular") return `/api/Albums/${currentSong.albumId}/cover`;
-		else if (currentSong.type === "youtube") return `/api/Yt/${currentSong.id}/thumbnail`;
-		else return "/vinyl.jpg";
-	});
+	if (currentSong.type === "regular") return `/api/Albums/${currentSong.albumId}/cover`;
+	else if (currentSong.type === "youtube") return `/api/Yt/${currentSong.id}/thumbnail`;
+	else return "/vinyl.jpg";
+});
 
-	let open = $state(false);
+let open = $state(false);
 </script>
 
 <div class="p-2 fixed bottom-0 w-screen">
@@ -33,13 +33,13 @@
 			{#if collapsed}
 				<PlayerContentsCollapsedMobile
 					bind:coverUrl
-					{song}
+					song={currentSong}
 					expand={() => (open = true)}
 				/>
 			{:else if !collapsed && currentTab === "playing"}
 				<PlayerContentsPlaying
 					bind:coverUrl
-					{song}
+					song={currentSong}
 				/>
 			{:else if !collapsed && currentTab === "queue"}
 				<PlayerContentsQueue />
@@ -63,7 +63,7 @@
 			</Tabs.Root>
 
 			{#if currentTab === "playing"}
-				<PlayerContentsPlaying bind:coverUrl {song} />
+				<PlayerContentsPlaying bind:coverUrl song={currentSong} />
 			{:else if currentTab === "queue"}
 				<PlayerContentsQueue />
 			{/if}

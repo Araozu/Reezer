@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Reezer.Application.UseCases;
 
 namespace Reezer.Api.Controllers.System;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class SystemController(SetYtCookiesUseCase setYtCookiesUseCase) : ControllerBase
 {

@@ -1,31 +1,31 @@
 <script lang="ts">
-	import { EllipsisVertical, MoreVertical, X } from "lucide-svelte";
-	import { GetQueueContext } from "~/player2/context/player-store";
-	import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
-	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+import { EllipsisVertical, X } from "lucide-svelte";
+import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+import { GetQueueContext } from "~/context/music-player-context";
+import { SvelteRuneQueue } from "~/audio-engine/queues/SvelteRuneQueue.svelte";
 
-	let queue = GetQueueContext();
-	let sv_queue = new SvelteRuneQueue(queue);
+let queue = GetQueueContext();
+let sv_queue = new SvelteRuneQueue(queue);
 
-	let current_queue = $derived(sv_queue.queue);
-	let currentIdx = $derived(sv_queue.currentIdx);
+let current_queue = $derived(sv_queue.queue);
+let currentIdx = $derived(sv_queue.currentIdx);
 
-	function clearAbove(index: number)
+function clearAbove(index: number)
+{
+	for (let i = index - 1; i >= 0; i -= 1)
 	{
-		for (let i = index - 1; i >= 0; i--)
-		{
-			queue.RemoveAt(i);
-		}
+		queue.RemoveAt(i);
 	}
+}
 
-	function clearBelow(index: number)
+function clearBelow(index: number)
+{
+	const length = current_queue.length;
+	for (let i = length - 1; i > index; i -= 1)
 	{
-		const length = current_queue.length;
-		for (let i = length - 1; i > index; i--)
-		{
-			queue.RemoveAt(i);
-		}
+		queue.RemoveAt(i);
 	}
+}
 </script>
 
 <div class="space-y-1.5 max-h-[calc(100vh-8rem)] overflow-scroll">

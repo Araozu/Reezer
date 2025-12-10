@@ -1,51 +1,51 @@
 <script lang="ts">
-	import { page } from "$app/state";
-	import type { ISong } from "../../providers";
-	import {
-		Play,
-		Pause,
-		SkipForward,
-		SkipBack,
-		Volume2,
-		Volume1,
-		LoaderCircle,
-	} from "lucide-svelte";
-	import VolumeSlider from "./volume-slider.svelte";
-	import PositionSlider from "./position-slider.svelte";
-	import { GetPlayerContext, GetQueueContext } from "~/player2/context/player-store";
+import { page } from "$app/state";
+import {
+	Play,
+	Pause,
+	SkipForward,
+	SkipBack,
+	Volume2,
+	Volume1,
+	LoaderCircle,
+} from "lucide-svelte";
+import VolumeSlider from "./volume-slider.svelte";
+import PositionSlider from "./position-slider.svelte";
+import { GetPlayerContext, GetQueueContext } from "~/context/music-player-context";
+import type { ISong } from "~/audio-engine/types";
 
-	let {
-		coverUrl = $bindable(),
-		song,
-	}: {
-		coverUrl: string;
-		song: ISong | null;
-	} = $props();
+let {
+	coverUrl = $bindable(),
+	song,
+}: {
+	coverUrl: string;
+	song: ISong | null;
+} = $props();
 
-	let player = GetPlayerContext();
-	let queue = GetQueueContext();
-	const roomId = page.params.roomId;
+let player = GetPlayerContext();
+let queue = GetQueueContext();
+const roomId = page.params.roomId;
 
-	// FIXME: regression
-	let isPaused = false;
-	let isBuffering = false;
+// FIXME: regression
+let isPaused = false;
+let isBuffering = false;
 
-	let artistName = $derived.by(() =>
-	{
-		if (!song) return "-";
+let artistName = $derived.by(() =>
+{
+	if (!song) return "-";
 
-		if (song.type === "regular") return song.artist;
-		else if (song.type === "youtube") return "YouTube";
-		else return "-";
-	});
-	let artistLink = $derived.by(() =>
-	{
-		if (!song) return "#";
+	if (song.type === "regular") return song.artist;
+	else if (song.type === "youtube") return "YouTube";
+	else return "-";
+});
+let artistLink = $derived.by(() =>
+{
+	if (!song) return "#";
 
-		if (song.type === "regular") return `/${roomId}/artists/${song.artistId}`;
-		else if (song.type === "youtube") return `/${roomId}/yt`;
-		else return "#";
-	});
+	if (song.type === "regular") return `/${roomId}/artists/${song.artistId}`;
+	else if (song.type === "youtube") return `/${roomId}/yt`;
+	else return "#";
+});
 
 </script>
 

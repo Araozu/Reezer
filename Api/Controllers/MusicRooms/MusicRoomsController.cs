@@ -7,6 +7,7 @@ using Reezer.Application.UseCases;
 namespace Reezer.Api.Controllers.MusicRooms;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class MusicRoomsController(
     GetAllMusicRoomsUseCase getAllMusicRoomsUseCase,
@@ -25,7 +26,6 @@ public class MusicRoomsController(
 
     [EndpointSummary("Create a new music room")]
     [HttpPost]
-    [Authorize]
     public async Task<ActionResult<MusicRoomDto>> CreateRoom(CancellationToken cancellationToken)
     {
         var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
