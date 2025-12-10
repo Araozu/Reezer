@@ -47,8 +47,9 @@
 		YouTube Songs
 	</h1>
 	<Button
-	onclick={() => {
-		openYtQueue()
+	onclick={() =>
+	{
+		openYtQueue();
 	}}
 	>
 		Add YouTube Song
