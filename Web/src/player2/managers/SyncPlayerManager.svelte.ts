@@ -3,10 +3,13 @@ import { type SyncResult ,CalculateVariance } from "~/lib/sync-utils";
 
 type ConnectionStatus = "disconnected" | "connecting" | "clock_sync" | "connected" | "reconnecting";
 
+const RESYNC_INTERVAL_MS = 60_000;
+
 /** A player manager with Sync Play capabilities */
 export class SyncPlayerManager
 {
 	private connection: SignalR.HubConnection;
+	private resyncInterval: ReturnType<typeof setInterval> | null = null;
 	public status: ConnectionStatus = $state("disconnected");
 	public syncResult: SyncResult | null = $state(null);
 
@@ -24,28 +27,84 @@ export class SyncPlayerManager
 			console.log(`${JSON.stringify(user)}: ${message}`);
 		});
 
+		this.connection.onreconnected(async () =>
+		{
+			await this.performClockSync();
+			this.startResyncInterval();
+		});
+
+		this.connection.onreconnecting(() =>
+		{
+			this.stopResyncInterval();
+			this.status = "reconnecting";
+		});
+
+		this.connection.onclose(() =>
+		{
+			this.stopResyncInterval();
+			this.status = "disconnected";
+		});
+
 		this.connection.start()
 			.then(async() =>
 			{
-				this.status = "clock_sync";
-				try
-				{
-					this.syncResult = await this.syncClock();
-					console.log("Clock sync result:");
-					console.log(JSON.stringify(this.syncResult,null,4));
-					this.status = "connected";
-				}
-				catch (error)
-				{
-					console.error("Clock sync failed:", error);
-					this.status = "disconnected";
-				}
+				await this.performClockSync();
+				this.startResyncInterval();
 			})
 			.catch((error) =>
 			{
 				console.error("Connection failed:", error);
 				this.status = "disconnected";
 			});
+	}
+
+	private async performClockSync(): Promise<void>
+	{
+		this.status = "clock_sync";
+		try
+		{
+			this.syncResult = await this.syncClock();
+			console.log("Clock sync result:", JSON.stringify(this.syncResult, null, 4));
+			this.status = "connected";
+		}
+		catch (error)
+		{
+			console.error("Clock sync failed:", error);
+			this.status = "disconnected";
+		}
+	}
+
+	private startResyncInterval(): void
+	{
+		this.stopResyncInterval();
+		this.resyncInterval = setInterval(async () =>
+		{
+			if (this.status !== "connected") return;
+			try
+			{
+				this.syncResult = await this.syncClock();
+				console.log("Clock resync:", JSON.stringify(this.syncResult, null, 4));
+			}
+			catch (error)
+			{
+				console.error("Clock resync failed:", error);
+			}
+		}, RESYNC_INTERVAL_MS);
+	}
+
+	private stopResyncInterval(): void
+	{
+		if (this.resyncInterval)
+		{
+			clearInterval(this.resyncInterval);
+			this.resyncInterval = null;
+		}
+	}
+
+	public async destroy(): Promise<void>
+	{
+		this.stopResyncInterval();
+		await this.connection.stop();
 	}
 
 	private async syncClock(): Promise<SyncResult>
