@@ -11,6 +11,7 @@ import { WebAudioBackend } from "~/audio-engine/backends/WebAudioBackend";
 import { UrlAudioSource } from "~/audio-engine/audio-sources/UrlAudioSource";
 import type { IQueue } from "~/audio-engine/interfaces/IQueue";
 import { GeneralPurposeQueue } from "~/audio-engine/queues/GeneralPurposeQueue";
+import { BrowserMediaSession } from "~/audio-engine/backends/BrowserMediaSession";
 
 let { children } = $props();
 
@@ -24,6 +25,9 @@ SetPlayerContext(audioBackend);
 
 const queue: IQueue = new GeneralPurposeQueue(audioBackend);
 SetQueueContext(queue);
+
+const mediaSession = new BrowserMediaSession(queue, audioBackend);
+mediaSession.Init();
 
 let audioTagSetup = $state(false);
 let playerCollapsed = $state(true);
