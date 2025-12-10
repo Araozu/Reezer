@@ -5,11 +5,13 @@ export interface SyncResult {
   accuracy: "high" | "medium" | "low";
 }
 
-export function CalculateVariance(values: number[]): number
+export function CalculateMAD(values: number[]): number
 {
-	const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-	const squaredDiffs = values.map((val) => Math.pow(val - mean, 2));
-	return squaredDiffs.reduce((sum, sq) => sum + sq, 0) / values.length;
+	const sorted = [...values].sort((a, b) => a - b);
+	const median = sorted[Math.floor(sorted.length / 2)]!;
+	const absoluteDeviations = values.map((val) => Math.abs(val - median));
+	const sortedDeviations = absoluteDeviations.sort((a, b) => a - b);
+	return sortedDeviations[Math.floor(sortedDeviations.length / 2)]!;
 }
 
 /**

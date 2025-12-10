@@ -1,5 +1,5 @@
 import * as SignalR from "@microsoft/signalr";
-import { type SyncResult ,CalculateVariance } from "~/lib/sync-utils";
+import { type SyncResult, CalculateMAD } from "~/lib/sync-utils";
 
 type ConnectionStatus = "disconnected" | "connecting" | "clock_sync" | "connected" | "reconnecting";
 
@@ -137,8 +137,8 @@ export class SyncPlayerManager
 		const medianRtt = sortedRtts[Math.floor(sortedRtts.length / 2)]!;
 		const medianOffset = sortedOffsets[Math.floor(sortedOffsets.length / 2)]!;
 
-		const variance = CalculateVariance(samples.map((s) => s.rtt));
-		const accuracy = variance < 10 ? "high" : variance < 50 ? "medium" : "low";
+		const mad = CalculateMAD(samples.map((s) => s.rtt));
+		const accuracy = mad < 2 ? "high" : mad < 5 ? "medium" : "low";
 
 		return {
 			roundTripTime: medianRtt,
