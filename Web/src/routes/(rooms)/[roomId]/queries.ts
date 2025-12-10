@@ -47,3 +47,21 @@ export function useRecentAlbums(limit: number = 6)
 		refetchOnWindowFocus: false,
 	});
 }
+
+export function useRandomAlbums(
+	$page: Readable<number>,
+	$pageSize: Readable<number>,
+	$seed: Readable<number | undefined>,
+)
+{
+	return createQuery(derived([$page, $pageSize, $seed], ([page, pageSize, seed]) => ({
+		queryKey: ["albums", "random", page, pageSize, seed],
+		queryFn: sv(() => api.GET("/api/Albums/random", {
+			params: {
+				query: { page, pageSize, seed },
+			},
+		})),
+		staleTime: 5 * 60 * 1000,
+		refetchOnWindowFocus: false,
+	})));
+}

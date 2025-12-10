@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { useRecentAlbums } from "./queries";
 	import * as Card from "$lib/components/ui/card/index.js";
-	import { Disc3, User } from "lucide-svelte";
+	import { Disc3, User, Shuffle } from "lucide-svelte";
 	import {page} from "$app/state";
 	import AlbumCard from "~/components/album-card.svelte";
 
@@ -23,7 +23,7 @@
 			</h1>
 		</div>
 
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 			<a href={`/${roomId}/albums`}>
 				<Card.Root
 					class="hover:border-primary transition-colors cursor-pointer group"
@@ -75,6 +75,34 @@
 							<Card.Description
 								>Discover by
 								artist</Card.Description
+							>
+						</div>
+					</Card.Content>
+				</Card.Root>
+			</a>
+
+			<a href={`/${roomId}/random`}>
+				<Card.Root
+					class="hover:border-primary transition-colors cursor-pointer group"
+				>
+					<Card.Content
+						class="flex items-center gap-4 p-6"
+					>
+						<div
+							class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors"
+						>
+							<Shuffle
+								class="w-6 h-6 text-primary"
+							/>
+						</div>
+						<div>
+							<Card.Title
+								class="text-lg"
+							>
+								Random Albums
+							</Card.Title>
+							<Card.Description
+								>Discover something new</Card.Description
 							>
 						</div>
 					</Card.Content>
