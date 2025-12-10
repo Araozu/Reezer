@@ -34,12 +34,6 @@
           # DevOps & Infrastructure
           ansible
         ];
-
-        shellHook = ''
-          if [ -z "$TMUX" ]; then
-            exec tmux
-          fi
-        '';
       };
     };
 }

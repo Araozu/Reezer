@@ -1,8 +1,8 @@
 <script lang="ts">
-import type { ISong } from "~/providers";
 import { Play, EllipsisVertical, ExternalLink, Plus, ListStart } from "lucide-svelte";
 import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 import { GetQueueContext } from "~/context/music-player-context";
+import type { ISong } from "~/audio-engine/types";
 
 let { song }: { song: ISong } = $props();
 

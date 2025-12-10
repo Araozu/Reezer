@@ -1,4 +1,4 @@
-import type { ISong } from "~/providers";
+import type { ISong } from "../types";
 
 /**
  * A queue interface for the Headless Music Player component

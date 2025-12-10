@@ -1,5 +1,4 @@
 export type { ISong } from "./song";
 export type { IPaginatedResult, IPaginationOptions } from "./pagination";
-export type { IMusicProvider, IAlbumDetails } from "./provider";
 export type { IAlbum } from "./album";
 export { type ProviderError } from "./errors";

@@ -1,5 +1,5 @@
 import type { IQueue } from "../interfaces/IQueue";
-import type { ISong } from "~/providers";
+import type { ISong } from "../types";
 
 /**
  * Wraps a IQueue to provide Svelte store compatibility.

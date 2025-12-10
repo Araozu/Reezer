@@ -1,6 +1,5 @@
 <script lang="ts">
 import { page } from "$app/state";
-import type { ISong } from "../../providers";
 import {
 	Play,
 	Pause,
@@ -13,6 +12,7 @@ import {
 import VolumeSlider from "./volume-slider.svelte";
 import PositionSlider from "./position-slider.svelte";
 import { GetPlayerContext, GetQueueContext } from "~/context/music-player-context";
+import type { ISong } from "~/audio-engine/types";
 
 let {
 	coverUrl = $bindable(),

@@ -1,23 +1,23 @@
 <script lang="ts">
-    import { GetPlayerContext } from "~/context/music-player-context";
-	import type { ISong } from "../../providers";
-	import { Play, Pause, LoaderCircle } from "lucide-svelte";
+import { GetPlayerContext } from "~/context/music-player-context";
+import { Play, Pause, LoaderCircle } from "lucide-svelte";
+import type { ISong } from "~/audio-engine/types";
 
-	let {
-		coverUrl = $bindable(),
-		song,
-		expand,
-	}: {
-		coverUrl: string;
-		song: ISong | null;
-		expand: () => void;
-	} = $props();
+let {
+	coverUrl = $bindable(),
+	song,
+	expand,
+}: {
+	coverUrl: string;
+	song: ISong | null;
+	expand: () => void;
+} = $props();
 
-	let player = GetPlayerContext();
+let player = GetPlayerContext();
 
-	// FIXME: regression
-	let isPaused = false;
-	let isBuffering = false;
+// FIXME: regression
+let isPaused = false;
+let isBuffering = false;
 </script>
 
 <div class="grid grid-cols-[3rem_auto_3rem] items-center gap-4">

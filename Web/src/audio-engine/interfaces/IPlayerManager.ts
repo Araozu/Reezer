@@ -1,5 +1,5 @@
 import type { Result } from "neverthrow";
-import type { ISong } from "~/providers";
+import type { ISong } from "../types";
 
 /** Abstracts over the player operations. */
 export interface IPlayerManager {

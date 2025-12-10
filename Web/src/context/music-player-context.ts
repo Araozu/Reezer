@@ -1,7 +1,7 @@
 import { getContext, setContext } from "svelte";
-import type { IAudioBackend } from "~/player2/interfaces/IAudioBackend";
-import type { IQueue } from "~/player2/interfaces/IQueue";
-import type { SyncPlayerManager } from "~/player2/managers/SyncPlayerManager.svelte";
+import type { IAudioBackend } from "~/audio-engine/interfaces/IAudioBackend";
+import type { IQueue } from "~/audio-engine/interfaces/IQueue";
+import type { SyncPlayerManager } from "~/audio-engine/managers/SyncPlayerManager.svelte";
 
 const AUDIO_CONTEXT_KEY = "audio";
 const QUEUE_CONTEXT_KEY = "queue";

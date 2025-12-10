@@ -1,7 +1,7 @@
 <script lang="ts">
 import * as Drawer from "$lib/components/ui/drawer/index.js";
 import * as Tabs from "$lib/components/ui/tabs/index.js";
-import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
+import { SvelteRuneQueue } from "~/audio-engine/queues/SvelteRuneQueue.svelte";
 import PlayerContentsCollapsedMobile from "./player-contents-collapsed-mobile.svelte";
 import PlayerContentsPlaying from "./player-contents-playing.svelte";
 import PlayerContentsQueue from "./player-contents-queue.svelte";

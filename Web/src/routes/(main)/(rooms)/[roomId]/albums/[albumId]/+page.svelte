@@ -2,13 +2,13 @@
 import { page } from "$app/state";
 import type { PageProps } from "./$types";
 import type { components } from "~/api";
-import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
 import AlbumMobileView from "./AlbumMobileView.svelte";
 import AlbumDesktopView from "./AlbumDesktopView.svelte";
 import AlbumMobileSkeleton from "./AlbumMobileSkeleton.svelte";
 import AlbumDesktopSkeleton from "./AlbumDesktopSkeleton.svelte";
 import type { RegularSong } from "./queries";
 import { GetQueueContext } from "~/context/music-player-context";
+import { SvelteRuneQueue } from "~/audio-engine/queues/SvelteRuneQueue.svelte";
 
 type AlbumWithTracklistDto = components["schemas"]["AlbumWithTracklistDto"];
 

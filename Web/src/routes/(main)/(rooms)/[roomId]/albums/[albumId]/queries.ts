@@ -1,7 +1,7 @@
 import { createQuery } from "@tanstack/svelte-query";
 import { api, sv, type components, type WithProblemDetails } from "~/api";
 import { derived, type Readable } from "svelte/store";
-import type { SongType } from "~/providers/types/song";
+import type { SongType } from "~/audio-engine/types/song";
 
 type AlbumWithTracklistDto = components["schemas"]["AlbumWithTracklistDto"]
 

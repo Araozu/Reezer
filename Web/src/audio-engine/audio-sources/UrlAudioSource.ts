@@ -1,6 +1,6 @@
 import {ok,type  Result} from "neverthrow";
 import type { IAudioSource } from "../interfaces/IAudioSource";
-import type { ISong } from "~/providers";
+import type { ISong } from "../types";
 
 type UrlAudioError = "NotFound" | "Other"
 

@@ -11,10 +11,10 @@ namespace Reezer.Infrastructure.Data;
 public class ReezerDbContext(DbContextOptions<ReezerDbContext> options)
     : IdentityDbContext<User>(options)
 {
-    public DbSet<Song> Songs { get; set; }
-    public DbSet<Artist> Artists { get; set; }
-    public DbSet<Album> Albums { get; set; }
-    public DbSet<YtSong> YtSongs { get; set; }
+    public DbSet<Song> Songs { get; set; } = null!;
+    public DbSet<Artist> Artists { get; set; } = null!;
+    public DbSet<Album> Albums { get; set; } = null!;
+    public DbSet<YtSong> YtSongs { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

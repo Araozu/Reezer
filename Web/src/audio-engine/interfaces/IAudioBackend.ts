@@ -1,4 +1,4 @@
-import type { ISong } from "~/providers";
+import type { ISong } from "../types";
 
 export type PlayState = "playing" | "paused" | "buffering";
 

@@ -1,6 +1,6 @@
-import type { ISong } from "~/providers";
 import type { IAudioBackend, PlayState } from "../interfaces/IAudioBackend";
 import type { IAudioSource } from "../interfaces/IAudioSource";
+import type { ISong } from "../types";
 
 /**
  * Web Audio API based audio backend implementation.

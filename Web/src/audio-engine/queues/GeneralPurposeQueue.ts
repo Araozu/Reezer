@@ -1,6 +1,6 @@
-import type { ISong } from "~/providers";
 import type { IQueue } from "../interfaces/IQueue";
 import type { IAudioBackend } from "../interfaces/IAudioBackend";
+import type { ISong } from "../types";
 
 /**
  * A regular queue implementation

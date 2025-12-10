@@ -1,8 +1,8 @@
 <script lang="ts">
 import { EllipsisVertical, X } from "lucide-svelte";
-import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
 import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 import { GetQueueContext } from "~/context/music-player-context";
+import { SvelteRuneQueue } from "~/audio-engine/queues/SvelteRuneQueue.svelte";
 
 let queue = GetQueueContext();
 let sv_queue = new SvelteRuneQueue(queue);

@@ -6,9 +6,9 @@ import PlayerContentsCollapsed from "./player-contents-collapsed.svelte";
 import PlayerContentsPlaying from "./player-contents-playing.svelte";
 import PlayerContentsQueue from "./player-contents-queue.svelte";
 import ColorBlobs from "./color-blobs.svelte";
-import { SvelteRuneQueue } from "~/player2/queues/SvelteRuneQueue.svelte";
 import { extractColorsFromImage } from "$lib/color-extractor";
 import { GetQueueContext } from "~/context/music-player-context";
+import { SvelteRuneQueue } from "~/audio-engine/queues/SvelteRuneQueue.svelte";
 
 let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
