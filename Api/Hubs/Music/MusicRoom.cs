@@ -1,8 +1,10 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Reezer.Application.Commands;
 using Reezer.Domain.Repositories.Room;
+using Reezer.Infrastructure.Identity;
 
 namespace Reezer.Api.Hubs.Music;
 
@@ -10,7 +12,8 @@ namespace Reezer.Api.Hubs.Music;
 public class MusicRoomHub(
     ILogger<MusicRoomHub> logger,
     ISender mediator,
-    IMusicRoomRepository musicRoomRepository
+    IMusicRoomRepository musicRoomRepository,
+    UserManager<User> userManager
 ) : Hub
 {
     public const string Route = "/hub/MusicRoom";
@@ -58,5 +61,36 @@ public class MusicRoomHub(
     public long SyncClock()
     {
         return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+    }
+
+    public async Task SendMessage(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            throw new HubException("Message cannot be empty");
+        }
+
+        var userId = Context.UserIdentifier;
+        if (string.IsNullOrEmpty(userId))
+        {
+            throw new HubException("User is not authenticated");
+        }
+
+        var user = await userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            throw new HubException("User not found");
+        }
+
+        var userName = user.Name ?? user.UserName ?? "Unknown";
+
+        logger.LogInformation(
+            "Chat message from {UserName} ({UserId}): {Message}",
+            userName,
+            userId,
+            message
+        );
+
+        await mediator.Send(new SendChatMessageCommand(userId, userName, message));
     }
 }
