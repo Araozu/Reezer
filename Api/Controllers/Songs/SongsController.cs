@@ -25,6 +25,7 @@ public class SongsController(
     }
 
     [EndpointSummary("Stream a song by ID")]
+    [AllowAnonymous]
     [HttpGet("{songId}/stream")]
     public async Task<IActionResult> StreamSong(Guid songId, CancellationToken cancellationToken)
     {

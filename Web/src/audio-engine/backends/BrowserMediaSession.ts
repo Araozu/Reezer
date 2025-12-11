@@ -98,12 +98,7 @@ export class BrowserMediaSession implements IMediaSession
 
 		const artworkArray = finalArtwork
 			? [
-				{ src: finalArtwork, sizes: "96x96", type: "image/jpeg" },
-				{ src: finalArtwork, sizes: "128x128", type: "image/jpeg" },
-				{ src: finalArtwork, sizes: "192x192", type: "image/jpeg" },
-				{ src: finalArtwork, sizes: "256x256", type: "image/jpeg" },
-				{ src: finalArtwork, sizes: "384x384", type: "image/jpeg" },
-				{ src: finalArtwork, sizes: "512x512", type: "image/jpeg" },
+				{ src: finalArtwork, sizes: "600x600", type: "image/jpeg" },
 			  ]
 			: [];
 
