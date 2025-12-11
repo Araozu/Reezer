@@ -1,10 +1,10 @@
 using System.Diagnostics;
 using System.Text.Json;
-using Acide.Perucontrol.Domain.Utils;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OneOf;
 using Reezer.Domain.Repositories;
+using Reezer.Domain.Utils;
 using Reezer.Infrastructure.Options;
 
 namespace Reezer.Infrastructure.Services;

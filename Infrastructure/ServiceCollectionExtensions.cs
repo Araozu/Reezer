@@ -52,9 +52,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IMusicRoomRepository>(sp =>
             sp.GetRequiredService<MusicRoomRepository>()
         );
-        services.AddSingleton<IConnectionManager>(sp =>
-            sp.GetRequiredService<MusicRoomRepository>()
-        );
 
         // Register services
         services.AddScoped<ILibraryInitializationService, LibraryInitializationService>();

@@ -2,9 +2,8 @@ namespace Reezer.Domain.Entities.Room;
 
 public class MusicRoom
 {
-    public MusicRoom(Guid id, Guid maestroId, string name, string code)
+    public MusicRoom(Guid maestroId, string name, string code)
     {
-        Id = id;
         MaestroId = maestroId;
         Name = name;
         Code = code;
@@ -35,7 +34,7 @@ public class MusicRoom
 
     public IReadOnlyCollection<(Guid UserId, string ConnectionId)> Participants => _participants;
 
-    public void AddParticipant(Guid userId, string connectionId)
+    public void AddConnection(Guid userId, string connectionId)
     {
         _participants.Add((userId, connectionId));
     }
