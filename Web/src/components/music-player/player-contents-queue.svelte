@@ -16,31 +16,36 @@ let items = $state<{id: string, song: any, isCurrent: boolean}[]>([]);
 let isDragging = $state(false);
 let dragDisabled = $state(true);
 
-$effect(() => {
-	if (!isDragging) {
+$effect(() =>
+{
+	if (!isDragging)
+	{
 		items = current_queue.map((song, i) => ({
 			id: crypto.randomUUID(),
 			song,
-			isCurrent: i === currentIdx
+			isCurrent: i === currentIdx,
 		}));
 	}
 });
 
-function handleDndConsider(e: CustomEvent<any>) {
+function handleDndConsider(e: CustomEvent<any>)
+{
 	items = e.detail.items;
 	isDragging = true;
 }
 
-function handleDndFinalize(e: CustomEvent<any>) {
+function handleDndFinalize(e: CustomEvent<any>)
+{
 	items = e.detail.items;
 	isDragging = false;
 	dragDisabled = true;
-	
-	const newCurrentIdx = items.findIndex(i => i.isCurrent);
-	queue.SetQueue(items.map(i => i.song), newCurrentIdx);
+
+	const newCurrentIdx = items.findIndex((i) => i.isCurrent);
+	queue.SetQueue(items.map((i) => i.song), newCurrentIdx);
 }
 
-function startDrag(e: MouseEvent | TouchEvent) {
+function startDrag(e: MouseEvent | TouchEvent)
+{
 	dragDisabled = false;
 }
 
@@ -62,7 +67,7 @@ function clearBelow(index: number)
 }
 </script>
 
-<div 
+<div
 	class="space-y-1.5 max-h-[calc(100vh-8rem)] overflow-y-auto overflow-x-hidden"
 	use:dndzone={{items, dragDisabled, flipDurationMs: 300}}
 	onconsider={handleDndConsider}

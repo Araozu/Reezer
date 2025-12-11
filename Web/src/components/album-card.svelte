@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { components } from "~/api";
-	import * as Card from "$lib/components/ui/card/index.js";
+	import * as Card from "~/lib/components/ui/card-plain";
 	import AlbumCover from "./album-cover.svelte";
 	import ColorBlobs from "./music-player/color-blobs.svelte";
 	import { page } from "$app/state";
