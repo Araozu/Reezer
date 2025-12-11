@@ -17,16 +17,23 @@ public class MusicRoomHub(
 
     public override async Task OnConnectedAsync()
     {
+        var httpContext = Context.GetHttpContext();
+        var roomId = httpContext?.Request.Query["roomId"];
+
         var userId = Context.UserIdentifier;
-        if (!string.IsNullOrEmpty(userId))
+        if (string.IsNullOrEmpty(userId))
         {
-            connectionManager.AddConnection(userId, Context.ConnectionId);
-            logger.LogInformation(
-                "User {UserId} connected with ConnectionId {ConnectionId}",
-                userId,
-                Context.ConnectionId
-            );
+            throw new HubException("User is not authenticated");
         }
+
+        connectionManager.AddConnection(userId, Context.ConnectionId);
+        logger.LogInformation(
+            "User {UserId} connected with ConnectionId {ConnectionId} to room {RoomId}",
+            userId,
+            Context.ConnectionId,
+            roomId
+        );
+        // Add connection to the room
 
         await base.OnConnectedAsync();
     }

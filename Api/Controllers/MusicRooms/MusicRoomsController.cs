@@ -26,7 +26,10 @@ public class MusicRoomsController(
 
     [EndpointSummary("Create a new music room")]
     [HttpPost]
-    public async Task<ActionResult<MusicRoomDto>> CreateRoom(CancellationToken cancellationToken)
+    public async Task<ActionResult<MusicRoomDto>> CreateRoom(
+        [FromBody] CreateMusicRoomDto dto,
+        CancellationToken cancellationToken
+    )
     {
         var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (!Guid.TryParse(userIdString, out var userId))
@@ -34,7 +37,11 @@ public class MusicRoomsController(
             return Unauthorized();
         }
 
-        var room = await createMusicRoomUseCase.ExecuteAsync(userId, cancellationToken);
+        var room = await createMusicRoomUseCase.ExecuteAsync(
+            userId,
+            dto.RoomName ?? "New Room",
+            cancellationToken
+        );
         return Ok(room);
     }
 }

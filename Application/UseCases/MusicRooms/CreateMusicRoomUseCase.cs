@@ -8,15 +8,26 @@ public class CreateMusicRoomUseCase(IMusicRoomRepository musicRoomRepository)
 {
     public async Task<MusicRoomDto> ExecuteAsync(
         Guid ownerId,
+        string roomName,
         CancellationToken cancellationToken = default
     )
     {
         var roomCode = GenerateRoomCode();
-        var room = new MusicRoom(Guid.NewGuid(), ownerId, roomCode);
+        var room = new MusicRoom(
+            id: Guid.NewGuid(),
+            maestroId: ownerId,
+            name: roomName,
+            code: roomCode
+        );
 
         await musicRoomRepository.AddAsync(room, cancellationToken);
 
-        return new MusicRoomDto(room.Id, room.Name, room.Participants.Count());
+        return new MusicRoomDto(
+            Id: room.Id,
+            RoomName: room.Name,
+            RoomCode: room.Code,
+            ConnectedUsers: room.Participants.Count()
+        );
     }
 
     private static string GenerateRoomCode()

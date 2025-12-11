@@ -263,44 +263,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/Songs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get all songs */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["SongDto"][];
-                        "application/json": components["schemas"]["SongDto"][];
-                        "text/json": components["schemas"]["SongDto"][];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/Songs/{songId}/stream": {
         parameters: {
             query?: never;
@@ -412,7 +374,13 @@ export interface paths {
                 path?: never;
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateMusicRoomDto"];
+                    "text/json": components["schemas"]["CreateMusicRoomDto"];
+                    "application/*+json": components["schemas"]["CreateMusicRoomDto"];
+                };
+            };
             responses: {
                 /** @description OK */
                 200: {
@@ -857,6 +825,9 @@ export interface components {
             name: string;
             albums: components["schemas"]["AlbumDto"][];
         };
+        CreateMusicRoomDto: {
+            roomName: null | string;
+        };
         /** Format: binary */
         IFormFile: string;
         LoginCommand: {
@@ -871,6 +842,7 @@ export interface components {
             /** Format: uuid */
             id: string;
             roomCode: string;
+            roomName: string;
             /** Format: int32 */
             connectedUsers: number | string;
         };
