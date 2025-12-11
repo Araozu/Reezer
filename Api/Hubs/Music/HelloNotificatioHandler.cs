@@ -1,7 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
-using Reezer.Api.Hubs.Music;
 using Reezer.Application.Notifications;
+
+namespace Reezer.Api.Hubs.Music;
 
 public class HelloNotificationHandler(
     IHubContext<MusicRoomHub> hubContext,

@@ -3,10 +3,11 @@ import * as Card from "$lib/components/ui/card";
 import { SetSyncPlayerManagerContext } from "~/context/music-player-context";
 import { Disc3 } from "lucide-svelte";
 import { SyncPlayerManager } from "~/audio-engine/managers/SyncPlayerManager.svelte";
+import { page } from "$app/state";
 
 let { children } = $props();
 
-const playerManager = new SyncPlayerManager();
+const playerManager = new SyncPlayerManager(page.params.roomId);
 SetSyncPlayerManagerContext(playerManager);
 const syncStatus = $derived(playerManager.status);
 

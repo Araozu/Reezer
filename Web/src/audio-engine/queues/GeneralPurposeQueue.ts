@@ -1,6 +1,6 @@
 import type { IQueue } from "../interfaces/IQueue";
 import type { IAudioBackend } from "../interfaces/IAudioBackend";
-import type { ISong } from "../types";
+import { type ISong, LoopMode } from "../types";
 
 /**
  * A regular queue implementation
@@ -9,6 +9,7 @@ export class GeneralPurposeQueue implements IQueue
 {
 	private _queueState: Array<ISong> = [];
 	private _currentIdx: number = -1;
+	private _loopMode: LoopMode = LoopMode.None;
 
 	// callbacks
 	private _onQueueChangedCallbacks: Array<() => void> = [];
@@ -20,10 +21,22 @@ export class GeneralPurposeQueue implements IQueue
 
 	private onSongEnd = () =>
 	{
+		if (this._loopMode === LoopMode.One)
+		{
+			this.backendPlayAndUpdate();
+			return;
+		}
+
 		// Move to next song if available
 		if (this._currentIdx < this._queueState.length - 1)
 		{
 			this._currentIdx += 1;
+			this.notifyQueueChanged();
+			this.backendPlayAndUpdate();
+		}
+		else if (this._loopMode === LoopMode.All && this._queueState.length > 0)
+		{
+			this._currentIdx = 0;
 			this.notifyQueueChanged();
 			this.backendPlayAndUpdate();
 		}
@@ -40,6 +53,17 @@ export class GeneralPurposeQueue implements IQueue
 	get currentIdx(): number
 	{
 		return this._currentIdx;
+	}
+	get loopMode(): LoopMode
+	{
+		return this._loopMode;
+	}
+
+	SetLoopMode(mode: LoopMode): void
+	{
+		this._loopMode = mode;
+		this.notifyQueueChanged();
+		this.backendUpdate();
 	}
 
 	PlaySong(song: ISong): void
@@ -112,6 +136,12 @@ export class GeneralPurposeQueue implements IQueue
 			this.notifyQueueChanged();
 			this.backendPlayAndUpdate();
 		}
+		else if (this._loopMode === LoopMode.All && this._queueState.length > 0)
+		{
+			this._currentIdx = 0;
+			this.notifyQueueChanged();
+			this.backendPlayAndUpdate();
+		}
 	}
 
 	Prev(): void
@@ -119,6 +149,12 @@ export class GeneralPurposeQueue implements IQueue
 		if (this._currentIdx > 0)
 		{
 			this._currentIdx -= 1;
+			this.notifyQueueChanged();
+			this.backendPlayAndUpdate();
+		}
+		else if (this._loopMode === LoopMode.All && this._queueState.length > 0)
+		{
+			this._currentIdx = this._queueState.length - 1;
 			this.notifyQueueChanged();
 			this.backendPlayAndUpdate();
 		}
@@ -193,7 +229,16 @@ export class GeneralPurposeQueue implements IQueue
 		}
 
 		const currentSong = this._queueState[this._currentIdx];
-		const nextSong: ISong | null = this._queueState[this._currentIdx + 1] ?? null;
+		let nextSong: ISong | null = this._queueState[this._currentIdx + 1] ?? null;
+
+		if (this._loopMode === LoopMode.One)
+		{
+			nextSong = currentSong;
+		}
+		else if (!nextSong && this._loopMode === LoopMode.All && this._queueState.length > 0)
+		{
+			nextSong = this._queueState[0];
+		}
 
 		this.audioBackend.Play(currentSong);
 		if (nextSong) this.audioBackend.Prefetch(nextSong);
@@ -206,7 +251,16 @@ export class GeneralPurposeQueue implements IQueue
 	{
 		if (this._currentIdx === -1 || this._currentIdx >= this._queueState.length) return;
 
-		const nextSong: ISong | null = this._queueState[this._currentIdx + 1] ?? null;
+		let nextSong: ISong | null = this._queueState[this._currentIdx + 1] ?? null;
+
+		if (this._loopMode === LoopMode.One)
+		{
+			nextSong = this._queueState[this._currentIdx];
+		}
+		else if (!nextSong && this._loopMode === LoopMode.All && this._queueState.length > 0)
+		{
+			nextSong = this._queueState[0];
+		}
 
 		if (nextSong) this.audioBackend.Prefetch(nextSong);
 		else this.audioBackend.ClearPrefetch();

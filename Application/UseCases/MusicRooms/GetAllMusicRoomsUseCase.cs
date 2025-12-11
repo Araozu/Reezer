@@ -10,6 +10,11 @@ public class GetAllMusicRoomsUseCase(IMusicRoomRepository musicRoomRepository)
     )
     {
         var rooms = await musicRoomRepository.GetAllAsync(cancellationToken);
-        return rooms.Select(r => new MusicRoomDto(r.Id, r.Name, r.Participants.Count()));
+        return rooms.Select(r => new MusicRoomDto(
+            Id: r.Id,
+            RoomName: r.Name,
+            RoomCode: r.Code,
+            ConnectedUsers: r.Participants.Count()
+        ));
     }
 }

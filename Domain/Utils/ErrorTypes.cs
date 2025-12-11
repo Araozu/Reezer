@@ -1,4 +1,4 @@
-namespace Acide.Perucontrol.Domain.Utils;
+namespace Reezer.Domain.Utils;
 
 public record Success;
 

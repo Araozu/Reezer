@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Acide.Perucontrol.Domain.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Http;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using OneOf;
 using Reezer.Application.DTOs.Auth;
 using Reezer.Application.Services;
+using Reezer.Domain.Utils;
 using Reezer.Infrastructure.Identity;
 
 namespace Reezer.Infrastructure.Services;

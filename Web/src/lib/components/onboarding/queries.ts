@@ -21,7 +21,9 @@ export function useCreateRoom()
 	const queryClient = useQueryClient();
 
 	const mutation = createMutation({
-		mutationFn: () => api.POST("/api/MusicRooms"),
+		mutationFn: () => api.POST("/api/MusicRooms", {
+			body: {roomName: "New Room"},
+		}),
 		onSuccess: () =>
 		{
 			queryClient.invalidateQueries({ queryKey: ["musicrooms"] });

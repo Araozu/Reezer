@@ -9,21 +9,10 @@ namespace Reezer.Api.Controllers.Songs;
 [Authorize]
 [Route("api/[controller]")]
 public class SongsController(
-    GetAllSongsUseCase getAllSongsUseCase,
     StreamSongUseCase streamSongUseCase,
     PrepareSongUseCase prepareSongUseCase
 ) : ControllerBase
 {
-    [EndpointSummary("Get all songs")]
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<SongDto>>> GetAllSongs(
-        CancellationToken cancellationToken
-    )
-    {
-        var songs = await getAllSongsUseCase.GetAllSongsAsync(cancellationToken);
-        return Ok(songs);
-    }
-
     [EndpointSummary("Stream a song by ID")]
     [AllowAnonymous]
     [HttpGet("{songId}/stream")]
