@@ -45,8 +45,16 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISongRepository, SongRepository>();
         services.AddScoped<IAlbumRepository, AlbumRepository>();
         services.AddScoped<IArtistRepository, ArtistRepository>();
-        services.AddScoped<IMusicRoomRepository, MusicRoomRepository>();
         services.AddScoped<IYtSongRepository, YtSongRepository>();
+
+        // Register MusicRoomRepository as Singleton and for both interfaces
+        services.AddSingleton<MusicRoomRepository>();
+        services.AddSingleton<IMusicRoomRepository>(sp =>
+            sp.GetRequiredService<MusicRoomRepository>()
+        );
+        services.AddSingleton<IConnectionManager>(sp =>
+            sp.GetRequiredService<MusicRoomRepository>()
+        );
 
         // Register services
         services.AddScoped<ILibraryInitializationService, LibraryInitializationService>();
