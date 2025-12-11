@@ -1,4 +1,4 @@
-import * as SignalR from "@microsoft/signalr";
+import { MusicRoomHubClient } from "~/api/MusicRoomHubClient";
 import { type SyncResult, CalculateMAD } from "~/lib/sync-utils";
 
 type ConnectionStatus = "disconnected" | "connecting" | "clock_sync" | "connected" | "reconnecting";
@@ -8,7 +8,7 @@ const RESYNC_INTERVAL_MS = 60_000;
 /** A player manager with Sync Play capabilities */
 export class SyncPlayerManager
 {
-	private connection: SignalR.HubConnection;
+	private hubClient: MusicRoomHubClient;
 	private resyncInterval: ReturnType<typeof setInterval> | null = null;
 	public status: ConnectionStatus = $state("disconnected");
 	public syncResult: SyncResult | null = $state(null);
@@ -16,47 +16,60 @@ export class SyncPlayerManager
 	constructor(roomId?: string)
 	{
 		this.status = "connecting";
-		const url = `${import.meta.env.VITE_PUBLIC_BACKEND_URL}/hub/MusicRoom${roomId ? `?roomId=${encodeURIComponent(roomId)}` : ""}`;
-		this.connection = new SignalR.HubConnectionBuilder()
-			.withUrl(url)
-			.withAutomaticReconnect()
-			.build();
+		this.hubClient = new MusicRoomHubClient(roomId);
 
-		this.connection.on("MessageReceived", (user, message) =>
+		// Subscribe to events
+		this.hubClient.OnMessageReceived((user, message) =>
 		{
 			console.log("Received from SignalR:");
 			console.log(`${JSON.stringify(user)}: ${message}`);
 		});
 
-		this.connection.onreconnected(async() =>
+		this.hubClient.OnChatMessage((message) =>
 		{
-			await this.performClockSync();
-			this.startResyncInterval();
+			console.log("Chat message received:", message);
 		});
 
-		this.connection.onreconnecting(() =>
+		// Watch for connection status changes
+		$effect(() =>
 		{
-			this.stopResyncInterval();
-			this.status = "reconnecting";
-		});
-
-		this.connection.onclose(() =>
-		{
-			this.stopResyncInterval();
-			this.status = "disconnected";
-		});
-
-		this.connection.start()
-			.then(async() =>
+			const currentStatus = this.hubClient.status;
+			
+			if (currentStatus === "connected")
 			{
-				await this.performClockSync();
-				this.startResyncInterval();
-			})
-			.catch((error) =>
+				if (this.status === "connecting")
+				{
+					// Initial connection
+					this.performClockSync().then(() =>
+					{
+						this.startResyncInterval();
+					});
+				}
+				else if (this.status === "reconnecting")
+				{
+					// Reconnected
+					this.performClockSync().then(() =>
+					{
+						this.startResyncInterval();
+					});
+				}
+				this.status = "connected";
+			}
+			else if (currentStatus === "reconnecting")
 			{
-				console.error("Connection failed:", error);
+				this.stopResyncInterval();
+				this.status = "reconnecting";
+			}
+			else if (currentStatus === "disconnected")
+			{
+				this.stopResyncInterval();
 				this.status = "disconnected";
-			});
+			}
+			else if (currentStatus === "connecting")
+			{
+				this.status = "connecting";
+			}
+		});
 	}
 
 	private async performClockSync(): Promise<void>
@@ -105,7 +118,12 @@ export class SyncPlayerManager
 	public async destroy(): Promise<void>
 	{
 		this.stopResyncInterval();
-		await this.connection.stop();
+		await this.hubClient.destroy();
+	}
+
+	public async sendChatMessage(message: string): Promise<void>
+	{
+		await this.hubClient.SendMessage(message);
 	}
 
 	private async syncClock(): Promise<SyncResult>
@@ -116,7 +134,7 @@ export class SyncPlayerManager
 		for (let i = 0; i < sampleCount; i += 1)
 		{
 			const t0 = Date.now();
-			const serverT2 = await this.connection.invoke<number>("SyncClock");
+			const serverT2 = await this.hubClient.SyncClock();
 			const t3 = Date.now();
 
 			const rtt = t3 - t0;
