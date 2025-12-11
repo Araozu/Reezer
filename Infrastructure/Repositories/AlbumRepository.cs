@@ -164,8 +164,8 @@ public class AlbumRepository(ReezerDbContext dbContext, IOptions<StorageOptions>
         var normalizedSeed = (seed % MaxSeedValue) / (double)MaxSeedValue;
         var offset = (page - 1) * pageSize;
 
-        var albumIds = await dbContext.Database
-            .SqlQuery<Guid>(
+        var albumIds = await dbContext
+            .Database.SqlQuery<Guid>(
                 $"""
                 SELECT "Id"
                 FROM (
@@ -179,8 +179,8 @@ public class AlbumRepository(ReezerDbContext dbContext, IOptions<StorageOptions>
             )
             .ToListAsync(cancellationToken);
 
-        var albums = await dbContext.Albums
-            .Include(a => a.Artist)
+        var albums = await dbContext
+            .Albums.Include(a => a.Artist)
             .Where(a => albumIds.Contains(a.Id))
             .AsNoTracking()
             .ToListAsync(cancellationToken);

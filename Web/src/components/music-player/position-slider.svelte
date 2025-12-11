@@ -33,6 +33,22 @@ function HandleSliderClick(event: MouseEvent)
 
 	player.Seek(seekTime);
 }
+
+function HandleValueCommit(newValue: number[] | number)
+{
+	let percentage = 0;
+	if (Array.isArray(newValue))
+	{
+		if (newValue.length > 0) percentage = newValue[0];
+	}
+	else
+	{
+		percentage = newValue;
+	}
+
+	const seekTime = (percentage / 100) * duration;
+	player.Seek(seekTime);
+}
 </script>
 
 <Slider
@@ -43,4 +59,5 @@ function HandleSliderClick(event: MouseEvent)
 	max={100}
 	step={0.1}
 	onclick={HandleSliderClick}
+	onValueCommit={HandleValueCommit}
 />

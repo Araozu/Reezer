@@ -109,6 +109,82 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/Yt/{ytId}/thumbnail": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get YouTube video thumbnail by ID */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    ytId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Yt/{ytId}/regenerate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Regenerate a YouTube song from its ID */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    ytId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["YtSongResponse"];
+                        "application/json": components["schemas"]["YtSongResponse"];
+                        "text/json": components["schemas"]["YtSongResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/User/me": {
         parameters: {
             query?: never;
@@ -141,6 +217,46 @@ export interface paths {
         };
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/System/yt-cookies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Store YouTube cookies file */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        file?: components["schemas"]["IFormFile"];
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -467,6 +583,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/Artists": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get paginated list of artists */
+        get: {
+            parameters: {
+                query?: {
+                    page?: number | string;
+                    pageSize?: number | string;
+                    search?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PaginatedResultOfArtistDto"];
+                        "application/json": components["schemas"]["PaginatedResultOfArtistDto"];
+                        "text/json": components["schemas"]["PaginatedResultOfArtistDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/Artists/{artistId}": {
         parameters: {
             query?: never;
@@ -699,6 +857,8 @@ export interface components {
             name: string;
             albums: components["schemas"]["AlbumDto"][];
         };
+        /** Format: binary */
+        IFormFile: string;
         LoginCommand: {
             email: string;
             password: string;
@@ -716,6 +876,15 @@ export interface components {
         };
         PaginatedResultOfAlbumDto: {
             items: components["schemas"]["AlbumDto"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalCount: number | string;
+        };
+        PaginatedResultOfArtistDto: {
+            items: components["schemas"]["ArtistDto"][];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */

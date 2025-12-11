@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { components } from "~/api";
-	import * as Card from "$lib/components/ui/card/index.js";
+	import * as Card from "~/lib/components/ui/card-plain";
 	import AlbumCover from "./album-cover.svelte";
 	import ColorBlobs from "./music-player/color-blobs.svelte";
 	import { page } from "$app/state";
@@ -14,13 +14,15 @@
 	let isHovered = $state(false);
 	let extractedColors = $state<string[]>([]);
 	let colorWeights = $state<number[]>([]);
+	let hasTriedExtraction = $state(false);
 
 	const coverUrl = `/api/Albums/${album.id}/cover`;
 
 	$effect(() =>
 	{
-		if (isHovered && extractedColors.length === 0)
+		if (isHovered && extractedColors.length === 0 && !hasTriedExtraction)
 		{
+			hasTriedExtraction = true;
 			extractColorsFromImage(coverUrl, 4).then((result) =>
 			{
 				extractedColors = result.colors;

@@ -18,4 +18,30 @@ public class ArtistRepository(ReezerDbContext dbContext) : IArtistRepository
                 .FirstOrDefaultAsync(a => a.Id == artistId, cancellationToken)
             ?? throw new KeyNotFoundException($"Artist with ID {artistId} not found.");
     }
+
+    public async Task<(IEnumerable<Artist> Artists, int TotalCount)> GetPaginatedArtistsAsync(
+        int page,
+        int pageSize,
+        string? search = null,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var query = dbContext.Artists.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(a => EF.Functions.ILike(a.Name, $"%{search}%"));
+        }
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var artists = await query
+            .OrderBy(a => EF.Functions.Collate(a.Name, "default"))
+            .ThenBy(a => a.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return (artists, totalCount);
+    }
 }
