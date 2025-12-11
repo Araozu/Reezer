@@ -3,6 +3,7 @@ import { api, sv, type WithProblemDetails } from "~/api";
 
 export type MusicRoomDto = {
 	roomCode: string;
+	roomName: string;
 	connectedUsers: number;
 };
 
@@ -21,8 +22,8 @@ export function useCreateRoom()
 	const queryClient = useQueryClient();
 
 	const mutation = createMutation({
-		mutationFn: () => api.POST("/api/MusicRooms", {
-			body: {roomName: "New Room"},
+		mutationFn: (roomName?: string) => api.POST("/api/MusicRooms", {
+			body: {roomName: roomName || null},
 		}),
 		onSuccess: () =>
 		{
