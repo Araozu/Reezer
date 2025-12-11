@@ -70,5 +70,10 @@ export interface IQueue
 
 	RemoveAt(idx: number): void;
 
+	/**
+	 * Replaces the entire queue and sets the current index
+	 */
+	SetQueue(newQueue: Array<ISong>, newCurrentIdx: number): void;
+
 	OnQueueChanged(callback: () => void): void;
 }

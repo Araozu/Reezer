@@ -212,6 +212,14 @@ export class GeneralPurposeQueue implements IQueue
 		else this.audioBackend.ClearPrefetch();
 	}
 
+	SetQueue(newQueue: Array<ISong>, newCurrentIdx: number): void
+	{
+		this._queueState = newQueue;
+		this._currentIdx = newCurrentIdx;
+		this.notifyQueueChanged();
+		this.backendUpdate();
+	}
+
 	OnQueueChanged(callback: () => void): void
 	{
 		this._onQueueChangedCallbacks.push(callback);
