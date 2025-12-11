@@ -8,4 +8,11 @@ public interface IArtistRepository
         Guid artistId,
         CancellationToken cancellationToken = default
     );
+
+    Task<(IEnumerable<Artist> Artists, int TotalCount)> GetPaginatedArtistsAsync(
+        int page,
+        int pageSize,
+        string? search = null,
+        CancellationToken cancellationToken = default
+    );
 }
