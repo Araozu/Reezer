@@ -2,7 +2,7 @@ import * as SignalR from "@microsoft/signalr";
 
 type ConnectionStatus = "disconnected" | "connecting" | "connected" | "reconnecting";
 
-interface ChatMessage {
+export interface ChatMessage {
 	userId: string;
 	userName: string;
 	message: string;
