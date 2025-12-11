@@ -65,6 +65,11 @@ public class MusicRoomHub(
 
     public async Task SendMessage(string message)
     {
+        if (string.IsNullOrWhiteSpace(message))
+        {
+            throw new HubException("Message cannot be empty");
+        }
+
         var userId = Context.UserIdentifier;
         if (string.IsNullOrEmpty(userId))
         {

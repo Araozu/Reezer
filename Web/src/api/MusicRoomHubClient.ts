@@ -101,5 +101,6 @@ export class MusicRoomHubClient {
 		await this.connection.stop();
 		this.messageReceivedHandlers = [];
 		this.chatMessageHandlers = [];
+		this.status = "disconnected";
 	}
 }

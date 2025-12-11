@@ -43,6 +43,9 @@ export class SyncPlayerManager
 					this.performClockSync().then(() =>
 					{
 						this.startResyncInterval();
+					}).catch((error) =>
+					{
+						console.error("Clock sync failed after connection:", error);
 					});
 				}
 				else if (this.status === "reconnecting")
@@ -51,6 +54,9 @@ export class SyncPlayerManager
 					this.performClockSync().then(() =>
 					{
 						this.startResyncInterval();
+					}).catch((error) =>
+					{
+						console.error("Clock sync failed after reconnection:", error);
 					});
 				}
 				this.status = "connected";
