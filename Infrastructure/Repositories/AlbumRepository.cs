@@ -149,4 +149,45 @@ public class AlbumRepository(ReezerDbContext dbContext, IOptions<StorageOptions>
                 .FirstOrDefaultAsync(a => a.Id == albumId, cancellationToken)
             ?? throw new KeyNotFoundException($"Album with ID {albumId} not found.");
     }
+
+    public async Task<(IEnumerable<Album> Albums, int TotalCount)> GetRandomAlbumsAsync(
+        int page,
+        int pageSize,
+        int seed,
+        CancellationToken cancellationToken = default
+    )
+    {
+        const int MaxSeedValue = 1000000;
+
+        var totalCount = await dbContext.Albums.CountAsync(cancellationToken);
+
+        var normalizedSeed = (seed % MaxSeedValue) / (double)MaxSeedValue;
+        var offset = (page - 1) * pageSize;
+
+        var albumIds = await dbContext.Database
+            .SqlQuery<Guid>(
+                $"""
+                SELECT "Id"
+                FROM (
+                    SELECT setseed({normalizedSeed})
+                ) AS seed,
+                "Albums"
+                ORDER BY random()
+                OFFSET {offset}
+                LIMIT {pageSize}
+                """
+            )
+            .ToListAsync(cancellationToken);
+
+        var albums = await dbContext.Albums
+            .Include(a => a.Artist)
+            .Where(a => albumIds.Contains(a.Id))
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        var albumsDict = albums.ToDictionary(a => a.Id);
+        var orderedAlbums = albumIds.Select(id => albumsDict[id]).ToList();
+
+        return (orderedAlbums, totalCount);
+    }
 }
