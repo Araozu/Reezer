@@ -1,15 +1,19 @@
 <script lang="ts">
 import * as Card from "$lib/components/ui/card";
 import Button from "$lib/components/ui/button/button.svelte";
+import Input from "$lib/components/ui/input/input.svelte";
 import { Plus, Users } from "lucide-svelte";
 import { useCreateRoom, useRooms } from "./queries";
 
 const rooms = useRooms();
 const createRoom = useCreateRoom();
 
+let roomName = $state("");
+
 const handleCreateRoom = () =>
 {
-	$createRoom.mutate();
+	$createRoom.mutate(roomName.trim() || undefined);
+	roomName = "";
 };
 </script>
 
@@ -21,17 +25,24 @@ const handleCreateRoom = () =>
 		>
 	</Card.Header>
 	<Card.Content class="space-y-4">
-		<Button
-			onclick={handleCreateRoom}
-			disabled={$createRoom.isPending}
-			class="w-full"
-			variant="default"
-		>
-			<Plus class="mr-2 size-4" />
-			{$createRoom.isPending
-				? "Creating..."
-				: "Create New Room"}
-		</Button>
+		<div class="space-y-2">
+			<Input
+				bind:value={roomName}
+				placeholder="Room name (optional)"
+				disabled={$createRoom.isPending}
+			/>
+			<Button
+				onclick={handleCreateRoom}
+				disabled={$createRoom.isPending}
+				class="w-full"
+				variant="default"
+			>
+				<Plus class="mr-2 size-4" />
+				{$createRoom.isPending
+					? "Creating..."
+					: "Create New Room"}
+			</Button>
+		</div>
 
 		{#if $rooms.isLoading}
 			<div class="text-muted-foreground text-center py-8">
@@ -53,10 +64,10 @@ const handleCreateRoom = () =>
 							class="w-full justify-between"
 							href="/{room.roomCode}"
 						>
-							<span
-								class="font-mono font-semibold"
-							>{room.roomCode}</span
-							>
+							<div class="flex flex-col items-start gap-1">
+								<span class="font-semibold">{room.roomName}</span>
+								<span class="font-mono text-sm opacity-50">{room.roomCode}</span>
+							</div>
 							<span
 								class="text-muted-foreground flex items-center gap-1"
 							>

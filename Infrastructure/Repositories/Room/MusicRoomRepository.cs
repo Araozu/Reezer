@@ -52,8 +52,17 @@ public class MusicRoomRepository : IMusicRoomRepository
 
     public void RemoveConnection(string connectionId)
     {
-        throw new NotImplementedException();
-        //
+        foreach (var room in _rooms.Values)
+        {
+            var participantToRemove = room.Participants
+                .FirstOrDefault(p => p.ConnectionId == connectionId);
+            
+            if (participantToRemove != default)
+            {
+                room.RemoveParticipant(participantToRemove.UserId, participantToRemove.ConnectionId);
+                break;
+            }
+        }
     }
 
     public IEnumerable<string> GetConnections(string userId)
