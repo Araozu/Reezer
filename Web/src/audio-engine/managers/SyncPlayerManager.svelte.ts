@@ -13,11 +13,12 @@ export class SyncPlayerManager
 	public status: ConnectionStatus = $state("disconnected");
 	public syncResult: SyncResult | null = $state(null);
 
-	constructor()
+	constructor(roomId?: string)
 	{
 		this.status = "connecting";
+		const url = `${import.meta.env.VITE_PUBLIC_BACKEND_URL}/hub/MusicRoom${roomId ? `?roomId=${encodeURIComponent(roomId)}` : ""}`;
 		this.connection = new SignalR.HubConnectionBuilder()
-			.withUrl(`${import.meta.env.VITE_PUBLIC_BACKEND_URL}/hub/MusicRoom`)
+			.withUrl(url)
 			.withAutomaticReconnect()
 			.build();
 
@@ -138,7 +139,19 @@ export class SyncPlayerManager
 		const medianOffset = sortedOffsets[Math.floor(sortedOffsets.length / 2)]!;
 
 		const mad = CalculateMAD(samples.map((s) => s.rtt));
-		const accuracy = mad < 2 ? "high" : mad < 5 ? "medium" : "low";
+		let accuracy: "high" | "medium" | "low";
+		if (mad < 2)
+		{
+			accuracy = "high";
+		}
+		else if (mad < 5)
+		{
+			accuracy = "medium";
+		}
+		else
+		{
+			accuracy = "low";
+		}
 
 		return {
 			roundTripTime: medianRtt,

@@ -1,8 +1,9 @@
 <script lang="ts">
-import { EllipsisVertical, X, GripVertical } from "lucide-svelte";
+import { EllipsisVertical, X, GripVertical, Repeat, Repeat1 } from "lucide-svelte";
 import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 import { GetQueueContext } from "~/context/music-player-context";
 import { SvelteRuneQueue } from "~/audio-engine/queues/SvelteRuneQueue.svelte";
+import { LoopMode } from "~/audio-engine/types";
 import { dndzone } from "svelte-dnd-action";
 import { flip } from "svelte/animate";
 
@@ -11,6 +12,7 @@ let sv_queue = new SvelteRuneQueue(queue);
 
 let current_queue = $derived(sv_queue.queue);
 let currentIdx = $derived(sv_queue.currentIdx);
+let loopMode = $derived(sv_queue.loopMode);
 
 let items = $state<{id: string, song: any, isCurrent: boolean}[]>([]);
 let isDragging = $state(false);
@@ -65,7 +67,30 @@ function clearBelow(index: number)
 		queue.RemoveAt(i);
 	}
 }
+
+function toggleLoopMode()
+{
+	const nextMode = (loopMode + 1) % 3;
+	queue.SetLoopMode(nextMode);
+}
 </script>
+
+<div class="flex items-center justify-between px-4 py-2 mb-2">
+	<h2 class="text-lg font-semibold">Queue</h2>
+	<button
+		class="p-2 rounded-full hover:bg-glass-bg-hover transition-colors touch-action-manipulation [-webkit-tap-highlight-color:transparent]"
+		onclick={toggleLoopMode}
+		title="Toggle Loop Mode"
+	>
+		{#if loopMode === LoopMode.None}
+			<Repeat class="opacity-50" />
+		{:else if loopMode === LoopMode.All}
+			<Repeat class="text-primary" />
+		{:else if loopMode === LoopMode.One}
+			<Repeat1 class="text-primary" />
+		{/if}
+	</button>
+</div>
 
 <div
 	class="space-y-1.5 max-h-[calc(100vh-8rem)] overflow-y-auto overflow-x-hidden"

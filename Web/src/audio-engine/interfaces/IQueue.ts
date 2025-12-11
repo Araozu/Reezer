@@ -1,4 +1,4 @@
-import type { ISong } from "../types";
+import type { ISong, LoopMode } from "../types";
 
 /**
  * A queue interface for the Headless Music Player component
@@ -11,6 +11,7 @@ export interface IQueue
 	get queue(): Readonly<Array<ISong>>;
 	get currentSong(): ISong | null;
 	get currentIdx(): number;
+	get loopMode(): LoopMode;
 
 	/**
 	 * Immediately play a single song.
@@ -74,6 +75,8 @@ export interface IQueue
 	 * Replaces the entire queue and sets the current index
 	 */
 	SetQueue(newQueue: Array<ISong>, newCurrentIdx: number): void;
+
+	SetLoopMode(mode: LoopMode): void;
 
 	OnQueueChanged(callback: () => void): void;
 }
