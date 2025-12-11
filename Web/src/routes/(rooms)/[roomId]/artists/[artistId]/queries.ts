@@ -1,8 +1,6 @@
 import { createQuery } from "@tanstack/svelte-query";
-import { api, sv, type components } from "~/api";
+import { api, sv } from "~/api";
 import { derived, type Readable } from "svelte/store";
-
-type ArtistDto = components["schemas"]["ArtistDto"];
 
 export function useArtistByIdQuery($artistId: Readable<string>)
 {
