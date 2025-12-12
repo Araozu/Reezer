@@ -171,6 +171,8 @@ export class BrowserMediaSession implements IMediaSession
 		navigator.mediaSession.setActionHandler("previoustrack", null);
 		navigator.mediaSession.setActionHandler("seekto", null);
 
+		// Note: Callbacks registered with queue and backend are cleared when
+		// their respective Deinit() methods are called. We just null our references here.
 		this.queueChangedCallback = null;
 		this.playStateChangeCallback = null;
 		this.positionUpdateCallback = null;
