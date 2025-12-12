@@ -1,6 +1,5 @@
 <script lang="ts">
 import MusicPlayer from "~/components/music-player/index.svelte";
-import ClickTrap from "./click-trap.svelte";
 import { SetPlayerContext, SetQueueContext } from "~/context/music-player-context";
 import * as Menubar from "$lib/components/ui/menubar/index.js";
 import {page} from "$app/state";
@@ -29,10 +28,7 @@ SetQueueContext(queue);
 const mediaSession = new BrowserMediaSession(queue, audioBackend);
 mediaSession.Init();
 
-let audioTagSetup = $state(false);
 let playerCollapsed = $state(true);
-
-audioBackend.OnReady(() => (audioTagSetup = true));
 </script>
 
 <div
@@ -44,40 +40,34 @@ audioBackend.OnReady(() => (audioTagSetup = true));
 	]}
 >
 	<div>
-		{#if audioTagSetup}
-			<div class="fixed top-0 z-10 w-full">
-				<Menubar.Root>
-					<a href={`/${roomId}/`} class="font-display font-bold px-6 py-2">Reezer</a>
-					<Menubar.Menu>
-						<a href={`/${roomId}/albums`} class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors">
-							Albums
-						</a>
-						<a href={`/${roomId}/artists`} class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors">
-							Artists
-						</a>
-						<a href={`/${roomId}/yt`} class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors">
-							YouTube
-						</a>
-						<button
-							class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors"
-							onclick={() => (syncDialogOpen = true)}
-						>
-							Sync
-						</button>
-					</Menubar.Menu>
-				</Menubar.Root>
-			</div>
-			<div class="pt-8">
-				{@render children()}
-				<YtQueue />
-			</div>
-		{:else}
-			<ClickTrap />
-		{/if}
+		<div class="fixed top-0 z-20 w-full">
+			<Menubar.Root>
+				<a href={`/${roomId}/`} class="font-display font-bold px-6 py-2">Reezer</a>
+				<Menubar.Menu>
+					<a href={`/${roomId}/albums`} class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors">
+						Albums
+					</a>
+					<a href={`/${roomId}/artists`} class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors">
+						Artists
+					</a>
+					<a href={`/${roomId}/yt`} class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors">
+						YouTube
+					</a>
+					<button
+						class="px-4 py-2 rounded-md hover:bg-glass-bg-hover transition-colors"
+						onclick={() => (syncDialogOpen = true)}
+					>
+						Sync
+					</button>
+				</Menubar.Menu>
+			</Menubar.Root>
+		</div>
+		<div class="pt-8">
+			{@render children()}
+			<YtQueue />
+		</div>
 	</div>
-	{#if audioTagSetup}
-		<MusicPlayer bind:collapsed={playerCollapsed} />
-	{/if}
+	<MusicPlayer bind:collapsed={playerCollapsed} />
 </div>
 
 <SyncDialog bind:open={syncDialogOpen} />

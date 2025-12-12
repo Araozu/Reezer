@@ -27,7 +27,7 @@ let coverUrl = $derived.by(() =>
 let open = $state(false);
 </script>
 
-<div class="p-2 fixed bottom-0 w-screen">
+<div class="p-2 fixed bottom-0 w-screen z-20">
 	<div class="h-full border border-glass-border py-0 rounded-2xl bg-background/80 backdrop-blur-xl shadow-[0_-4px_24px_-4px_var(--glass-shadow),inset_0_1px_1px_var(--glass-highlight)]">
 		<div class={collapsed ? "p-1" : ""}>
 			{#if collapsed}
