@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Reezer.Application.Commands;
-using Reezer.Domain.Repositories.Room;
 using Reezer.Infrastructure.Identity;
 
 namespace Reezer.Api.Hubs.Music;
@@ -12,7 +11,6 @@ namespace Reezer.Api.Hubs.Music;
 public class MusicRoomHub(
     ILogger<MusicRoomHub> logger,
     ISender mediator,
-    IMusicRoomRepository musicRoomRepository,
     UserManager<User> userManager
 ) : Hub
 {
@@ -50,6 +48,12 @@ public class MusicRoomHub(
         );
 
         await base.OnConnectedAsync();
+    }
+
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        await mediator.Send(new DisconnectFromRoomCommand(Context.ConnectionId));
+        await base.OnDisconnectedAsync(exception);
     }
 
     public async Task Hello(string name)
