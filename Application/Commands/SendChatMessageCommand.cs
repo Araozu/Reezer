@@ -8,10 +8,7 @@ public record SendChatMessageCommand(string UserId, string UserName, string Mess
 public class SendChatMessageCommandHandler(IMediator mediator)
     : IRequestHandler<SendChatMessageCommand>
 {
-    public async Task Handle(
-        SendChatMessageCommand request,
-        CancellationToken cancellationToken
-    )
+    public async Task Handle(SendChatMessageCommand request, CancellationToken cancellationToken)
     {
         var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         await mediator.Publish(

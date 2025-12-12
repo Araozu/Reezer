@@ -50,19 +50,31 @@ public class MusicRoomRepository : IMusicRoomRepository
         );
     }
 
-    public void RemoveConnection(string connectionId)
+    public MusicRoom? RemoveConnection(string connectionId)
     {
         foreach (var room in _rooms.Values)
         {
-            var participantToRemove = room.Participants
-                .FirstOrDefault(p => p.ConnectionId == connectionId);
-            
+            var participantToRemove = room.Participants.FirstOrDefault(p =>
+                p.ConnectionId == connectionId
+            );
+
             if (participantToRemove != default)
             {
-                room.RemoveParticipant(participantToRemove.UserId, participantToRemove.ConnectionId);
-                break;
+                room.RemoveParticipant(
+                    participantToRemove.UserId,
+                    participantToRemove.ConnectionId
+                );
+                return room;
             }
         }
+        return null;
+    }
+
+    public MusicRoom? GetRoomByConnectionId(string connectionId)
+    {
+        return _rooms.Values.FirstOrDefault(room =>
+            room.Participants.Any(p => p.ConnectionId == connectionId)
+        );
     }
 
     public IEnumerable<string> GetConnections(string userId)

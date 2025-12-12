@@ -9,98 +9,144 @@ export interface ChatMessage {
 	timestamp: number;
 }
 
+export interface ConnectedUser {
+	userId: string;
+	userName: string;
+}
+
 /** Client wrapper for MusicRoomHub that mirrors C# hub methods and events */
-export class MusicRoomHubClient {
+export class MusicRoomHubClient
+{
 	private connection: SignalR.HubConnection;
 	public status: ConnectionStatus = $state("disconnected");
 
 	private messageReceivedHandlers: Array<(user: unknown, message: unknown) => void> = [];
 	private chatMessageHandlers: Array<(message: ChatMessage) => void> = [];
+	private connectedUsersChangedHandlers: Array<(users: ConnectedUser[]) => void> = [];
 
-	constructor(roomId?: string) {
+	constructor(roomId?: string)
+	{
 		this.status = "connecting";
 		const url = `${import.meta.env.VITE_PUBLIC_BACKEND_URL}/hub/MusicRoom${roomId ? `?roomId=${encodeURIComponent(roomId)}` : ""}`;
-		
+
 		this.connection = new SignalR.HubConnectionBuilder()
 			.withUrl(url)
 			.withAutomaticReconnect()
 			.build();
 
 		// Register SignalR event handlers
-		this.connection.on("MessageReceived", (user, message) => {
-			this.messageReceivedHandlers.forEach(handler => handler(user, message));
+		this.connection.on("MessageReceived", (user, message) =>
+		{
+			this.messageReceivedHandlers.forEach((handler) => handler(user, message));
 		});
 
-		this.connection.on("ChatMessage", (message: ChatMessage) => {
-			this.chatMessageHandlers.forEach(handler => handler(message));
+		this.connection.on("ChatMessage", (message: ChatMessage) =>
+		{
+			this.chatMessageHandlers.forEach((handler) => handler(message));
 		});
 
-		this.connection.onreconnected(() => {
+		this.connection.on("ConnectedUsersChanged", (users: ConnectedUser[]) =>
+		{
+			this.connectedUsersChangedHandlers.forEach((handler) => handler(users));
+		});
+
+		this.connection.onreconnected(() =>
+		{
 			this.status = "connected";
 		});
 
-		this.connection.onreconnecting(() => {
+		this.connection.onreconnecting(() =>
+		{
 			this.status = "reconnecting";
 		});
 
-		this.connection.onclose(() => {
+		this.connection.onclose(() =>
+		{
 			this.status = "disconnected";
 		});
 
 		this.connection.start()
-			.then(() => {
+			.then(() =>
+			{
 				this.status = "connected";
 			})
-			.catch((error) => {
+			.catch((error) =>
+			{
 				console.error("Connection failed:", error);
 				this.status = "disconnected";
 			});
 	}
 
 	/** Subscribe to MessageReceived events from the server */
-	public OnMessageReceived(handler: (user: unknown, message: unknown) => void): () => void {
+	public OnMessageReceived(handler: (user: unknown, message: unknown) => void): () => void
+	{
 		this.messageReceivedHandlers.push(handler);
 		// Return unsubscribe function
-		return () => {
+		return () =>
+		{
 			const index = this.messageReceivedHandlers.indexOf(handler);
-			if (index > -1) {
+			if (index > -1)
+			{
 				this.messageReceivedHandlers.splice(index, 1);
 			}
 		};
 	}
 
 	/** Subscribe to ChatMessage events from the server */
-	public OnChatMessage(handler: (message: ChatMessage) => void): () => void {
+	public OnChatMessage(handler: (message: ChatMessage) => void): () => void
+	{
 		this.chatMessageHandlers.push(handler);
 		// Return unsubscribe function
-		return () => {
+		return () =>
+		{
 			const index = this.chatMessageHandlers.indexOf(handler);
-			if (index > -1) {
+			if (index > -1)
+			{
 				this.chatMessageHandlers.splice(index, 1);
 			}
 		};
 	}
 
+	/** Subscribe to ConnectedUsersChanged events from the server */
+	public OnConnectedUsersChanged(handler: (users: ConnectedUser[]) => void): () => void
+	{
+		this.connectedUsersChangedHandlers.push(handler);
+		// Return unsubscribe function
+		return () =>
+		{
+			const index = this.connectedUsersChangedHandlers.indexOf(handler);
+			if (index > -1)
+			{
+				this.connectedUsersChangedHandlers.splice(index, 1);
+			}
+		};
+	}
+
 	/** Call Hello method on the hub */
-	public async Hello(name: string): Promise<void> {
+	public async Hello(name: string): Promise<void>
+	{
 		await this.connection.invoke("Hello", name);
 	}
 
 	/** Call SyncClock method on the hub - returns server timestamp in milliseconds */
-	public async SyncClock(): Promise<number> {
+	public async SyncClock(): Promise<number>
+	{
 		return await this.connection.invoke<number>("SyncClock");
 	}
 
 	/** Send a chat message to the room */
-	public async SendMessage(message: string): Promise<void> {
+	public async SendMessage(message: string): Promise<void>
+	{
 		await this.connection.invoke("SendMessage", message);
 	}
 
 	/** Stop the connection and cleanup */
-	public async destroy(): Promise<void> {
+	public async destroy(): Promise<void>
+	{
 		await this.connection.stop();
 		this.messageReceivedHandlers = [];
 		this.chatMessageHandlers = [];
+		this.connectedUsersChangedHandlers = [];
 		this.status = "disconnected";
 	}
 }

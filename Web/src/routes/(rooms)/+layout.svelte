@@ -15,17 +15,23 @@ const syncStatus = $derived(playerManager.status);
 
 let countdown = $state(5);
 
-$effect(() => {
-	if (syncStatus === "disconnected") {
-		const timer = setInterval(() => {
+$effect(() =>
+{
+	if (syncStatus === "disconnected")
+	{
+		const timer = setInterval(() =>
+		{
 			countdown--;
-			if (countdown <= 0) {
+			if (countdown <= 0)
+			{
 				clearInterval(timer);
 				goto("/");
 			}
 		}, 1000);
 		return () => clearInterval(timer);
-	} else {
+	}
+	else
+	{
 		countdown = 5;
 	}
 });

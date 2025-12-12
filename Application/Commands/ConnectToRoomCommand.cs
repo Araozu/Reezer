@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using OneOf;
+using Reezer.Application.Notifications;
 using Reezer.Domain.Entities.Room;
 using Reezer.Domain.Repositories.Room;
 
@@ -11,7 +12,8 @@ public record ConnectToRoomCommand(string code, Guid userId, string connectionId
 
 public class ConnectToRoomCommandHandler(
     ILogger<ConnectToRoomCommandHandler> logger,
-    IMusicRoomRepository roomRepository
+    IMusicRoomRepository roomRepository,
+    IPublisher publisher
 ) : IRequestHandler<ConnectToRoomCommand, OneOf<MusicRoom, Domain.Utils.NotFound>>
 {
     public async Task<OneOf<MusicRoom, Domain.Utils.NotFound>> Handle(
@@ -29,6 +31,18 @@ public class ConnectToRoomCommandHandler(
             roomCode: request.code,
             userId: request.userId,
             connectionId: request.connectionId
+        );
+
+        await addResult.Match(
+            async room =>
+            {
+                var uniqueUserIds = room.Participants.Select(p => p.UserId).Distinct().ToList();
+                await publisher.Publish(
+                    new ConnectedUsersChangedNotification(room.Code, uniqueUserIds),
+                    cancellationToken
+                );
+            },
+            _ => Task.CompletedTask
         );
 
         return addResult;
