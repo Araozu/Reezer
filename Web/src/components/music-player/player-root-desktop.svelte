@@ -9,6 +9,7 @@ import ColorBlobs from "./color-blobs.svelte";
 import { extractColorsFromImage } from "$lib/color-extractor";
 import { GetQueueContext } from "~/context/music-player-context";
 import { SvelteRuneQueue } from "~/audio-engine/queues/SvelteRuneQueue.svelte";
+    import PlayerContentsGroup from "./player-contents-group.svelte";
 
 let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
@@ -16,7 +17,7 @@ let queue = GetQueueContext();
 let svelteQueue = new SvelteRuneQueue(queue);
 
 let currentSong = $derived(svelteQueue.currentSong);
-let currentTab = $state<"playing" | "queue">("playing");
+let currentTab = $state<"playing" | "queue" | "multiplayer">("playing");
 
 let coverUrl = $derived.by(() =>
 {
@@ -64,6 +65,9 @@ $effect(() =>
 							<Tabs.Trigger value="queue">
 								Queue
 							</Tabs.Trigger>
+							<Tabs.Trigger value="multiplayer">
+								Multiplayer
+							</Tabs.Trigger>
 						</Tabs.List>
 					</Tabs.Root>
 				{/if}
@@ -96,6 +100,8 @@ $effect(() =>
 					bind:coverUrl
 					song={currentSong}
 				/>
+			{:else if !collapsed && currentTab === "multiplayer"}
+			<PlayerContentsGroup />
 			{:else if !collapsed && currentTab === "queue"}
 				<PlayerContentsQueue />
 			{/if}
