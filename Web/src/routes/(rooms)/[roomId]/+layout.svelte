@@ -45,7 +45,7 @@ audioBackend.OnReady(() => (audioTagSetup = true));
 >
 	<div>
 		{#if audioTagSetup}
-			<div class="fixed top-0 z-10 w-full">
+			<div class="fixed top-0 z-20 w-full">
 				<Menubar.Root>
 					<a href={`/${roomId}/`} class="font-display font-bold px-6 py-2">Reezer</a>
 					<Menubar.Menu>

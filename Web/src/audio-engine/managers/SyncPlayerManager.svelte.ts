@@ -1,4 +1,4 @@
-import { MusicRoomHubClient } from "~/api/MusicRoomHubClient";
+import { MusicRoomHubClient } from "~/api/MusicRoomHubClient.svelte";
 import { type SyncResult, CalculateMAD } from "~/lib/sync-utils";
 
 type ConnectionStatus = "disconnected" | "connecting" | "clock_sync" | "connected" | "reconnecting";
@@ -34,7 +34,7 @@ export class SyncPlayerManager
 		$effect(() =>
 		{
 			const currentStatus = this.hubClient.status;
-			
+
 			if (currentStatus === "connected")
 			{
 				if (this.status === "connecting")
@@ -43,10 +43,11 @@ export class SyncPlayerManager
 					this.performClockSync().then(() =>
 					{
 						this.startResyncInterval();
-					}).catch((error) =>
-					{
-						console.error("Clock sync failed after connection:", error);
-					});
+					})
+						.catch((error) =>
+						{
+							console.error("Clock sync failed after connection:", error);
+						});
 				}
 				else if (this.status === "reconnecting")
 				{
@@ -54,10 +55,11 @@ export class SyncPlayerManager
 					this.performClockSync().then(() =>
 					{
 						this.startResyncInterval();
-					}).catch((error) =>
-					{
-						console.error("Clock sync failed after reconnection:", error);
-					});
+					})
+						.catch((error) =>
+						{
+							console.error("Clock sync failed after reconnection:", error);
+						});
 				}
 				this.status = "connected";
 			}
