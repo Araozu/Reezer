@@ -23,6 +23,15 @@ onMount(() =>
 
 let positionValue = $derived(duration > 0 ? (currentTime / duration) * 100 : 0);
 
+function FormatTime(seconds: number): string
+{
+	if (!isFinite(seconds) || seconds < 0) return "0:00";
+
+	const mins = Math.floor(seconds / 60);
+	const secs = Math.floor(seconds % 60);
+	return `${mins}:${secs.toString().padStart(2, "0")}`;
+}
+
 function HandleSliderClick(event: MouseEvent)
 {
 	const progressBar = event.currentTarget as HTMLElement;
@@ -51,13 +60,19 @@ function HandleValueCommit(newValue: number[] | number)
 }
 </script>
 
-<Slider
-	type="single"
-	orientation="horizontal"
-	value={positionValue}
-	min={0}
-	max={100}
-	step={0.1}
-	onclick={HandleSliderClick}
-	onValueCommit={HandleValueCommit}
-/>
+<div class="w-full">
+	<Slider
+		type="single"
+		orientation="horizontal"
+		value={positionValue}
+		min={0}
+		max={100}
+		step={0.1}
+		onclick={HandleSliderClick}
+		onValueCommit={HandleValueCommit}
+	/>
+	<div class="flex justify-between mt-1 text-xs text-muted-foreground">
+		<span>{FormatTime(currentTime)}</span>
+		<span>{FormatTime(duration)}</span>
+	</div>
+</div>
