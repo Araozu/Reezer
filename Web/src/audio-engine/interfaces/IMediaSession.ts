@@ -7,4 +7,5 @@ export interface IMediaSession {
 	UpdatePosition(position: number, duration: number): void;
 	ClearMetadata(): void;
 	Init(): void;
+	Deinit(): void;
 }

@@ -283,5 +283,8 @@ export class GeneralPurposeQueue implements IQueue
 		this._onQueueChangedCallbacks.forEach((callback) => callback());
 	}
 
-	// FIXME: Add init/deinit methods that also setup the audio backend
+	Deinit(): void
+	{
+		this._onQueueChangedCallbacks = [];
+	}
 }

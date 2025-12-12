@@ -35,6 +35,14 @@ $effect(() =>
 		countdown = 5;
 	}
 });
+
+$effect(() =>
+{
+	return () =>
+	{
+		playerManager.destroy();
+	};
+});
 </script>
 
 {@render children()}

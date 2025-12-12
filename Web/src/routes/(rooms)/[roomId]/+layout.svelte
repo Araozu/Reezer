@@ -29,6 +29,16 @@ const mediaSession = new BrowserMediaSession(queue, audioBackend);
 mediaSession.Init();
 
 let playerCollapsed = $state(true);
+
+$effect(() =>
+{
+	return () =>
+	{
+		mediaSession.Deinit();
+		queue.Deinit();
+		audioBackend.Deinit();
+	};
+});
 </script>
 
 <div
