@@ -79,4 +79,6 @@ export interface IQueue
 	SetLoopMode(mode: LoopMode): void;
 
 	OnQueueChanged(callback: () => void): void;
+
+	Deinit(): void;
 }

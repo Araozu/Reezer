@@ -6,6 +6,10 @@ import type { IQueue } from "../interfaces/IQueue";
 export class BrowserMediaSession implements IMediaSession
 {
 	private lastPosition = 0;
+	private queueChangedCallback: (() => void) | null = null;
+	private playStateChangeCallback: ((state: PlayState) => void) | null = null;
+	private positionUpdateCallback: ((position: number) => void) | null = null;
+	private durationChangeCallback: ((duration: number) => void) | null = null;
 
 	constructor(
 		private queue: IQueue,
@@ -49,7 +53,7 @@ export class BrowserMediaSession implements IMediaSession
 			}
 		});
 
-		this.queue.OnQueueChanged(() =>
+		this.queueChangedCallback = () =>
 		{
 			const song = this.queue.currentSong;
 			if (song)
@@ -60,14 +64,16 @@ export class BrowserMediaSession implements IMediaSession
 			{
 				this.ClearMetadata();
 			}
-		});
+		};
+		this.queue.OnQueueChanged(this.queueChangedCallback);
 
-		this.backend.OnPlayStateChange((state) =>
+		this.playStateChangeCallback = (state) =>
 		{
 			this.UpdatePlaybackState(state);
-		});
+		};
+		this.backend.OnPlayStateChange(this.playStateChangeCallback);
 
-		this.backend.OnPositionUpdate((position) =>
+		this.positionUpdateCallback = (position) =>
 		{
 			this.lastPosition = position;
 			const duration = this.backend.duration;
@@ -75,12 +81,14 @@ export class BrowserMediaSession implements IMediaSession
 			{
 				this.UpdatePosition(position, duration);
 			}
-		});
+		};
+		this.backend.OnPositionUpdate(this.positionUpdateCallback);
 
-		this.backend.OnDurationChange((duration) =>
+		this.durationChangeCallback = (duration) =>
 		{
 			this.UpdatePosition(this.lastPosition, duration);
-		});
+		};
+		this.backend.OnDurationChange(this.durationChangeCallback);
 	}
 
 	UpdateMetadata(song: ISong, artwork?: string): void
@@ -150,5 +158,24 @@ export class BrowserMediaSession implements IMediaSession
 	{
 		if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
 		navigator.mediaSession.metadata = null;
+	}
+
+	Deinit(): void
+	{
+		console.log("[BrowserMediaSession] Deinit called");
+		if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
+
+		navigator.mediaSession.setActionHandler("play", null);
+		navigator.mediaSession.setActionHandler("pause", null);
+		navigator.mediaSession.setActionHandler("nexttrack", null);
+		navigator.mediaSession.setActionHandler("previoustrack", null);
+		navigator.mediaSession.setActionHandler("seekto", null);
+
+		// Note: Callbacks registered with queue and backend are cleared when
+		// their respective Deinit() methods are called. We just null our references here.
+		this.queueChangedCallback = null;
+		this.playStateChangeCallback = null;
+		this.positionUpdateCallback = null;
+		this.durationChangeCallback = null;
 	}
 }

@@ -35,6 +35,15 @@ $effect(() =>
 		countdown = 5;
 	}
 });
+
+$effect(() =>
+{
+	return () =>
+	{
+		console.log("[rooms layout] Cleanup called - cleaning up player manager");
+		playerManager.destroy();
+	};
+});
 </script>
 
 {@render children()}
