@@ -134,6 +134,7 @@ export class SyncPlayerManager
 
 	public async destroy(): Promise<void>
 	{
+		console.log("[SyncPlayerManager] destroy called");
 		this.stopResyncInterval();
 		await this.hubClient.destroy();
 	}

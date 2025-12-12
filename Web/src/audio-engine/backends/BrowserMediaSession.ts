@@ -162,6 +162,7 @@ export class BrowserMediaSession implements IMediaSession
 
 	Deinit(): void
 	{
+		console.log("[BrowserMediaSession] Deinit called");
 		if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
 
 		navigator.mediaSession.setActionHandler("play", null);

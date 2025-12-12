@@ -40,6 +40,7 @@ $effect(() =>
 {
 	return () =>
 	{
+		console.log("[rooms layout] Cleanup called - cleaning up player manager");
 		playerManager.destroy();
 	};
 });

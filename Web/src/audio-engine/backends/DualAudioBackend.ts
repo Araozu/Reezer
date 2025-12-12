@@ -215,6 +215,7 @@ export class DualAudioBackend implements IAudioBackend
 
 	Deinit(): void
 	{
+		console.log("[DualAudioBackend] Deinit called");
 		this.stopPositionTracking();
 		this.player1?.removeEventListener("ended", this.autoPlayNext);
 		this.player2?.removeEventListener("ended", this.autoPlayNext);

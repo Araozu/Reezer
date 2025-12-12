@@ -264,6 +264,7 @@ export class WebAudioBackend implements IAudioBackend
 
 	Deinit(): void
 	{
+		console.log("[WebAudioBackend] Deinit called");
 		this.stopPositionTracking();
 		this.stopCurrentSource();
 		this.ClearPrefetch();

@@ -285,6 +285,7 @@ export class GeneralPurposeQueue implements IQueue
 
 	Deinit(): void
 	{
+		console.log("[GeneralPurposeQueue] Deinit called");
 		this._onQueueChangedCallbacks = [];
 	}
 }
