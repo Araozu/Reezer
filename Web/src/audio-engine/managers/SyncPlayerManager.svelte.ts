@@ -1,4 +1,4 @@
-import { MusicRoomHubClient, type ChatMessage } from "~/api/MusicRoomHubClient.svelte";
+import { MusicRoomHubClient, type ChatMessage, type ConnectedUser } from "~/api/MusicRoomHubClient.svelte";
 import { type SyncResult, CalculateMAD } from "~/lib/sync-utils";
 
 type ConnectionStatus = "disconnected" | "connecting" | "clock_sync" | "connected" | "reconnecting";
@@ -13,6 +13,7 @@ export class SyncPlayerManager
 	public status: ConnectionStatus = $state("disconnected");
 	public syncResult: SyncResult | null = $state(null);
 	public messages: ChatMessage[] = $state([]);
+	public connectedUsers: ConnectedUser[] = $state([]);
 
 	constructor(roomId?: string)
 	{
@@ -30,6 +31,12 @@ export class SyncPlayerManager
 		{
 			console.log("Chat message received:", message);
 			this.messages.push(message);
+		});
+
+		this.hubClient.OnConnectedUsersChanged((users) =>
+		{
+			console.log("Connected users changed:", users);
+			this.connectedUsers = users;
 		});
 
 		// Watch for connection status changes

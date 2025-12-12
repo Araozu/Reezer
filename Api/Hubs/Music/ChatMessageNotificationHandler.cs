@@ -26,7 +26,7 @@ public class ChatMessageNotificationHandler(
                 userId = notification.UserId,
                 userName = notification.UserName,
                 message = notification.Message,
-                timestamp = notification.Timestamp
+                timestamp = notification.Timestamp,
             },
             cancellationToken
         );

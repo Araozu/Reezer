@@ -19,8 +19,13 @@ public interface IMusicRoomRepository
         CancellationToken cancellationToken = default
     );
 
-    Task<OneOf<MusicRoom, NotFound>> AddConnection(string roomCode, Guid userId, string connectionId);
-    void RemoveConnection(string connectionId);
+    Task<OneOf<MusicRoom, NotFound>> AddConnection(
+        string roomCode,
+        Guid userId,
+        string connectionId
+    );
+    MusicRoom? RemoveConnection(string connectionId);
+    MusicRoom? GetRoomByConnectionId(string connectionId);
     IEnumerable<string> GetConnections(string userId);
     IEnumerable<string> GetOnlineUsers();
 }
