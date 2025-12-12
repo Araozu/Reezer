@@ -69,6 +69,8 @@ export class WebAudioBackend implements IAudioBackend
 
 	async Play(track: ISong): Promise<void>
 	{
+		this.ensureInitialized();
+
 		const id = track.id;
 		if (!this.audioContext || !this.gainNode)
 		{
@@ -147,6 +149,8 @@ export class WebAudioBackend implements IAudioBackend
 
 	TogglePlayPause(): void
 	{
+		this.ensureInitialized();
+
 		if (!this.audioContext || !this.currentBuffer)
 		{
 			return;
@@ -190,6 +194,8 @@ export class WebAudioBackend implements IAudioBackend
 
 	async Prefetch(track: ISong): Promise<void>
 	{
+		this.ensureInitialized();
+
 		const id = track.id;
 		if (!this.audioContext)
 		{
@@ -228,12 +234,7 @@ export class WebAudioBackend implements IAudioBackend
 
 	Init(): void
 	{
-		this.audioContext = new AudioContext();
-		this.gainNode = this.audioContext.createGain();
-		this.gainNode.gain.value = this._volume;
-		this.gainNode.connect(this.audioContext.destination);
-
-		this.readyCallbacks.forEach((callback) => callback());
+		this.ensureInitialized();
 	}
 
 	OnReady(callback: () => void): void
@@ -281,6 +282,18 @@ export class WebAudioBackend implements IAudioBackend
 		this.positionUpdateCallbacks = [];
 		this.durationChangeCallbacks = [];
 		this.playStateChangeCallbacks = [];
+	}
+
+	private ensureInitialized(): void
+	{
+		if (!this.audioContext)
+		{
+			this.audioContext = new AudioContext();
+			this.gainNode = this.audioContext.createGain();
+			this.gainNode.gain.value = this._volume;
+			this.gainNode.connect(this.audioContext.destination);
+			this.readyCallbacks.forEach((callback) => callback());
+		}
 	}
 
 	private async ensureAudioContextResumed(): Promise<void>

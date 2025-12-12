@@ -43,8 +43,7 @@ $effect(() => {
 {/if}
 
 {#if syncStatus === "connecting" || syncStatus === "clock_sync" || syncStatus === "disconnected"}
-	<LavaBackground />
-	<div class="fixed inset-0 flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10 z-50">
+	<div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10 z-50">
 		<div class="flex w-full flex-col justify-center items-center gap-6">
 			<div class="flex items-center gap-2 self-center font-medium">
 				<div class="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
