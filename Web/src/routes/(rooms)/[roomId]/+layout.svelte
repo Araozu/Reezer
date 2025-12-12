@@ -30,15 +30,12 @@ mediaSession.Init();
 
 let playerCollapsed = $state(true);
 
-$effect(() =>
+$effect(() => () =>
 {
-	return () =>
-	{
-		console.log("[roomId layout] Cleanup called - cleaning up audio components");
-		mediaSession.Deinit();
-		queue.Deinit();
-		audioBackend.Deinit();
-	};
+	console.log("[roomId layout] Cleanup called - cleaning up audio components");
+	mediaSession.Deinit();
+	queue.Deinit();
+	audioBackend.Deinit();
 });
 </script>
 
