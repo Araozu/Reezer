@@ -5,34 +5,48 @@
 	import ColorBlobs from "./music-player/color-blobs.svelte";
 	import { page } from "$app/state";
 	import { extractColorsFromImage } from "$lib/color-extractor";
+	import { onMount } from "svelte";
 
 	type Album = components["schemas"]["AlbumDto"];
 
 	let { album }: { album: Album } = $props();
-	const roomId = page.params.roomId;
 
 	let isHovered = $state(false);
 	let extractedColors = $state<string[]>([]);
 	let colorWeights = $state<number[]>([]);
-	let hasTriedExtraction = $state(false);
+	let isVisible = $state(false);
+	let cardRef: HTMLAnchorElement | undefined = $state();
 
-	const coverUrl = `/api/Albums/${album.id}/cover`;
+	const roomId = $derived(page.params.roomId);
+	const coverUrl = $derived(`/api/Albums/${album.id}/cover`);
 
-	$effect(() =>
+	onMount(() =>
 	{
-		if (isHovered && extractedColors.length === 0 && !hasTriedExtraction)
-		{
-			hasTriedExtraction = true;
-			extractColorsFromImage(coverUrl, 4).then((result) =>
+		if (!cardRef) return;
+
+		const observer = new IntersectionObserver(
+			(entries) =>
 			{
-				extractedColors = result.colors;
-				colorWeights = result.weights;
-			});
-		}
+				if (entries[0].isIntersecting && !isVisible)
+				{
+					isVisible = true;
+					extractColorsFromImage(coverUrl, 4).then((result) =>
+					{
+						extractedColors = result.colors;
+						colorWeights = result.weights;
+					});
+				}
+			},
+			{ rootMargin: "200px" }
+		);
+
+		observer.observe(cardRef);
+
+		return () => observer.disconnect();
 	});
 </script>
 
-<a class="inline-block touch-action-manipulation [-webkit-tap-highlight-color:transparent]" href={`/${roomId}/albums/${album.id}`}>
+<a bind:this={cardRef} class="inline-block touch-action-manipulation [-webkit-tap-highlight-color:transparent]" href={`/${roomId}/albums/${album.id}`}>
 	<Card.Root
 		class="w-full hover:bg-glass-bg-hover hover:border-glass-border-hover transition-all duration-300 relative overflow-hidden"
 		onmouseenter={() => isHovered = true}

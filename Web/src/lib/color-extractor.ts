@@ -23,6 +23,8 @@ interface ColorCandidate {
 	score: number;
 }
 
+const colorCache = new Map<string, ExtractedColors>();
+
 function rgbToHex(r: number, g: number, b: number): string
 {
 	return `#${[r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("")}`;
@@ -175,6 +177,10 @@ function kMeansClustering(pixels: RGB[], k: number, iterations: number = 10): RG
 
 export async function extractColorsFromImage(imageUrl: string, maxColors: number = 4): Promise<ExtractedColors>
 {
+	const cacheKey = `${imageUrl}-${maxColors}`;
+	const cached = colorCache.get(cacheKey);
+	if (cached) return cached;
+
 	return new Promise((resolve) =>
 	{
 		const img = new Image();
@@ -284,16 +290,21 @@ export async function extractColorsFromImage(imageUrl: string, maxColors: number
 			const maxWeight = Math.max(...weights);
 			const normalizedWeights = weights.map((w) => Math.max(0.3, w / maxWeight));
 
-			resolve({
+			const result: ExtractedColors = {
 				colors: selectedCandidates.map((c) => rgbToHex(c.rgb.r, c.rgb.g, c.rgb.b)),
 				weights: normalizedWeights,
 				isDark,
-			});
+			};
+
+			colorCache.set(cacheKey, result);
+			resolve(result);
 		};
 
 		img.onerror = () =>
 		{
-			resolve({ colors: [], weights: [], isDark: false });
+			const errorResult: ExtractedColors = { colors: [], weights: [], isDark: false };
+			colorCache.set(cacheKey, errorResult);
+			resolve(errorResult);
 		};
 
 		img.src = imageUrl;
