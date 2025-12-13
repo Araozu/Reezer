@@ -13,7 +13,8 @@ public class YtController(
     GetPaginatedYtSongsUseCase getPaginatedYtSongsUseCase,
     StreamYtSongUseCase streamYtSongUseCase,
     GetYtThumbnailUseCase getYtThumbnailUseCase,
-    RegenerateYtSongUseCase regenerateYtSongUseCase
+    RegenerateYtSongUseCase regenerateYtSongUseCase,
+    SetYtCookiesUseCase setYtCookiesUseCase
 ) : ControllerBase
 {
     public record AddYtSongRequest(string Url);
@@ -131,5 +132,22 @@ public class YtController(
             notFound => NotFound(new ProblemDetails { Detail = notFound.Reason }),
             internalError => StatusCode(500, new ProblemDetails { Detail = internalError.Reason })
         );
+    }
+
+    [EndpointSummary("Set YouTube cookies from file")]
+    [HttpPost("cookies")]
+    public async Task<IActionResult> SetYtCookies(
+        IFormFile file,
+        CancellationToken cancellationToken
+    )
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest(new ProblemDetails { Detail = "No file provided" });
+        }
+
+        await using var stream = file.OpenReadStream();
+        await setYtCookiesUseCase.ExecuteAsync(stream, cancellationToken);
+        return Ok();
     }
 }

@@ -4,6 +4,7 @@ import { SetPlayerContext, SetQueueContext } from "~/context/music-player-contex
 import * as Menubar from "$lib/components/ui/menubar/index.js";
 import {page} from "$app/state";
 import YtQueue from "./yt-queue.svelte";
+import YtCookiesDialog from "./yt-cookies-dialog.svelte";
 import SyncDialog from "~/components/room/sync-dialog.svelte";
 import type { IAudioBackend } from "~/audio-engine/interfaces/IAudioBackend";
 import { WebAudioBackend } from "~/audio-engine/backends/WebAudioBackend";
@@ -73,6 +74,7 @@ $effect(() => () =>
 		<div class="pt-8">
 			{@render children()}
 			<YtQueue />
+			<YtCookiesDialog />
 		</div>
 	</div>
 	<MusicPlayer bind:collapsed={playerCollapsed} />
