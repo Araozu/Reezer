@@ -146,15 +146,8 @@ public class YtController(
             return BadRequest(new ProblemDetails { Detail = "No file provided" });
         }
 
-        try
-        {
-            await using var stream = file.OpenReadStream();
-            await setYtCookiesUseCase.ExecuteAsync(stream, cancellationToken);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new ProblemDetails { Detail = ex.Message });
-        }
+        await using var stream = file.OpenReadStream();
+        await setYtCookiesUseCase.ExecuteAsync(stream, cancellationToken);
+        return Ok();
     }
 }

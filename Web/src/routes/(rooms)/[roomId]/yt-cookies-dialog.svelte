@@ -52,7 +52,7 @@ async function handleSubmit(e: Event)
 		<form onsubmit={handleSubmit} class="grid gap-4 py-4">
 			<div class="grid gap-2">
 				<Label for="cookies">
-					Use extension "Get cookies.txt LOCALLY" for Chrome or "cookies.txt" for Firefox
+					Use extension "Get cookies.txt locally" for Chrome or "cookies.txt" for Firefox
 				</Label>
 				<Textarea
 					id="cookies"

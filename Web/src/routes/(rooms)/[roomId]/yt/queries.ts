@@ -67,7 +67,7 @@ export function useSetYtCookies()
 				throw { detail: `HTTP error ${response.status}` };
 			}
 
-			return response;
+			return;
 		},
 	});
 
