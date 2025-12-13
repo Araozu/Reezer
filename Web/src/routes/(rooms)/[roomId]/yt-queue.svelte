@@ -6,6 +6,7 @@ import * as Dialog from "$lib/components/ui/dialog";
 import * as Card from "$lib/components/ui/card";
 import YtQueueItem from "./yt-queue-item.svelte";
 import {ytOpenState } from "./yt-queue.impl.svelte";
+import { openYtCookiesDialog } from "./yt-cookies-dialog.impl.svelte";
 
 let open = $derived(ytOpenState.open);
 let url = $state("");
@@ -34,7 +35,16 @@ async function handleSubmit(e: Event)
 <Dialog.Root bind:open>
 	<Dialog.Content>
 		<Dialog.Header>
-			<Dialog.Title>YouTube Downloads</Dialog.Title>
+			<Dialog.Title class="flex items-center justify-between">
+				<span>YouTube Downloads</span>
+				<Button
+					variant="outline"
+					onclick={() => openYtCookiesDialog()}
+					class="ml-auto"
+				>
+					Set Cookies
+				</Button>
+			</Dialog.Title>
 
 			<form onsubmit={handleSubmit} class="grid grid-cols-[auto_7rem] items-end">
 				<div class="grid gap-4 py-4">

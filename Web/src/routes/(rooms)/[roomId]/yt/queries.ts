@@ -40,3 +40,36 @@ export function useAddYtSong()
 
 	return mutation as unknown as WithProblemDetails<typeof mutation>;
 }
+
+export function useSetYtCookies()
+{
+	const mutation = createMutation({
+		mutationFn: async (cookiesText: string) =>
+		{
+			const blob = new Blob([cookiesText], { type: "text/plain" });
+			const formData = new FormData();
+			formData.append("file", blob, "cookies.txt");
+
+			const response = await fetch("/api/Yt/cookies", {
+				method: "POST",
+				body: formData,
+				credentials: "include",
+			});
+
+			if (!response.ok)
+			{
+				const contentType = response.headers.get("content-type");
+				if (contentType?.includes("application/json"))
+				{
+					const problem = await response.json();
+					throw problem;
+				}
+				throw { detail: `HTTP error ${response.status}` };
+			}
+
+			return response;
+		},
+	});
+
+	return mutation as unknown as WithProblemDetails<typeof mutation>;
+}
