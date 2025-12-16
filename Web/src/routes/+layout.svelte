@@ -3,6 +3,8 @@
 	import { ModeWatcher } from "mode-watcher";
 	import favicon from "$lib/assets/favicon.svg";
 	import { browser } from "$app/environment";
+	import { beforeNavigate, afterNavigate } from "$app/navigation";
+	import posthog from "posthog-js";
 	import {
 		QueryClient,
 		QueryClientProvider,
@@ -20,9 +22,13 @@
 		},
 	});
 
-	if (browser && "serviceWorker" in navigator)
-	{
+	if (browser && "serviceWorker" in navigator) {
 		navigator.serviceWorker.register("/sw.js");
+	}
+
+	if (browser) {
+		beforeNavigate(() => posthog.capture('$pageleave'));
+		afterNavigate(() => posthog.capture('$pageview'));
 	}
 
 	let { children } = $props();

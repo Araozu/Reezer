@@ -13,6 +13,9 @@ const config = {
 		alias: {
 			"~": "src",
 		},
+		paths: {
+			relative: false, // Required for PostHog session replay to work correctly
+		},
 	},
 };
 
