@@ -55,6 +55,8 @@
     "neverthrow": "^8.2.0",
     "openapi-fetch": "^0.14.1",
     "openapi-typescript": "^7.10.1",
+    "posthog-js": "^1.306.2",
+    "posthog-node": "^5.17.2",
     "svelte-dnd-action": "^0.9.68"
   }
 }
