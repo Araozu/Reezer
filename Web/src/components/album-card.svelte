@@ -37,7 +37,7 @@
 					});
 				}
 			},
-			{ rootMargin: "200px" }
+			{ rootMargin: "200px" },
 		);
 
 		observer.observe(cardRef);

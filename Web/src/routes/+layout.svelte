@@ -22,13 +22,15 @@
 		},
 	});
 
-	if (browser && "serviceWorker" in navigator) {
+	if (browser && "serviceWorker" in navigator)
+	{
 		navigator.serviceWorker.register("/sw.js");
 	}
 
-	if (browser) {
-		beforeNavigate(() => posthog.capture('$pageleave'));
-		afterNavigate(() => posthog.capture('$pageview'));
+	if (browser)
+	{
+		beforeNavigate(() => posthog.capture("$pageleave"));
+		afterNavigate(() => posthog.capture("$pageview"));
 	}
 
 	let { children } = $props();
