@@ -1,17 +1,17 @@
 <script lang="ts">
 import * as Card from "$lib/components/ui/card";
-import { SetSyncPlayerManagerContext } from "~/context/music-player-context";
 import { Disc3, Loader2, AlertCircle } from "lucide-svelte";
-import { SyncPlayerManager } from "~/audio-engine/managers/SyncPlayerManager.svelte";
-import { page } from "$app/state";
-import LavaBackground from "$lib/components/lava-background.svelte";
 import { goto } from "$app/navigation";
+import { SetPlayerManagerContext } from "~/context/music-player-context";
+import { SoloPlayerManager } from "~/audio-engine/managers/SoloPlayerManager";
+    import { UrlAudioSource } from "~/audio-engine/audio-sources/UrlAudioSource";
 
 let { children } = $props();
 
-const playerManager = new SyncPlayerManager(page.params.roomId);
-SetSyncPlayerManagerContext(playerManager);
-const syncStatus = $derived(playerManager.status);
+const playerManager = new SoloPlayerManager(new UrlAudioSource());
+SetPlayerManagerContext(playerManager);
+
+const syncStatus: string = $derived("connected");
 
 let countdown = $state(5);
 
@@ -21,7 +21,7 @@ $effect(() =>
 	{
 		const timer = setInterval(() =>
 		{
-			countdown--;
+			countdown -= 1;
 			if (countdown <= 0)
 			{
 				clearInterval(timer);
@@ -39,7 +39,7 @@ $effect(() =>
 $effect(() => () =>
 {
 	console.log("[rooms layout] Cleanup called - cleaning up player manager");
-	playerManager.destroy();
+	// playerManager.destroy();
 });
 </script>
 

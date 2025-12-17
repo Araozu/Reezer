@@ -1,43 +1,17 @@
 <script lang="ts">
 import MusicPlayer from "~/components/music-player/index.svelte";
-import { SetPlayerContext, SetQueueContext } from "~/context/music-player-context";
 import * as Menubar from "$lib/components/ui/menubar/index.js";
 import {page} from "$app/state";
 import YtQueue from "./yt-queue.svelte";
 import YtCookiesDialog from "./yt-cookies-dialog.svelte";
 import SyncDialog from "~/components/room/sync-dialog.svelte";
-import type { IAudioBackend } from "~/audio-engine/interfaces/IAudioBackend";
-import { WebAudioBackend } from "~/audio-engine/backends/WebAudioBackend";
-import { UrlAudioSource } from "~/audio-engine/audio-sources/UrlAudioSource";
-import type { IQueue } from "~/audio-engine/interfaces/IQueue";
-import { GeneralPurposeQueue } from "~/audio-engine/queues/GeneralPurposeQueue";
-import { BrowserMediaSession } from "~/audio-engine/backends/BrowserMediaSession";
 
 let { children } = $props();
 
 const roomId = page.params.roomId;
 let syncDialogOpen = $state(false);
 
-// Setup music player
-// FIXME: Remove context for audio backend, should use the IQueue instead
-const audioBackend: IAudioBackend = new WebAudioBackend(new UrlAudioSource());
-SetPlayerContext(audioBackend);
-
-const queue: IQueue = new GeneralPurposeQueue(audioBackend);
-SetQueueContext(queue);
-
-const mediaSession = new BrowserMediaSession(queue, audioBackend);
-mediaSession.Init();
-
 let playerCollapsed = $state(true);
-
-$effect(() => () =>
-{
-	console.log("[roomId layout] Cleanup called - cleaning up audio components");
-	mediaSession.Deinit();
-	queue.Deinit();
-	audioBackend.Deinit();
-});
 </script>
 
 <div
