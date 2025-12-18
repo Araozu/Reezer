@@ -3,7 +3,6 @@ import { MediaQuery } from "svelte/reactivity";
 import { onMount } from "svelte";
 import PlayerRootMobile from "./player-root-mobile.svelte";
 import PlayerRootDesktop from "./player-root-desktop.svelte";
-import { GetPlayerContext } from "~/context/music-player-context";
 
 let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 

@@ -23,4 +23,11 @@ export class UrlAudioSource implements IAudioSource
 		else if (track.type === "youtube") return ok(`${UrlAudioSource.baseUrl}/api/Yt/${track.id}/stream`);
 		else throw new Error("Unreachable: Unsupported song type");
 	}
+
+	async GetTrackCover(track: ISong): Promise<Result<string, UrlAudioError>>
+	{
+		if (track.type === "regular") return ok(`${UrlAudioSource.baseUrl}/api/Songs/${track.id}/cover`);
+		else if (track.type === "youtube") return ok(`${UrlAudioSource.baseUrl}/api/Yt/${track.id}/cover`);
+		else throw new Error("Unreachable: Unsupported song type");
+	}
 }

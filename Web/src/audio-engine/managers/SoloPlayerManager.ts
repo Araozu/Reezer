@@ -41,4 +41,14 @@ export class SoloPlayerManager implements IPlayerManager
 		this.queueManager.PlaySong(song);
 		return ok();
 	}
+
+	async Init(): Promise<Result<void, unknown>>
+	{
+		return ok();
+	}
+
+	async Deinit(): Promise<void>
+	{
+
+	}
 }
