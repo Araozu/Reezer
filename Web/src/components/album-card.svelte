@@ -14,6 +14,8 @@
 	let extractedColors = $state<string[]>([]);
 	let hasTriedExtraction = $state(false);
 
+	let showGlow = $derived(isHovered && extractedColors.length > 0);
+
 	const coverUrl = `/api/Albums/${album.id}/cover`;
 
 	$effect(() =>
@@ -31,13 +33,13 @@
 
 <a class="inline-block touch-action-manipulation [-webkit-tap-highlight-color:transparent]" href={`/${roomId}/albums/${album.id}`}>
 	<Card.Root
-		class="w-full hover:bg-glass-bg-hover hover:border-glass-border-hover transition-all duration-300 relative overflow-hidden"
+		class="w-full transition-all duration-300 relative overflow-hidden"
 		onmouseenter={() => (isHovered = true)}
 		onmouseleave={() => (isHovered = false)}
 	>
 		<div
-			class="absolute inset-0 transition-opacity {isHovered ? 'duration-1000' : 'duration-[250ms]'}"
-			style:opacity={isHovered && extractedColors.length > 0 ? 1 : 0}
+			class="absolute inset-0 transition-opacity {showGlow ? 'duration-500' : 'duration-[250ms]'}"
+			style:opacity={showGlow ? 1 : 0}
 		>
 			{#if extractedColors.length > 0}
 				<div
@@ -52,13 +54,13 @@
 				{/if}
 				{#if extractedColors[2]}
 					<div
-						class="absolute top-[20%] right-[10%] w-[50%] h-[50%] rounded-full blur-3xl opacity-50"
+						class="absolute -top-[20%] -right-[20%] w-[50%] h-[50%] rounded-full blur-3xl opacity-50"
 						style:background-color={extractedColors[2]}
 					></div>
 				{/if}
 				{#if extractedColors[3]}
 					<div
-						class="absolute bottom-[20%] left-[10%] w-[50%] h-[50%] rounded-full blur-3xl opacity-50"
+						class="absolute -bottom-[20%] -left-[10%] w-[50%] h-[50%] rounded-full blur-3xl opacity-50"
 						style:background-color={extractedColors[3]}
 					></div>
 				{/if}

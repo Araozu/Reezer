@@ -114,7 +114,6 @@ export class SyncPlayerManager
 			try
 			{
 				this.syncResult = await this.syncClock();
-				console.log("Clock resync:", JSON.stringify(this.syncResult, null, 4));
 			}
 			catch (error)
 			{
