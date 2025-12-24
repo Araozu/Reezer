@@ -50,9 +50,22 @@
 
 		debounceTimeout = setTimeout(() =>
 		{
-			let query = page.url.searchParams;
-			query.set("search", searchTerm);
-			goto(`?${query.toString()}`);
+			const query = new URLSearchParams(page.url.searchParams);
+			if (searchTerm)
+			{
+				query.set("search", searchTerm);
+			}
+			else
+			{
+				query.delete("search");
+			}
+
+			goto(`?${query.toString()}`,
+			{
+				replaceState: true,
+				noScroll: true,
+				keepFocus: true,
+			});
 
 			debouncedSearchTerm = searchTerm;
 			requestPage = 1;
