@@ -28,6 +28,7 @@ interface Blob {
 let blobs = $state<Blob[]>([]);
 let containerRef = $state<HTMLDivElement | null>(null);
 let animationId: number;
+let lastTime = 0;
 
 function randomInRange(min: number, max: number): number
 {
@@ -53,14 +54,17 @@ function initBlobs()
 	});
 }
 
-function animate()
+function animate(time: number)
 {
+	const delta = lastTime ? (time - lastTime) / (1000 / 60) : 1;
+	lastTime = time;
+
 	blobs = blobs.map((blob) =>
 	{
 		let { x, y, vx, vy } = blob;
 
-		x += vx;
-		y += vy;
+		x += vx * delta;
+		y += vy * delta;
 
 		if (x < -50) x = 150;
 		if (x > 150) x = -50;
@@ -76,7 +80,7 @@ function animate()
 onMount(() =>
 {
 	initBlobs();
-	animate();
+	animationId = requestAnimationFrame(animate);
 
 	return () =>
 	{

@@ -19,6 +19,8 @@ public partial class LibraryInitializationService(
 {
     private static readonly string[] CoverFilePatterns =
     [
+        "getCoverArt.jpg",
+        "getCoverArt.png",
         "cover.jpg",
         "cover.jpeg",
         "cover.png",
