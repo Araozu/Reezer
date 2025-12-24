@@ -23,6 +23,7 @@
 	<div class="mt-2 flex justify-center gap-2">
 		<Skeleton class="h-10 w-28 rounded-md" />
 		<Skeleton class="h-10 w-32 rounded-md" />
+		<Skeleton class="h-10 w-10 rounded-md" />
 	</div>
 </div>
 
