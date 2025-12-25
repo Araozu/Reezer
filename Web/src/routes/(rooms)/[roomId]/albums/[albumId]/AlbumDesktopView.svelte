@@ -49,7 +49,8 @@
 </script>
 
 <div class="grid grid-cols-[20rem_auto] xl:grid-cols-[35rem_auto]">
-	<div class="h-screen flex flex-col items-center justify-center px-4 sticky top-0">
+	<div>
+	<div class="h-screen w-[20rem] xl:w-[35rem] flex flex-col items-center justify-center px-4 fixed top-0">
 		<AlbumCover {albumId} {albumName} skipFadeIn />
 		<div class="w-full px-4 py-2 transform -translate-y-8">
 			<div class="py-1 font-display text-4xl font-bold text-center backdrop-blur-xl bg-glass-bg border border-glass-border rounded-2xl
@@ -101,6 +102,7 @@
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
 		</div>
+	</div>
 	</div>
 	<div>
 		<div class="min-h-screen flex flex-col justify-center px-4 py-16">
