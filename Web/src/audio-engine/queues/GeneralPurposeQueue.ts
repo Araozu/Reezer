@@ -242,6 +242,7 @@ export class GeneralPurposeQueue implements IQueue
 
 		this.audioBackend.Play(currentSong);
 		if (nextSong) this.audioBackend.Prefetch(nextSong);
+		else this.audioBackend.ClearPrefetch();
 	}
 
 	/**

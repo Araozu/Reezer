@@ -1,178 +1,57 @@
-interface RGB {
-	r: number;
-	g: number;
-	b: number;
-}
-
-interface HSL {
-	h: number;
-	s: number;
-	l: number;
-}
-
 interface ExtractedColors {
 	colors: string[];
 	weights: number[];
 	isDark: boolean;
 }
 
-interface ColorCandidate {
-	rgb: RGB;
-	hsl: HSL;
+interface ColorBucket {
+	r: number;
+	g: number;
+	b: number;
 	count: number;
-	score: number;
 }
 
-const colorCache = new Map<string, ExtractedColors>();
+const QUANT_BITS = 5;
+const QUANT_SHIFT = 8 - QUANT_BITS;
+const QUANT_LEVELS = 1 << QUANT_BITS;
 
 function rgbToHex(r: number, g: number, b: number): string
 {
-	return `#${[r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("")}`;
+	return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
 }
 
-function rgbToHsl(r: number, g: number, b: number): HSL
+function colorDistanceSq(r1: number, g1: number, b1: number, r2: number, g2: number, b2: number): number
 {
-	const rNorm = r / 255;
-	const gNorm = g / 255;
-	const bNorm = b / 255;
-
-	const max = Math.max(rNorm, gNorm, bNorm);
-	const min = Math.min(rNorm, gNorm, bNorm);
-	const l = (max + min) / 2;
-
-	if (max === min)
-	{
-		return { h: 0, s: 0, l };
-	}
-
-	const d = max - min;
-	const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-
-	let h = 0;
-	if (max === rNorm)
-	{
-		h = (((gNorm - bNorm) / d) + (gNorm < bNorm ? 6 : 0)) / 6;
-	}
-	else if (max === gNorm)
-	{
-		h = (((bNorm - rNorm) / d) + 2) / 6;
-	}
-	else
-	{
-		h = (((rNorm - gNorm) / d) + 4) / 6;
-	}
-
-	return { h, s, l };
+	const dr = r1 - r2;
+	const dg = g1 - g2;
+	const db = b1 - b2;
+	return (dr * dr * 2) + (dg * dg * 4) + (db * db * 3);
 }
 
-function colorDistanceLab(c1: RGB, c2: RGB): number
+function getSaturation(r: number, g: number, b: number): number
 {
-	const lab1 = rgbToLab(c1);
-	const lab2 = rgbToLab(c2);
-
-	const dl = lab1.l - lab2.l;
-	const da = lab1.a - lab2.a;
-	const db = lab1.b - lab2.b;
-
-	return Math.sqrt((dl * dl) + (da * da) + (db * db));
+	const max = Math.max(r, g, b);
+	const min = Math.min(r, g, b);
+	if (max === 0) return 0;
+	return (max - min) / max;
 }
 
-function rgbToLab(rgb: RGB): { l: number; a: number; b: number }
+function getLightness(r: number, g: number, b: number): number
 {
-	const rNorm = rgb.r / 255;
-	const gNorm = rgb.g / 255;
-	const bNorm = rgb.b / 255;
-
-	const rLinear = rNorm > 0.04045 ? Math.pow((rNorm + 0.055) / 1.055, 2.4) : rNorm / 12.92;
-	const gLinear = gNorm > 0.04045 ? Math.pow((gNorm + 0.055) / 1.055, 2.4) : gNorm / 12.92;
-	const bLinear = bNorm > 0.04045 ? Math.pow((bNorm + 0.055) / 1.055, 2.4) : bNorm / 12.92;
-
-	const xRaw = ((rLinear * 0.4124564) + (gLinear * 0.3575761) + (bLinear * 0.1804375)) / 0.95047;
-	const yRaw = (rLinear * 0.2126729) + (gLinear * 0.7151522) + (bLinear * 0.0721750);
-	const zRaw = ((rLinear * 0.0193339) + (gLinear * 0.1191920) + (bLinear * 0.9503041)) / 1.08883;
-
-	const x = xRaw > 0.008856 ? Math.pow(xRaw, 1 / 3) : (7.787 * xRaw) + (16 / 116);
-	const y = yRaw > 0.008856 ? Math.pow(yRaw, 1 / 3) : (7.787 * yRaw) + (16 / 116);
-	const z = zRaw > 0.008856 ? Math.pow(zRaw, 1 / 3) : (7.787 * zRaw) + (16 / 116);
-
-	return {
-		l: (116 * y) - 16,
-		a: 500 * (x - y),
-		b: 200 * (y - z),
-	};
+	return (Math.max(r, g, b) + Math.min(r, g, b)) / 510;
 }
 
-function getColorLuminance(r: number, g: number, b: number): number
-{
-	return ((0.299 * r) + (0.587 * g) + (0.114 * b)) / 255;
-}
-
-function calculateColorScore(hsl: HSL, count: number, totalPixels: number): number
+function scoreColor(r: number, g: number, b: number, count: number, totalPixels: number): number
 {
 	const frequency = count / totalPixels;
+	const saturation = getSaturation(r, g, b);
+	const lightness = getLightness(r, g, b);
 
-	const saturationWeight = hsl.s > 0.15 ? hsl.s * 2 : hsl.s * 0.5;
+	const satBonus = saturation > 0.15 ? saturation * 2 : saturation * 0.5;
+	const lightnessScore = 1 - (Math.abs(lightness - 0.5) * 1.5);
+	const grayPenalty = saturation < 0.1 ? 0.3 : 1;
 
-	const lightnessScore = 1 - (Math.abs(hsl.l - 0.5) * 1.5);
-
-	const isGrayish = hsl.s < 0.1;
-	const grayPenalty = isGrayish ? 0.3 : 1;
-
-	return (frequency * 0.3) + (saturationWeight * 0.4) + (lightnessScore * 0.3 * grayPenalty);
-}
-
-function kMeansClustering(pixels: RGB[], k: number, iterations: number = 10): RGB[]
-{
-	if (pixels.length === 0) return [];
-
-	let centroids: RGB[] = [];
-	const step = Math.floor(pixels.length / k);
-	for (let i = 0; i < k; i += 1)
-	{
-		centroids.push({ ...pixels[Math.min(i * step, pixels.length - 1)] });
-	}
-
-	for (let iter = 0; iter < iterations; iter += 1)
-	{
-		const clusters: RGB[][] = Array.from({ length: k }, () => []);
-
-		for (const pixel of pixels)
-		{
-			let minDist = Infinity;
-			let closestIdx = 0;
-
-			for (let i = 0; i < centroids.length; i += 1)
-			{
-				const dist = colorDistanceLab(pixel, centroids[i]);
-				if (dist < minDist)
-				{
-					minDist = dist;
-					closestIdx = i;
-				}
-			}
-
-			clusters[closestIdx].push(pixel);
-		}
-
-		const previousCentroids = centroids;
-		centroids = clusters.map((cluster, idx) =>
-		{
-			if (cluster.length === 0) return previousCentroids[idx];
-
-			const sum = cluster.reduce(
-				(acc, p) => ({ r: acc.r + p.r, g: acc.g + p.g, b: acc.b + p.b }),
-				{ r: 0, g: 0, b: 0 },
-			);
-
-			return {
-				r: Math.round(sum.r / cluster.length),
-				g: Math.round(sum.g / cluster.length),
-				b: Math.round(sum.b / cluster.length),
-			};
-		});
-	}
-
-	return centroids;
+	return (frequency * 0.3) + (satBonus * 0.4) + (lightnessScore * 0.3 * grayPenalty);
 }
 
 export async function extractColorsFromImage(imageUrl: string, maxColors: number = 4): Promise<ExtractedColors>
@@ -189,7 +68,7 @@ export async function extractColorsFromImage(imageUrl: string, maxColors: number
 		img.onload = () =>
 		{
 			const canvas = document.createElement("canvas");
-			const ctx = canvas.getContext("2d");
+			const ctx = canvas.getContext("2d", { willReadFrequently: true });
 			if (!ctx)
 			{
 				resolve({ colors: [], weights: [], isDark: false });
@@ -199,13 +78,13 @@ export async function extractColorsFromImage(imageUrl: string, maxColors: number
 			const size = 100;
 			canvas.width = size;
 			canvas.height = size;
-
 			ctx.drawImage(img, 0, 0, size, size);
 
 			const imageData = ctx.getImageData(0, 0, size, size);
 			const pixels = imageData.data;
+			const totalPixels = size * size;
 
-			const rgbPixels: RGB[] = [];
+			const histogram = new Map<number, ColorBucket>();
 			let totalLuminance = 0;
 
 			for (let i = 0; i < pixels.length; i += 4)
@@ -214,84 +93,114 @@ export async function extractColorsFromImage(imageUrl: string, maxColors: number
 				const g = pixels[i + 1];
 				const b = pixels[i + 2];
 
-				totalLuminance += getColorLuminance(r, g, b);
-				rgbPixels.push({ r, g, b });
+				totalLuminance += (0.299 * r) + (0.587 * g) + (0.114 * b);
+
+				const rq = r >> QUANT_SHIFT;
+				const gq = g >> QUANT_SHIFT;
+				const bq = b >> QUANT_SHIFT;
+				const key = (rq << (QUANT_BITS * 2)) | (gq << QUANT_BITS) | bq;
+
+				const bucket = histogram.get(key);
+				if (bucket)
+				{
+					bucket.r += r;
+					bucket.g += g;
+					bucket.b += b;
+					bucket.count += 1;
+				}
+				else
+				{
+					histogram.set(key, { r, g, b, count: 1 });
+				}
 			}
 
-			const avgLuminance = totalLuminance / rgbPixels.length;
+			const avgLuminance = totalLuminance / (totalPixels * 255);
 			const isDark = avgLuminance < 0.5;
 
-			const clusteredColors = kMeansClustering(rgbPixels, 12, 8);
+			const buckets = Array.from(histogram.values())
+				.filter((b) => b.count >= 3)
+				.map((b) => ({
+					r: Math.round(b.r / b.count),
+					g: Math.round(b.g / b.count),
+					b: Math.round(b.b / b.count),
+					count: b.count,
+					score: 0,
+				}));
 
-			const candidates: ColorCandidate[] = clusteredColors.map((rgb) =>
+			for (const bucket of buckets)
 			{
-				const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+				bucket.score = scoreColor(bucket.r, bucket.g, bucket.b, bucket.count, totalPixels);
+			}
 
-				let count = 0;
-				for (const pixel of rgbPixels)
+			const selected: typeof buckets = [];
+			const minDistSq = 1600;
+			const diversityRadius = 10000;
+
+			while (selected.length < maxColors)
+			{
+				let bestIdx = -1;
+				let bestScore = -Infinity;
+
+				for (let i = 0; i < buckets.length; i += 1)
 				{
-					if (colorDistanceLab(pixel, rgb) < 30)
+					const bucket = buckets[i];
+
+					const lightness = getLightness(bucket.r, bucket.g, bucket.b);
+					if (lightness < 0.08 || lightness > 0.95) continue;
+
+					let diversityPenalty = 0;
+					let tooClose = false;
+
+					for (const s of selected)
 					{
-						count += 1;
+						const distSq = colorDistanceSq(s.r, s.g, s.b, bucket.r, bucket.g, bucket.b);
+						if (distSq < minDistSq)
+						{
+							tooClose = true;
+							break;
+						}
+						if (distSq < diversityRadius)
+						{
+							diversityPenalty += 1 - (distSq / diversityRadius);
+						}
+					}
+
+					if (tooClose) continue;
+
+					const adjustedScore = bucket.score - (diversityPenalty * 0.3);
+					if (adjustedScore > bestScore)
+					{
+						bestScore = adjustedScore;
+						bestIdx = i;
 					}
 				}
 
-				return {
-					rgb,
-					hsl,
-					count,
-					score: calculateColorScore(hsl, count, rgbPixels.length),
-				};
-			});
+				if (bestIdx === -1) break;
 
-			candidates.sort((a, b) => b.score - a.score);
-
-			const selectedCandidates: ColorCandidate[] = [];
-			const minDistance = 35;
-
-			for (const candidate of candidates)
-			{
-				const isTooClose = selectedCandidates.some((existing) => colorDistanceLab(existing.rgb, candidate.rgb) < minDistance);
-
-				const isTooExtreme = candidate.hsl.l < 0.08 || candidate.hsl.l > 0.95;
-
-				if (!isTooClose && !isTooExtreme)
-				{
-					selectedCandidates.push(candidate);
-					if (selectedCandidates.length >= maxColors) break;
-				}
+				selected.push(buckets[bestIdx]);
+				buckets.splice(bestIdx, 1);
 			}
 
-			for (const candidate of candidates)
-			{
-				if (selectedCandidates.length >= maxColors) break;
-
-				const isTooClose = selectedCandidates.some((existing) => colorDistanceLab(existing.rgb, candidate.rgb) < minDistance);
-
-				if (!isTooClose)
-				{
-					selectedCandidates.push(candidate);
-				}
-			}
-
-			if (selectedCandidates.length === 0)
+			if (selected.length === 0)
 			{
 				resolve({ colors: [], weights: [], isDark });
 				return;
 			}
 
-			const weights = selectedCandidates.map((c) =>
+			const weights = selected.map((c) =>
 			{
-				const frequency = c.count / rgbPixels.length;
-				const vividness = c.hsl.s * (1 - Math.abs(c.hsl.l - 0.5));
+				const frequency = c.count / totalPixels;
+				const saturation = getSaturation(c.r, c.g, c.b);
+				const lightness = getLightness(c.r, c.g, c.b);
+				const vividness = saturation * (1 - Math.abs(lightness - 0.5));
 				return (frequency * 0.6) + (vividness * 0.4);
 			});
 
 			const maxWeight = Math.max(...weights);
 			const normalizedWeights = weights.map((w) => Math.max(0.3, w / maxWeight));
 
-			const result: ExtractedColors = {
-				colors: selectedCandidates.map((c) => rgbToHex(c.rgb.r, c.rgb.g, c.rgb.b)),
+			resolve({
+				colors: selected.map((c) => rgbToHex(c.r, c.g, c.b)),
 				weights: normalizedWeights,
 				isDark,
 			};

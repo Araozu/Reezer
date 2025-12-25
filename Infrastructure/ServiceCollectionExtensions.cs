@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Reezer.Application.Services;
+using Reezer.Application.UseCases.Search;
 using Reezer.Domain.Repositories;
 using Reezer.Domain.Repositories.Room;
 using Reezer.Infrastructure.Data;
@@ -46,6 +47,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAlbumRepository, AlbumRepository>();
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IYtSongRepository, YtSongRepository>();
+        services.AddScoped<IUnifiedSearchRepository, UnifiedSearchRepository>();
 
         // Register MusicRoomRepository as Singleton and for both interfaces
         services.AddSingleton<MusicRoomRepository>();
