@@ -1,97 +1,96 @@
 <script lang="ts">
-	import { createQuery } from "@tanstack/svelte-query";
-	import { api, sv, type components } from "~/api";
-	import { Search, Music, Disc3, User, Youtube, Loader2 } from "lucide-svelte";
-	import Input from "~/lib/components/ui/input/input.svelte";
-	import Button from "~/lib/components/ui/button/button.svelte";
-	import { page } from "$app/state";
-	import AlbumCover from "~/components/album-cover.svelte";
-	import { GetQueueContext } from "~/context/music-player-context";
-	import type { ISong } from "~/audio-engine/types";
-	import YoutubeSearchDialog from "./youtube-search-dialog.svelte";
-	import { derived, writable } from "svelte/store";
+import { createQuery } from "@tanstack/svelte-query";
+import { api, type components } from "~/api";
+import { Search, Music, Disc3, User, Youtube, Loader2 } from "lucide-svelte";
+import Input from "~/lib/components/ui/input/input.svelte";
+import Button from "~/lib/components/ui/button/button.svelte";
+import { page } from "$app/state";
+import AlbumCover from "~/components/album-cover.svelte";
+import type { ISong } from "~/audio-engine/types";
+import YoutubeSearchDialog from "./youtube-search-dialog.svelte";
+import { derived, writable } from "svelte/store";
 
-	type SongDto = components["schemas"]["SongDto"];
-	type YtSongDto = components["schemas"]["YtSongDto"];
-	type AlbumDto = components["schemas"]["AlbumDto"];
-	type ArtistDto = components["schemas"]["ArtistDto"];
+type SongDto = components["schemas"]["SongDto"];
+type YtSongDto = components["schemas"]["YtSongDto"];
+type AlbumDto = components["schemas"]["AlbumDto"];
+type ArtistDto = components["schemas"]["ArtistDto"];
 
-	type UnifiedSearchResult = {
-		songs: SongDto[];
-		ytSongs: YtSongDto[];
-		albums: AlbumDto[];
-		artists: ArtistDto[];
+type UnifiedSearchResult = {
+	songs: SongDto[];
+	ytSongs: YtSongDto[];
+	albums: AlbumDto[];
+	artists: ArtistDto[];
+};
+
+const roomId = page.params.roomId;
+const queue: any = {}; // FIXME: regression
+
+let searchInput = $state("");
+const searchQuery = writable<string | null>(null);
+let youtubeDialogOpen = $state(false);
+
+const searchResults = createQuery<UnifiedSearchResult>(derived(searchQuery, ($searchQuery) => ({
+	queryKey: ["unifiedSearch", $searchQuery],
+	queryFn: async() =>
+	{
+		if (!$searchQuery) return { songs: [], ytSongs: [], albums: [], artists: [] };
+		const res = await api.GET("/api/Search" as any, {
+			params: { query: { q: $searchQuery, limit: 10 } },
+		});
+		if (res.error) throw res.error;
+		return res.data as UnifiedSearchResult;
+	},
+	enabled: !!$searchQuery,
+})));
+
+function handleSearch(e: Event)
+{
+	e.preventDefault();
+	if (searchInput.trim())
+	{
+		searchQuery.set(searchInput.trim());
+	}
+}
+
+function handleKeydown(e: KeyboardEvent)
+{
+	if (e.key === "Enter")
+	{
+		handleSearch(e);
+	}
+}
+
+function playSong(song: SongDto)
+{
+	const queueSong: ISong = {
+		id: song.id,
+		name: song.name,
+		type: "regular",
+		artist: song.artist,
+		album: song.album,
+		albumId: song.albumId,
 	};
+	queue.PlaySong(queueSong);
+}
 
-	const roomId = page.params.roomId;
-	const queue = GetQueueContext();
+function playYtSong(song: YtSongDto)
+{
+	const queueSong: ISong = {
+		id: song.ytId,
+		name: song.name,
+		type: "youtube",
+	};
+	queue.PlaySong(queueSong);
+}
 
-	let searchInput = $state("");
-	const searchQuery = writable<string | null>(null);
-	let youtubeDialogOpen = $state(false);
+const hasResults = $derived($searchResults.data &&
+	($searchResults.data.songs.length > 0 ||
+		$searchResults.data.ytSongs.length > 0 ||
+		$searchResults.data.albums.length > 0 ||
+		$searchResults.data.artists.length > 0));
 
-	const searchResults = createQuery<UnifiedSearchResult>(derived(searchQuery, ($searchQuery) => ({
-		queryKey: ["unifiedSearch", $searchQuery],
-		queryFn: async() =>
-		{
-			if (!$searchQuery) return { songs: [], ytSongs: [], albums: [], artists: [] };
-			const res = await api.GET("/api/Search" as any, {
-				params: { query: { q: $searchQuery, limit: 10 } },
-			});
-			if (res.error) throw res.error;
-			return res.data as UnifiedSearchResult;
-		},
-		enabled: !!$searchQuery,
-	})));
-
-	function handleSearch(e: Event)
-	{
-		e.preventDefault();
-		if (searchInput.trim())
-		{
-			searchQuery.set(searchInput.trim());
-		}
-	}
-
-	function handleKeydown(e: KeyboardEvent)
-	{
-		if (e.key === "Enter")
-		{
-			handleSearch(e);
-		}
-	}
-
-	function playSong(song: SongDto)
-	{
-		const queueSong: ISong = {
-			id: song.id,
-			name: song.name,
-			type: "regular",
-			artist: song.artist,
-			album: song.album,
-			albumId: song.albumId,
-		};
-		queue.PlaySong(queueSong);
-	}
-
-	function playYtSong(song: YtSongDto)
-	{
-		const queueSong: ISong = {
-			id: song.ytId,
-			name: song.name,
-			type: "youtube",
-		};
-		queue.PlaySong(queueSong);
-	}
-
-	const hasResults = $derived($searchResults.data &&
-			($searchResults.data.songs.length > 0 ||
-				$searchResults.data.ytSongs.length > 0 ||
-				$searchResults.data.albums.length > 0 ||
-				$searchResults.data.artists.length > 0));
-
-	const currentSearchQuery = $derived($searchQuery);
-	const noResults = $derived(currentSearchQuery && !$searchResults.isLoading && !hasResults);
+const currentSearchQuery = $derived($searchQuery);
+const noResults = $derived(currentSearchQuery && !$searchResults.isLoading && !hasResults);
 </script>
 
 <div class="space-y-6">

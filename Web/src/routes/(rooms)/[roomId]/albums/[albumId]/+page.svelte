@@ -7,14 +7,13 @@ import AlbumDesktopView from "./AlbumDesktopView.svelte";
 import AlbumMobileSkeleton from "./AlbumMobileSkeleton.svelte";
 import AlbumDesktopSkeleton from "./AlbumDesktopSkeleton.svelte";
 import type { RegularSong } from "./queries";
-import { GetQueueContext } from "~/context/music-player-context";
 import { SvelteRuneQueue } from "~/audio-engine/queues/SvelteRuneQueue.svelte";
 
 type AlbumWithTracklistDto = components["schemas"]["AlbumWithTracklistDto"];
 
 let { data }: PageProps = $props();
 
-const queue = GetQueueContext();
+const queue: any = {}; // FIXME: regression
 const svQueue = new SvelteRuneQueue(queue);
 
 const currentSongId = $derived(svQueue.currentSong?.id ?? null);

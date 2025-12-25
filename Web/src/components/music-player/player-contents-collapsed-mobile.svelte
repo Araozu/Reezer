@@ -1,5 +1,4 @@
 <script lang="ts">
-import { GetPlayerContext } from "~/context/music-player-context";
 import { Play, Pause, LoaderCircle } from "lucide-svelte";
 import type { ISong } from "~/audio-engine/types";
 
@@ -13,9 +12,9 @@ let {
 	expand: () => void;
 } = $props();
 
-let player = GetPlayerContext();
-
 // FIXME: regression
+let player: any = {};
+
 let isPaused = false;
 let isBuffering = false;
 </script>

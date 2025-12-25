@@ -22,6 +22,15 @@ export interface IPlayerManager {
 
 	/** Plays a song. May fail if the current user doesn't have permission to do so. */
 	PlaySong(song: ISong): Promise<Result<void, unknown>>;
+
+	/**
+	 * Sets the volume, as a value between 0 and 1.
+	 *
+	 * Always allowed, the volume is local only.
+	 */
+	SetVolume(volume: number): void
+	/** Gets the current volume, as a value between 0 and 1. */
+	GetVolume(): number;
 }
 
 export type Action = "play";

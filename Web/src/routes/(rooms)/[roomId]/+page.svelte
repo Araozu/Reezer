@@ -68,10 +68,9 @@
 							>
 								Artists
 							</Card.Title>
-							<Card.Description
-								>Discover by
-								artist</Card.Description
-							>
+							<Card.Description>
+								Discover by artist
+							</Card.Description>
 						</div>
 					</Card.Content>
 				</Card.Root>

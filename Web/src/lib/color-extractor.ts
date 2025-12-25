@@ -13,7 +13,7 @@ interface ColorBucket {
 
 const QUANT_BITS = 5;
 const QUANT_SHIFT = 8 - QUANT_BITS;
-const QUANT_LEVELS = 1 << QUANT_BITS;
+// const QUANT_LEVELS = 1 << QUANT_BITS;
 
 function rgbToHex(r: number, g: number, b: number): string
 {
@@ -56,10 +56,6 @@ function scoreColor(r: number, g: number, b: number, count: number, totalPixels:
 
 export async function extractColorsFromImage(imageUrl: string, maxColors: number = 4): Promise<ExtractedColors>
 {
-	const cacheKey = `${imageUrl}-${maxColors}`;
-	const cached = colorCache.get(cacheKey);
-	if (cached) return cached;
-
 	return new Promise((resolve) =>
 	{
 		const img = new Image();
@@ -203,17 +199,12 @@ export async function extractColorsFromImage(imageUrl: string, maxColors: number
 				colors: selected.map((c) => rgbToHex(c.r, c.g, c.b)),
 				weights: normalizedWeights,
 				isDark,
-			};
-
-			colorCache.set(cacheKey, result);
-			resolve(result);
+			});
 		};
 
 		img.onerror = () =>
 		{
-			const errorResult: ExtractedColors = { colors: [], weights: [], isDark: false };
-			colorCache.set(cacheKey, errorResult);
-			resolve(errorResult);
+			resolve({ colors: [], weights: [], isDark: false });
 		};
 
 		img.src = imageUrl;

@@ -11,7 +11,6 @@ import {
 } from "lucide-svelte";
 import VolumeSlider from "./volume-slider.svelte";
 import PositionSlider from "./position-slider.svelte";
-import { GetPlayerContext, GetQueueContext } from "~/context/music-player-context";
 import type { ISong } from "~/audio-engine/types";
 
 let {
@@ -22,11 +21,11 @@ let {
 	song: ISong | null;
 } = $props();
 
-let player = GetPlayerContext();
-let queue = GetQueueContext();
+// FIXME: regression
+let player : any = {};
+let queue: any = {};
 const roomId = page.params.roomId;
 
-// FIXME: regression
 let isPaused = false;
 let isBuffering = false;
 

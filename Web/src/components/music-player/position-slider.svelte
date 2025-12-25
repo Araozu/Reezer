@@ -1,9 +1,9 @@
 <script lang="ts">
 import { Slider } from "$lib/components/ui/slider";
 import { onMount } from "svelte";
-import { GetPlayerContext } from "~/context/music-player-context";
 
-let player = GetPlayerContext();
+// FIXME: regression
+let player: any = {};
 
 let duration = $state(player.duration ?? 0);
 let currentTime = $state(0);

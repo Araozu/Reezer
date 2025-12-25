@@ -1,13 +1,12 @@
 <script lang="ts">
 import { EllipsisVertical, X, GripVertical, Repeat, Repeat1 } from "lucide-svelte";
 import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
-import { GetQueueContext } from "~/context/music-player-context";
 import { SvelteRuneQueue } from "~/audio-engine/queues/SvelteRuneQueue.svelte";
 import { LoopMode } from "~/audio-engine/types";
 import { dndzone } from "svelte-dnd-action";
 import { flip } from "svelte/animate";
 
-let queue = GetQueueContext();
+let queue: any = {}; // FIXME: regression
 let sv_queue = new SvelteRuneQueue(queue);
 
 let current_queue = $derived(sv_queue.queue);

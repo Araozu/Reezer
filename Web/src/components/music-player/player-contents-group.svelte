@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { GetSyncPlayerManagerContext } from "~/context/music-player-context";
 	import { cn } from "$lib/utils";
 	import RoomChat from "./room-chat.svelte";
 	import ConnectedUsersList from "./connected-users-list.svelte";
 	import { Users, MessageCircle } from "lucide-svelte";
 
-	const playerManager = GetSyncPlayerManagerContext();
+	const playerManager: any = {};
 
 	const status = $derived(playerManager.status);
 	const connectedUsers = $derived(playerManager.connectedUsers);

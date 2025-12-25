@@ -12,7 +12,7 @@ import type { IMediaSession } from "../interfaces/IMediaSession";
 /**
  * A player manager for solo (local) playback.
  *
- * As this is a solo player, all actions are always permitted.
+ * As this is a solo player, all actions are always allowed.
  */
 export class SoloPlayerManager implements IPlayerManager
 {
@@ -40,6 +40,16 @@ export class SoloPlayerManager implements IPlayerManager
 	{
 		this.queueManager.PlaySong(song);
 		return ok();
+	}
+
+	/** Always allowed, the volume is local only */
+	SetVolume(volume: number): void
+	{
+		this.audioBackend.volume = volume;
+	}
+	GetVolume(): number
+	{
+		return this.audioBackend.volume;
 	}
 
 	async Init(): Promise<Result<void, unknown>>

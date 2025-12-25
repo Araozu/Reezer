@@ -5,11 +5,10 @@ import { SvelteRuneQueue } from "~/audio-engine/queues/SvelteRuneQueue.svelte";
 import PlayerContentsCollapsedMobile from "./player-contents-collapsed-mobile.svelte";
 import PlayerContentsPlaying from "./player-contents-playing.svelte";
 import PlayerContentsQueue from "./player-contents-queue.svelte";
-import { GetQueueContext } from "~/context/music-player-context";
 
 let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
-let queue = GetQueueContext();
+let queue : any = {}; // FIXME: regression
 let svelteQueue = new SvelteRuneQueue(queue);
 
 let currentSong = $derived(svelteQueue.currentSong);

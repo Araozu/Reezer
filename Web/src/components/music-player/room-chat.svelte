@@ -1,59 +1,58 @@
 <script lang="ts">
-	import { GetSyncPlayerManagerContext } from "~/context/music-player-context";
-	import { Button } from "$lib/components/ui/button";
-	import { Input } from "$lib/components/ui/input";
-	import { Send } from "lucide-svelte";
+import { Button } from "$lib/components/ui/button";
+import { Input } from "$lib/components/ui/input";
+import { Send } from "lucide-svelte";
 
-	const playerManager = GetSyncPlayerManagerContext();
+const playerManager: any = {};
 
-	let newMessage = $state("");
-	let chatContainer: HTMLDivElement;
+let newMessage = $state("");
+let chatContainer: HTMLDivElement;
 
-	const messages = $derived(playerManager.messages);
-	const status = $derived(playerManager.status);
+const messages = $derived(playerManager.messages);
+const status = $derived(playerManager.status);
 
-	$effect(() =>
+$effect(() =>
+{
+	if (messages.length > 0)
 	{
-		if (messages.length > 0)
-		{
-			scrollToBottom();
-		}
-	});
-
-	function scrollToBottom()
-	{
-		if (chatContainer)
-		{
-			setTimeout(() =>
-			{
-				chatContainer.scrollTop = chatContainer.scrollHeight;
-			}, 0);
-		}
+		scrollToBottom();
 	}
+});
 
-	async function sendMessage()
+function scrollToBottom()
+{
+	if (chatContainer)
 	{
-		if (!newMessage.trim()) return;
-
-		try
+		setTimeout(() =>
 		{
-			await playerManager.sendChatMessage(newMessage);
-			newMessage = "";
-		}
-		catch (e)
-		{
-			console.error("Failed to send message", e);
-		}
+			chatContainer.scrollTop = chatContainer.scrollHeight;
+		}, 0);
 	}
+}
 
-	function handleKeydown(e: KeyboardEvent)
+async function sendMessage()
+{
+	if (!newMessage.trim()) return;
+
+	try
 	{
-		if (e.key === "Enter" && !e.shiftKey)
-		{
-			e.preventDefault();
-			sendMessage();
-		}
+		await playerManager.sendChatMessage(newMessage);
+		newMessage = "";
 	}
+	catch (e)
+	{
+		console.error("Failed to send message", e);
+	}
+}
+
+function handleKeydown(e: KeyboardEvent)
+{
+	if (e.key === "Enter" && !e.shiftKey)
+	{
+		e.preventDefault();
+		sendMessage();
+	}
+}
 </script>
 
 <div class="flex flex-col h-full w-full">

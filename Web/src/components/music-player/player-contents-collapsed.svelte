@@ -7,7 +7,6 @@ import {
 	LoaderCircle,
 } from "lucide-svelte";
 import VolumeSlider from "./volume-slider.svelte";
-import { GetPlayerContext, GetQueueContext } from "~/context/music-player-context";
 
 let {
 	coverUrl = $bindable(),
@@ -15,10 +14,10 @@ let {
 	coverUrl: string;
 } = $props();
 
-let player = GetPlayerContext();
-let queue  = GetQueueContext();
-
 // FIXME: regression
+let player : any = {};
+let queue: any   = {};
+
 let isPaused = false;
 let isBuffering = false;
 </script>

@@ -1,11 +1,11 @@
 <script lang="ts">
 import { Slider } from "$lib/components/ui/slider";
-import { GetPlayerContext } from "~/context/music-player-context";
 import { sliderToVolume, volumeToSlider } from "./volume-constants";
 
 let { collapsed }: { collapsed: boolean } = $props();
 
-let player = GetPlayerContext();
+// FIXME: regression
+let player: any = {};
 let rawVolume = $state(player.volume);
 
 let sliderVolume = $derived(volumeToSlider(rawVolume));
