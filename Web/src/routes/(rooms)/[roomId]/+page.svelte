@@ -1,14 +1,10 @@
 <script lang="ts">
-	import { useRecentAlbums } from "./queries";
 	import * as Card from "$lib/components/ui/card/index.js";
 	import { Disc3, User, Shuffle } from "lucide-svelte";
 	import {page} from "$app/state";
-	import AlbumCard from "~/components/album-card.svelte";
+	import UnifiedSearch from "./unified-search.svelte";
 
 	const roomId = page.params.roomId;
-	const albumsQuery = useRecentAlbums(6);
-
-	const recentAlbums = $derived($albumsQuery.data?.items ?? []);
 </script>
 
 <svelte:head>
@@ -111,35 +107,10 @@
 		</div>
 	</section>
 
-	{#if $albumsQuery.isLoading}
-		<section>
-			<h2 class="text-2xl font-semibold mb-4 font-display">
-				Loading...
-			</h2>
-		</section>
-	{:else if $albumsQuery.error}
-		<section>
-			<Card.Root class="border-destructive">
-				<Card.Content class="p-6">
-					<p class="text-destructive">
-						Error loading albums: {$albumsQuery
-							.error.message}
-					</p>
-				</Card.Content>
-			</Card.Root>
-		</section>
-	{:else if recentAlbums.length > 0}
-		<section>
-			<h2 class="text-2xl font-semibold mb-4 font-display">
-				Recent Albums
-			</h2>
-			<div
-				class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
-			>
-				{#each recentAlbums as album (album.id)}
-					<AlbumCard {album} />
-				{/each}
-			</div>
-		</section>
-	{/if}
+	<section>
+		<h2 class="text-2xl font-semibold mb-4 font-display">
+			Search
+		</h2>
+		<UnifiedSearch />
+	</section>
 </div>

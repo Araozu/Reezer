@@ -185,6 +185,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/Yt/cookies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Set YouTube cookies from file */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        file?: components["schemas"]["IFormFile"];
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/User/me": {
         parameters: {
             query?: never;
@@ -329,6 +369,47 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/Search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Unified search across songs, YouTube songs, albums, and artists */
+        get: {
+            parameters: {
+                query?: {
+                    q?: string;
+                    limit?: number | string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["UnifiedSearchResultDto"];
+                        "application/json": components["schemas"]["UnifiedSearchResultDto"];
+                        "text/json": components["schemas"]["UnifiedSearchResultDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -887,6 +968,12 @@ export interface components {
             artistId: string;
             /** Format: uuid */
             albumId: string;
+        };
+        UnifiedSearchResultDto: {
+            songs: components["schemas"]["SongDto"][];
+            ytSongs: components["schemas"]["YtSongDto"][];
+            albums: components["schemas"]["AlbumDto"][];
+            artists: components["schemas"]["ArtistDto"][];
         };
         UserDto: {
             id: string;
