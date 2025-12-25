@@ -38,7 +38,7 @@
 		onmouseleave={() => (isHovered = false)}
 	>
 		<div
-			class="absolute inset-0 transition-opacity {showGlow ? 'duration-500' : 'duration-[250ms]'}"
+			class="absolute inset-0 transition-opacity {showGlow ? "duration-500" : "duration-[250ms]"}"
 			style:opacity={showGlow ? 1 : 0}
 		>
 			{#if extractedColors.length > 0}

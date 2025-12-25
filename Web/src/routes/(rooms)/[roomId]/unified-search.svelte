@@ -30,35 +30,39 @@
 	const searchQuery = writable<string | null>(null);
 	let youtubeDialogOpen = $state(false);
 
-	const searchResults = createQuery<UnifiedSearchResult>(
-		derived(searchQuery, ($searchQuery) => ({
-			queryKey: ["unifiedSearch", $searchQuery],
-			queryFn: async () => {
-				if (!$searchQuery) return { songs: [], ytSongs: [], albums: [], artists: [] };
-				const res = await api.GET("/api/Search" as any, {
-					params: { query: { q: $searchQuery, limit: 10 } },
-				});
-				if (res.error) throw res.error;
-				return res.data as UnifiedSearchResult;
-			},
-			enabled: !!$searchQuery,
-		}))
-	);
+	const searchResults = createQuery<UnifiedSearchResult>(derived(searchQuery, ($searchQuery) => ({
+		queryKey: ["unifiedSearch", $searchQuery],
+		queryFn: async() =>
+		{
+			if (!$searchQuery) return { songs: [], ytSongs: [], albums: [], artists: [] };
+			const res = await api.GET("/api/Search" as any, {
+				params: { query: { q: $searchQuery, limit: 10 } },
+			});
+			if (res.error) throw res.error;
+			return res.data as UnifiedSearchResult;
+		},
+		enabled: !!$searchQuery,
+	})));
 
-	function handleSearch(e: Event) {
+	function handleSearch(e: Event)
+	{
 		e.preventDefault();
-		if (searchInput.trim()) {
+		if (searchInput.trim())
+		{
 			searchQuery.set(searchInput.trim());
 		}
 	}
 
-	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === "Enter") {
+	function handleKeydown(e: KeyboardEvent)
+	{
+		if (e.key === "Enter")
+		{
 			handleSearch(e);
 		}
 	}
 
-	function playSong(song: SongDto) {
+	function playSong(song: SongDto)
+	{
 		const queueSong: ISong = {
 			id: song.id,
 			name: song.name,
@@ -70,7 +74,8 @@
 		queue.PlaySong(queueSong);
 	}
 
-	function playYtSong(song: YtSongDto) {
+	function playYtSong(song: YtSongDto)
+	{
 		const queueSong: ISong = {
 			id: song.ytId,
 			name: song.name,
@@ -79,18 +84,14 @@
 		queue.PlaySong(queueSong);
 	}
 
-	const hasResults = $derived(
-		$searchResults.data &&
+	const hasResults = $derived($searchResults.data &&
 			($searchResults.data.songs.length > 0 ||
 				$searchResults.data.ytSongs.length > 0 ||
 				$searchResults.data.albums.length > 0 ||
-				$searchResults.data.artists.length > 0)
-	);
+				$searchResults.data.artists.length > 0));
 
 	const currentSearchQuery = $derived($searchQuery);
-	const noResults = $derived(
-		currentSearchQuery && !$searchResults.isLoading && !hasResults
-	);
+	const noResults = $derived(currentSearchQuery && !$searchResults.isLoading && !hasResults);
 </script>
 
 <div class="space-y-6">

@@ -41,7 +41,8 @@
 		artistName,
 	}: Props = $props();
 
-	function copyTracklist(discNumber: number) {
+	function copyTracklist(discNumber: number)
+	{
 		const songs = getSongsForDisc(discNumber);
 		const text = songs.map((s) => s.name).join("\n");
 		navigator.clipboard.writeText(text);

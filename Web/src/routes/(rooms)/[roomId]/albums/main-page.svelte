@@ -60,12 +60,14 @@
 				query.delete("search");
 			}
 
-			goto(`?${query.toString()}`,
-			{
-				replaceState: true,
-				noScroll: true,
-				keepFocus: true,
-			});
+			goto(
+				`?${query.toString()}`,
+				{
+					replaceState: true,
+					noScroll: true,
+					keepFocus: true,
+				},
+			);
 
 			debouncedSearchTerm = searchTerm;
 			requestPage = 1;
