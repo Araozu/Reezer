@@ -61,4 +61,13 @@ export class SoloPlayerManager implements IPlayerManager
 	{
 
 	}
+
+	GetCurrentSong(): ISong | null
+	{
+		return this.queueManager.currentSong;
+	}
+	OnQueueChanged(callback: () => void): void
+	{
+		this.queueManager.OnQueueChanged = callback;
+	}
 }

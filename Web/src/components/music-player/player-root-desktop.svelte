@@ -7,17 +7,14 @@ import PlayerContentsPlaying from "./player-contents-playing.svelte";
 import PlayerContentsQueue from "./player-contents-queue.svelte";
 import ColorBlobs from "./color-blobs.svelte";
 import { extractColorsFromImage } from "$lib/color-extractor";
-import { SvelteRuneQueue } from "~/audio-engine/queues/SvelteRuneQueue.svelte";
 import PlayerContentsGroup from "./player-contents-group.svelte";
 import { GetPlayerManagerContext } from "~/context/music-player-context";
 import type { ISong } from "~/audio-engine/types";
+import { onMount } from "svelte";
 
 let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
 let playerManager = GetPlayerManagerContext();
-
-// let queue = GetQueueContext();
-// let svelteQueue = new SvelteRuneQueue(queue);
 
 let currentSong = $derived<ISong | null>(null);
 let currentTab = $state<"playing" | "queue" | "multiplayer">("playing");
@@ -33,6 +30,15 @@ let coverUrl = $derived.by(() =>
 
 let extractedColors = $state<string[]>([]);
 let colorWeights = $state<number[]>([]);
+
+onMount(() =>
+{
+	// FIXME: there must be a better way to do this, like, a svelte wrapper for the manager
+	playerManager.OnQueueChanged(() =>
+	{
+		currentSong = playerManager.GetCurrentSong();
+	});
+});
 
 $effect(() =>
 {

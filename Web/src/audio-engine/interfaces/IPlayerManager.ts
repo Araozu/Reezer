@@ -31,6 +31,11 @@ export interface IPlayerManager {
 	SetVolume(volume: number): void
 	/** Gets the current volume, as a value between 0 and 1. */
 	GetVolume(): number;
+
+	GetCurrentSong(): ISong | null;
+	OnQueueChanged(callback: () => void): void;
 }
 
-export type Action = "play";
+export type Action = "PlaySong"
+                   | "TogglePlayPause"
+
