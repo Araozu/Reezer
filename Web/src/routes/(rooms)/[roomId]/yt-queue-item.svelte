@@ -55,7 +55,8 @@ onMount(() =>
 		<Item.Title class="flex-1 min-w-0 truncate max-w-80">{ytUrl}</Item.Title>
 		<Item.Description>
 			{#if errorMessage}
-				<Item.Description class="text-destructive">Error: {errorMessage}</Item.Description>
+				<span class="text-destructive">Error: {errorMessage}</span>
+				<span class="text-destructive">Puede que necesites configurar las cookies de YouTube.</span>
 			{:else}
 				{mutationStatus}
 			{/if}

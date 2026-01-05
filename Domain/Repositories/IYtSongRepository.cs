@@ -35,4 +35,9 @@ public interface IYtSongRepository
         YtSong ytSong,
         CancellationToken cancellationToken = default
     );
+
+    Task<OneOf<Success, NotFound, InternalError>> DeleteAsync(
+        string ytId,
+        CancellationToken cancellationToken = default
+    );
 }

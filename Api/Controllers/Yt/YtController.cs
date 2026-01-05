@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Reezer.Application.DTOs;
 using Reezer.Application.UseCases;
+using Reezer.Application.UseCases.Yt;
 
 namespace Reezer.Api.Controllers.Yt;
 
@@ -14,6 +15,7 @@ public class YtController(
     StreamYtSongUseCase streamYtSongUseCase,
     GetYtThumbnailUseCase getYtThumbnailUseCase,
     RegenerateYtSongUseCase regenerateYtSongUseCase,
+    DeleteYtSongUseCase deleteYtSongUseCase,
     SetYtCookiesUseCase setYtCookiesUseCase
 ) : ControllerBase
 {
@@ -129,6 +131,19 @@ public class YtController(
 
         return result.Match<ActionResult<YtSongResponse>>(
             song => Ok(new YtSongResponse(song.YtId, song.Name)),
+            notFound => NotFound(new ProblemDetails { Detail = notFound.Reason }),
+            internalError => StatusCode(500, new ProblemDetails { Detail = internalError.Reason })
+        );
+    }
+
+    [EndpointSummary("Delete a YouTube song by ID")]
+    [HttpDelete("{ytId}")]
+    public async Task<IActionResult> DeleteYtSong(string ytId, CancellationToken cancellationToken)
+    {
+        var result = await deleteYtSongUseCase.ExecuteAsync(ytId, cancellationToken);
+
+        return result.Match<IActionResult>(
+            _ => NoContent(),
             notFound => NotFound(new ProblemDetails { Detail = notFound.Reason }),
             internalError => StatusCode(500, new ProblemDetails { Detail = internalError.Reason })
         );

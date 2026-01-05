@@ -1,12 +1,30 @@
 <script lang="ts">
-import { Play, EllipsisVertical, ExternalLink, Plus, ListStart } from "lucide-svelte";
+import { Play, EllipsisVertical, ExternalLink, Plus, ListStart, Trash2 } from "lucide-svelte";
 import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 import { GetQueueContext } from "~/context/music-player-context";
 import type { ISong } from "~/audio-engine/types";
+import { useDeleteYtSong } from "./queries";
+import { toast } from "svelte-sonner";
 
 let { song }: { song: ISong } = $props();
 
 const queue = GetQueueContext();
+const deleteMutation = useDeleteYtSong();
+
+async function deleteSong()
+{
+	const result = await $deleteMutation.mutateAsync(song.id);
+	if ("error" in result)
+	{
+		toast.error("Failed to delete song", {
+			description: result.error?.detail ?? "An unknown error occurred",
+		});
+	}
+	else
+	{
+		toast.success("Song deleted");
+	}
+}
 </script>
 
 <div
@@ -68,11 +86,11 @@ const queue = GetQueueContext();
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content>
 				<DropdownMenu.Item onclick={() => queue.AddNextSong(song)}>
-					<Plus size={16} class="mr-2" />
+					<ListStart size={16} class="mr-2" />
 					Play Next
 				</DropdownMenu.Item>
 				<DropdownMenu.Item onclick={() => queue.AddLastSong(song)}>
-					<ListStart size={16} class="mr-2" />
+					<Plus size={16} class="mr-2" />
 					Add to Queue
 				</DropdownMenu.Item>
 				<a href={`https://www.youtube.com/watch?v=${song.id}`} target="_blank" rel="noopener noreferrer">
@@ -81,6 +99,20 @@ const queue = GetQueueContext();
 						See in YouTube
 					</DropdownMenu.Item>
 				</a>
+				<DropdownMenu.Separator />
+				<DropdownMenu.Item
+					class="text-destructive focus:text-destructive"
+					onclick={() =>
+					{
+						if (confirm("Are you sure you want to delete this song?"))
+						{
+							deleteSong();
+						}
+					}}
+				>
+					<Trash2 size={16} class="mr-2" />
+					Delete Song
+				</DropdownMenu.Item>
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
 	</div>

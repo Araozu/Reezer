@@ -194,4 +194,42 @@ public class YtSongRepository(
             return new InternalError($"Failed to update YouTube song: {ex.Message}");
         }
     }
+
+    public async Task<OneOf<Success, NotFound, InternalError>> DeleteAsync(
+        string ytId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        try
+        {
+            var song = await dbContext.YtSongs.FirstOrDefaultAsync(
+                s => s.YtId == ytId,
+                cancellationToken
+            );
+
+            if (song is null)
+            {
+                return new NotFound($"YouTube song with ID {ytId} not found.");
+            }
+
+            if (!string.IsNullOrEmpty(song.CachedPath) && File.Exists(song.CachedPath))
+            {
+                File.Delete(song.CachedPath);
+            }
+
+            if (!string.IsNullOrEmpty(song.ThumbnailPath) && File.Exists(song.ThumbnailPath))
+            {
+                File.Delete(song.ThumbnailPath);
+            }
+
+            dbContext.YtSongs.Remove(song);
+            await dbContext.SaveChangesAsync(cancellationToken);
+
+            return new Success();
+        }
+        catch (Exception ex)
+        {
+            return new InternalError($"Failed to delete YouTube song: {ex.Message}");
+        }
+    }
 }
