@@ -1,28 +1,29 @@
 <script lang="ts">
 import { Play, EllipsisVertical, ExternalLink, Plus, ListStart, Trash2 } from "lucide-svelte";
 import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
-import { GetQueueContext } from "~/context/music-player-context";
 import type { ISong } from "~/audio-engine/types";
 import { useDeleteYtSong } from "./queries";
 import { toast } from "svelte-sonner";
+import { GetSvelteManagerContext } from "~/context/music-player-context";
 
 let { song }: { song: ISong } = $props();
 
-const queue = GetQueueContext();
+const svManager = GetSvelteManagerContext();
 const deleteMutation = useDeleteYtSong();
 
 async function deleteSong()
 {
-	const result = await $deleteMutation.mutateAsync(song.id);
-	if ("error" in result)
-	{
-		toast.error("Failed to delete song", {
-			description: result.error?.detail ?? "An unknown error occurred",
-		});
-	}
-	else
-	{
+	try {
+		await $deleteMutation.mutateAsync(song.id);
 		toast.success("Song deleted");
+	} catch (error) {
+		const details =
+			typeof error === "object" && error && "detail" in error
+				? (error as { detail?: string }).detail
+				: undefined;
+		toast.error("Failed to delete song", {
+			description: details ?? "An unknown error occurred",
+		});
 	}
 }
 </script>
@@ -50,7 +51,7 @@ async function deleteSong()
 		transition-transform duration-200
 		"
 		data-slot="button"
-		onclick={() => queue.PlaySong(song)}
+		onclick={() => svManager.imanager.PlaySong(song)}
 	>
 		<img
 			src="/api/Yt/{song.id}/thumbnail"
@@ -85,11 +86,11 @@ async function deleteSong()
 				<EllipsisVertical size={20} class="text-muted-foreground" />
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content>
-				<DropdownMenu.Item onclick={() => queue.AddNextSong(song)}>
+				<DropdownMenu.Item onclick={() => svManager.imanager.AddNextSong(song)}>
 					<ListStart size={16} class="mr-2" />
 					Play Next
 				</DropdownMenu.Item>
-				<DropdownMenu.Item onclick={() => queue.AddLastSong(song)}>
+				<DropdownMenu.Item onclick={() => svManager.imanager.AddLastSong(song)}>
 					<Plus size={16} class="mr-2" />
 					Add to Queue
 				</DropdownMenu.Item>

@@ -1,34 +1,34 @@
 <script lang="ts">
-	import type { components } from "~/api";
-	import * as Card from "~/lib/components/ui/card-plain";
-	import AlbumCover from "./album-cover.svelte";
-	import { page } from "$app/state";
-	import { extractColorsFromImage } from "$lib/color-extractor";
+import type { components } from "~/api";
+import * as Card from "~/lib/components/ui/card-plain";
+import AlbumCover from "./album-cover.svelte";
+import { page } from "$app/state";
+import { extractColorsFromImage } from "$lib/color-extractor";
 
-	type Album = components["schemas"]["AlbumDto"];
+type Album = components["schemas"]["AlbumDto"];
 
-	let { album }: { album: Album } = $props();
-	const roomId = page.params.roomId;
+let { album }: { album: Album } = $props();
+const roomId = page.params.roomId;
 
-	let isHovered = $state(false);
-	let extractedColors = $state<string[]>([]);
-	let hasTriedExtraction = $state(false);
+let isHovered = $state(false);
+let extractedColors = $state<string[]>([]);
+let hasTriedExtraction = $state(false);
 
-	let showGlow = $derived(isHovered && extractedColors.length > 0);
+let showGlow = $derived(isHovered && extractedColors.length > 0);
 
-	const coverUrl = `/api/Albums/${album.id}/cover`;
+const coverUrl = `/api/Albums/${album.id}/cover`;
 
-	$effect(() =>
+$effect(() =>
+{
+	if (isHovered && extractedColors.length === 0 && !hasTriedExtraction)
 	{
-		if (isHovered && extractedColors.length === 0 && !hasTriedExtraction)
+		hasTriedExtraction = true;
+		extractColorsFromImage(coverUrl, 4).then((result) =>
 		{
-			hasTriedExtraction = true;
-			extractColorsFromImage(coverUrl, 4).then((result) =>
-			{
-				extractedColors = result.colors;
-			});
-		}
-	});
+			extractedColors = result.colors;
+		});
+	}
+});
 </script>
 
 <a class="inline-block touch-action-manipulation [-webkit-tap-highlight-color:transparent]" href={`/${roomId}/albums/${album.id}`}>
@@ -38,7 +38,7 @@
 		onmouseleave={() => (isHovered = false)}
 	>
 		<div
-			class="absolute inset-0 transition-opacity {showGlow ? 'duration-500' : 'duration-[250ms]'}"
+			class="absolute inset-0 transition-opacity {showGlow ? "duration-500" : "duration-250"}"
 			style:opacity={showGlow ? 1 : 0}
 		>
 			{#if extractedColors.length > 0}

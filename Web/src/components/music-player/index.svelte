@@ -3,12 +3,12 @@ import { MediaQuery } from "svelte/reactivity";
 import { onMount } from "svelte";
 import PlayerRootMobile from "./player-root-mobile.svelte";
 import PlayerRootDesktop from "./player-root-desktop.svelte";
-import { GetPlayerContext } from "~/context/music-player-context";
+import { GetPlayerManagerContext } from "~/context/music-player-context";
 
 let { collapsed = $bindable() }: { collapsed: boolean } = $props();
 
 const isDesktop = new MediaQuery("(min-width: 48rem)");
-const player = GetPlayerContext();
+const playerManager = GetPlayerManagerContext();
 
 const VOLUME_STORAGE_KEY = "reezer-volume";
 
@@ -20,7 +20,7 @@ if (typeof window !== "undefined")
 		const volume = parseFloat(savedVolume);
 		if (!isNaN(volume) && volume >= 0 && volume <= 1)
 		{
-			player.volume = volume;
+			playerManager.SetVolume(volume);
 		}
 	}
 }

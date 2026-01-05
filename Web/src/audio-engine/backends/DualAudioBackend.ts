@@ -27,6 +27,7 @@ export class DualAudioBackend implements IAudioBackend
 
 	private positionInterval: ReturnType<typeof setInterval> | null = null;
 	private lastReportedSecond = -1;
+	private _playState: PlayState = "paused";
 
 	constructor(private audioSource: IAudioSource)
 	{}
@@ -40,6 +41,11 @@ export class DualAudioBackend implements IAudioBackend
 	{
 		const player = this.GetCurrentPlayer();
 		return player ? player.currentTime : 0;
+	}
+
+	get playState(): PlayState
+	{
+		return this._playState;
 	}
 
 	get volume(): number
@@ -174,6 +180,11 @@ export class DualAudioBackend implements IAudioBackend
 	 */
 	Init(): void
 	{
+		if (this.player1)
+		{
+			return;
+		}
+
 		this.player1 = new Audio();
 		this.player2 = new Audio();
 		this.player1.crossOrigin = "use-credentials";
@@ -305,6 +316,7 @@ export class DualAudioBackend implements IAudioBackend
 
 	private notifyPlayStateChange(state: PlayState): void
 	{
+		this._playState = state;
 		this.playStateChangeCallbacks.forEach((cb) => cb(state));
 	}
 }

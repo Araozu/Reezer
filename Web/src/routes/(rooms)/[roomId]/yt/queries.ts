@@ -63,7 +63,7 @@ export function useDeleteYtSong()
 export function useSetYtCookies()
 {
 	const mutation = createMutation({
-		mutationFn: async (cookiesText: string) =>
+		mutationFn: async(cookiesText: string) =>
 		{
 			const blob = new Blob([cookiesText], { type: "text/plain" });
 			const formData = new FormData();

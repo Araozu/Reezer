@@ -13,7 +13,7 @@ interface ColorBucket {
 
 const QUANT_BITS = 5;
 const QUANT_SHIFT = 8 - QUANT_BITS;
-const QUANT_LEVELS = 1 << QUANT_BITS;
+// const QUANT_LEVELS = 1 << QUANT_BITS;
 
 function rgbToHex(r: number, g: number, b: number): string
 {

@@ -17,25 +17,29 @@
 
 	let ytUrl = $state("");
 
-	const youtubeSearchUrl = $derived(
-		`https://www.youtube.com/results?search_query=${encodeURIComponent(searchTerm || "")}`
-	);
+	const youtubeSearchUrl = $derived(`https://www.youtube.com/results?search_query=${encodeURIComponent(searchTerm || "")}`);
 
-	async function handleAddSong() {
+	async function handleAddSong()
+	{
 		if (!ytUrl.trim()) return;
 
-		try {
+		try
+		{
 			await $addYtSongMutation.mutateAsync(ytUrl.trim());
 			toast.success("YouTube song added successfully!");
 			ytUrl = "";
 			open = false;
-		} catch (e: any) {
+		}
+		catch (e: any)
+		{
 			toast.error(e?.detail ?? "Failed to add YouTube song");
 		}
 	}
 
-	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === "Enter" && ytUrl.trim()) {
+	function handleKeydown(e: KeyboardEvent)
+	{
+		if (e.key === "Enter" && ytUrl.trim())
+		{
 			handleAddSong();
 		}
 	}

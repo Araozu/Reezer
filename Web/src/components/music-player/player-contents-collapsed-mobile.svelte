@@ -1,7 +1,7 @@
 <script lang="ts">
-import { GetPlayerContext } from "~/context/music-player-context";
 import { Play, Pause, LoaderCircle } from "lucide-svelte";
 import type { ISong } from "~/audio-engine/types";
+import { GetSvelteManagerContext } from "~/context/music-player-context";
 
 let {
 	coverUrl = $bindable(),
@@ -13,11 +13,10 @@ let {
 	expand: () => void;
 } = $props();
 
-let player = GetPlayerContext();
+const svManager = GetSvelteManagerContext();
 
-// FIXME: regression
-let isPaused = false;
-let isBuffering = false;
+let isPaused = $derived(svManager.playState === "paused");
+let isBuffering = $derived(svManager.playState === "buffering");
 </script>
 
 <div class="grid grid-cols-[3rem_auto_3rem] items-center gap-4">
@@ -35,7 +34,7 @@ let isBuffering = false;
 	<div>
 		<button
 			class="hover:bg-glass-bg-hover rounded-full cursor-pointer transition-all duration-300 active:scale-95"
-			onclick={() => player.TogglePlayPause()}
+			onclick={() => svManager.imanager.TogglePlayPause()}
 		>
 			{#if isBuffering}
 				<LoaderCircle
