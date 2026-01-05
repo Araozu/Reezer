@@ -1,12 +1,12 @@
 <script lang="ts">
 import { Slider } from "$lib/components/ui/slider";
+import { GetSvelteManagerContext } from "~/context/music-player-context";
 import { sliderToVolume, volumeToSlider } from "./volume-constants";
 
 let { collapsed }: { collapsed: boolean } = $props();
 
-// FIXME: regression
-let player: any = {};
-let rawVolume = $state(player.volume);
+let svPlayerManager = GetSvelteManagerContext();
+let rawVolume = $state(svPlayerManager.imanager.GetVolume());
 
 let sliderVolume = $derived(volumeToSlider(rawVolume));
 
@@ -16,7 +16,8 @@ function UpdateRawVolume(sliderNumber: number)
 {
 	let value = sliderToVolume[Math.round(sliderNumber)] ?? 0;
 	rawVolume = value;
-	player.volume = value;
+
+	svPlayerManager.imanager.SetVolume(value);
 	localStorage.setItem(VOLUME_STORAGE_KEY, String(value));
 }
 </script>

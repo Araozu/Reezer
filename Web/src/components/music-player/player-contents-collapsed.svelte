@@ -7,15 +7,11 @@ import {
 	LoaderCircle,
 } from "lucide-svelte";
 import VolumeSlider from "./volume-slider.svelte";
-    import { GetPlayerManagerContext } from "~/context/music-player-context";
+import { GetSvelteManagerContext } from "~/context/music-player-context";
 
-let {
-	coverUrl = $bindable(),
-}: {
-	coverUrl: string;
-} = $props();
+let { coverUrl = $bindable() }: { coverUrl: string; } = $props();
 
-let playerManager = GetPlayerManagerContext();
+let svPlayerManager = GetSvelteManagerContext();
 
 let isPaused = false;
 let isBuffering = false;

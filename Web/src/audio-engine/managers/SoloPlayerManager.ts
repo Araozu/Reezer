@@ -1,6 +1,6 @@
 import { ok, type Result } from "neverthrow";
 import type { Action, IPlayerManager } from "../interfaces/IPlayerManager";
-import type { ISong } from "../types";
+import { type ISong, LoopMode } from "../types";
 import type { IAudioBackend } from "../interfaces/IAudioBackend";
 import type { IQueue } from "../interfaces/IQueue";
 import { DualAudioBackend } from "../backends/DualAudioBackend";
@@ -39,6 +39,83 @@ export class SoloPlayerManager implements IPlayerManager
 		return ok();
 	}
 
+	async AddLastSong(song: ISong): Promise<Result<void, unknown>>
+	{
+		await this.Init();
+		this.queueManager.AddLastSong(song);
+		return ok();
+	}
+
+	async AddLastSongList(songs: Array<ISong>): Promise<Result<void, unknown>>
+	{
+		await this.Init();
+		this.queueManager.AddLastSongList(songs);
+		return ok();
+	}
+
+	async AddNextSong(song: ISong): Promise<Result<void, unknown>>
+	{
+		await this.Init();
+		this.queueManager.AddNextSong(song);
+		return ok();
+	}
+
+	async AddNextSongList(songs: Array<ISong>): Promise<Result<void, unknown>>
+	{
+		await this.Init();
+		this.queueManager.AddNextSongList(songs);
+		return ok();
+	}
+
+	async Next(): Promise<Result<void, unknown>>
+	{
+		await this.Init();
+		this.queueManager.Next();
+		return ok();
+	}
+
+	async Prev(): Promise<Result<void, unknown>>
+	{
+		await this.Init();
+		this.queueManager.Prev();
+		return ok();
+	}
+
+	async PlayAt(idx: number): Promise<Result<void, unknown>>
+	{
+		await this.Init();
+		this.queueManager.PlayAt(idx);
+		return ok();
+	}
+
+	async ClearQueue(): Promise<Result<void, unknown>>
+	{
+		await this.Init();
+		this.queueManager.ClearQueue();
+		return ok();
+	}
+
+	async RemoveAt(idx: number): Promise<Result<void, unknown>>
+	{
+		await this.Init();
+		this.queueManager.RemoveAt(idx);
+		return ok();
+	}
+
+	async SetQueue(newQueue: Array<ISong>, newCurrentIdx: number): Promise<Result<void, unknown>>
+	{
+		await this.Init();
+		this.queueManager.SetQueue(newQueue, newCurrentIdx);
+		return ok();
+	}
+
+	async SetLoopMode(mode: LoopMode): Promise<Result<void, unknown>>
+	{
+		await this.Init();
+		this.queueManager.SetLoopMode(mode);
+		return ok();
+	}
+
 	HasPermission(action: Action): boolean
 	{
 		void action;
@@ -70,15 +147,31 @@ export class SoloPlayerManager implements IPlayerManager
 
 	async Deinit(): Promise<void>
 	{
-
+		this.queueManager.Deinit();
 	}
 
 	GetCurrentSong(): ISong | null
 	{
 		return this.queueManager.currentSong;
 	}
+
+	GetQueue(): Readonly<Array<ISong>>
+	{
+		return this.queueManager.queue;
+	}
+
+	GetCurrentIdx(): number
+	{
+		return this.queueManager.currentIdx;
+	}
+
+	GetLoopMode(): LoopMode
+	{
+		return this.queueManager.loopMode;
+	}
+
 	OnQueueChanged(callback: () => void): void
 	{
-		this.queueManager.OnQueueChanged = callback;
+		this.queueManager.OnQueueChanged(callback);
 	}
 }

@@ -1,17 +1,16 @@
 <script lang="ts">
 import { EllipsisVertical, X, GripVertical, Repeat, Repeat1 } from "lucide-svelte";
 import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
-import { SvelteRuneQueue } from "~/audio-engine/queues/SvelteRuneQueue.svelte";
 import { LoopMode } from "~/audio-engine/types";
 import { dndzone } from "svelte-dnd-action";
 import { flip } from "svelte/animate";
+import { GetSvelteManagerContext } from "~/context/music-player-context";
 
-let queue: any = {}; // FIXME: regression
-let sv_queue = new SvelteRuneQueue(queue);
+const svManager = GetSvelteManagerContext();
 
-let current_queue = $derived(sv_queue.queue);
-let currentIdx = $derived(sv_queue.currentIdx);
-let loopMode = $derived(sv_queue.loopMode);
+let current_queue = $derived(svManager.queue);
+let currentIdx = $derived(svManager.currentIdx);
+let loopMode = $derived(svManager.loopMode);
 
 let items = $state<{id: string, song: any, isCurrent: boolean}[]>([]);
 let isDragging = $state(false);
@@ -42,7 +41,7 @@ function handleDndFinalize(e: CustomEvent<any>)
 	dragDisabled = true;
 
 	const newCurrentIdx = items.findIndex((i) => i.isCurrent);
-	queue.SetQueue(items.map((i) => i.song), newCurrentIdx);
+	svManager.imanager.SetQueue(items.map((i) => i.song), newCurrentIdx);
 }
 
 function startDrag(e: MouseEvent | TouchEvent)
@@ -54,7 +53,7 @@ function clearAbove(index: number)
 {
 	for (let i = index - 1; i >= 0; i -= 1)
 	{
-		queue.RemoveAt(i);
+		svManager.imanager.RemoveAt(i);
 	}
 }
 
@@ -63,14 +62,14 @@ function clearBelow(index: number)
 	const length = items.length;
 	for (let i = length - 1; i > index; i -= 1)
 	{
-		queue.RemoveAt(i);
+		svManager.imanager.RemoveAt(i);
 	}
 }
 
 function toggleLoopMode()
 {
 	const nextMode = (loopMode + 1) % 3;
-	queue.SetLoopMode(nextMode);
+	svManager.imanager.SetLoopMode(nextMode);
 }
 </script>
 
@@ -121,7 +120,7 @@ function toggleLoopMode()
 
 			<button
 				class="flex-1 min-w-0 text-left cursor-pointer rounded-lg p-3 transition-all duration-300 touch-action-manipulation [-webkit-tap-highlight-color:transparent]"
-				onclick={() => queue.PlayAt(index)}
+				onclick={() => svManager.imanager.PlayAt(index)}
 			>
 				<p class="font-medium truncate">
 					{item.song.name}
@@ -153,7 +152,7 @@ function toggleLoopMode()
 				onclick={(e) =>
 				{
 					e.stopPropagation();
-					queue.RemoveAt(index);
+					svManager.imanager.RemoveAt(index);
 				}}
 				aria-label="Remove song from queue"
 			>
