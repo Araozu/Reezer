@@ -1,11 +1,31 @@
 <script lang="ts">
-import { Play, EllipsisVertical, ExternalLink, Plus, ListStart } from "lucide-svelte";
+import { Play, EllipsisVertical, ExternalLink, Plus, ListStart, Trash2 } from "lucide-svelte";
 import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
 import type { ISong } from "~/audio-engine/types";
+import { useDeleteYtSong } from "./queries";
+import { toast } from "svelte-sonner";
+import { GetSvelteManagerContext } from "~/context/music-player-context";
 
 let { song }: { song: ISong } = $props();
 
-const queue: any = {};
+const svManager = GetSvelteManagerContext();
+const deleteMutation = useDeleteYtSong();
+
+async function deleteSong()
+{
+	try {
+		await $deleteMutation.mutateAsync(song.id);
+		toast.success("Song deleted");
+	} catch (error) {
+		const details =
+			typeof error === "object" && error && "detail" in error
+				? (error as { detail?: string }).detail
+				: undefined;
+		toast.error("Failed to delete song", {
+			description: details ?? "An unknown error occurred",
+		});
+	}
+}
 </script>
 
 <div
@@ -31,7 +51,7 @@ const queue: any = {};
 		transition-transform duration-200
 		"
 		data-slot="button"
-		onclick={() => queue.PlaySong(song)}
+		onclick={() => svManager.imanager.PlaySong(song)}
 	>
 		<img
 			src="/api/Yt/{song.id}/thumbnail"
@@ -66,12 +86,12 @@ const queue: any = {};
 				<EllipsisVertical size={20} class="text-muted-foreground" />
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content>
-				<DropdownMenu.Item onclick={() => queue.AddNextSong(song)}>
-					<Plus size={16} class="mr-2" />
+				<DropdownMenu.Item onclick={() => svManager.imanager.AddNextSong(song)}>
+					<ListStart size={16} class="mr-2" />
 					Play Next
 				</DropdownMenu.Item>
-				<DropdownMenu.Item onclick={() => queue.AddLastSong(song)}>
-					<ListStart size={16} class="mr-2" />
+				<DropdownMenu.Item onclick={() => svManager.imanager.AddLastSong(song)}>
+					<Plus size={16} class="mr-2" />
 					Add to Queue
 				</DropdownMenu.Item>
 				<a href={`https://www.youtube.com/watch?v=${song.id}`} target="_blank" rel="noopener noreferrer">
@@ -80,6 +100,20 @@ const queue: any = {};
 						See in YouTube
 					</DropdownMenu.Item>
 				</a>
+				<DropdownMenu.Separator />
+				<DropdownMenu.Item
+					class="text-destructive focus:text-destructive"
+					onclick={() =>
+					{
+						if (confirm("Are you sure you want to delete this song?"))
+						{
+							deleteSong();
+						}
+					}}
+				>
+					<Trash2 size={16} class="mr-2" />
+					Delete Song
+				</DropdownMenu.Item>
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
 	</div>

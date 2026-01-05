@@ -46,7 +46,7 @@
 							<div class="inline-flex items-center justify-center h-6 text-muted-foreground">
 								<span class="tabular-nums">{track}</span>
 							</div>
-							<Skeleton class="h-5 w-48 rounded" />
+							<Skeleton class="h-5 w-48 rounded-md" />
 						</div>
 					</div>
 				{/each}

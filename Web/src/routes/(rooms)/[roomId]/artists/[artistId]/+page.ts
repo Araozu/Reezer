@@ -7,7 +7,9 @@ export const load: PageLoad = async({params, fetch}) =>
 {
 	const artistId = params.artistId;
 
-	const artistDataPromise = fetch(`/api/Artists/${artistId}`)
+	const artistDataPromise = fetch(`/api/Artists/${artistId}`, {
+		credentials: "include",
+	})
 		.then((res) => res.json() as Promise<ArtistDto>);
 
 	return {

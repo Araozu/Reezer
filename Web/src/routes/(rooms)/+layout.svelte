@@ -70,13 +70,13 @@ $effect(() => () =>
 	<div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10 z-50">
 		<div class="flex w-full flex-col justify-center items-center gap-6">
 			<div class="flex items-center gap-2 self-center font-medium">
-				<div class="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
+				<div class="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-lg">
 					<Disc3 class="size-4" />
 				</div>
 				Reezer
 			</div>
 
-			<Card.Root class="w-full max-w-md bg-glass-bg backdrop-blur-xl border-glass-border shadow-[0_4px_24px_-4px_var(--glass-shadow),inset_0_1px_1px_var(--glass-highlight)]">
+			<Card.Root class="w-full max-w-md bg-card border-border shadow-lg">
 				<Card.Header>
 					<Card.Title class="flex items-center gap-2">
 						{#if syncStatus === "connecting"}

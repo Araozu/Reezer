@@ -12,7 +12,7 @@ const playerManager = GetPlayerManagerContext();
 
 const VOLUME_STORAGE_KEY = "reezer-volume";
 
-onMount(() =>
+if (typeof window !== "undefined")
 {
 	const savedVolume = localStorage.getItem(VOLUME_STORAGE_KEY);
 	if (savedVolume !== null)
@@ -23,7 +23,7 @@ onMount(() =>
 			playerManager.SetVolume(volume);
 		}
 	}
-});
+}
 </script>
 
 {#if isDesktop.current}

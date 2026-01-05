@@ -41,6 +41,25 @@ export function useAddYtSong()
 	return mutation as unknown as WithProblemDetails<typeof mutation>;
 }
 
+export function useDeleteYtSong()
+{
+	const queryClient = useQueryClient();
+
+	const mutation = createMutation({
+		mutationFn: (ytId: string) => api.DELETE("/api/Yt/{ytId}", {
+			params: {
+				path: { ytId },
+			},
+		}),
+		onSuccess: () =>
+		{
+			queryClient.invalidateQueries({ queryKey: ["ytSongs"] });
+		},
+	});
+
+	return mutation as unknown as WithProblemDetails<typeof mutation>;
+}
+
 export function useSetYtCookies()
 {
 	const mutation = createMutation({

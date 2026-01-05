@@ -148,7 +148,7 @@ function toggleLoopMode()
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
 			<button
-				class="px-3 opacity-0 group-hover/queue-item:opacity-100 hover:bg-destructive/20 rounded-r-[11px] transition-all duration-300 active:scale-95 flex items-center touch-action-manipulation [-webkit-tap-highlight-color:transparent]"
+				class="px-3 opacity-0 group-hover/queue-item:opacity-100 hover:bg-destructive/20 rounded-r-xl transition-all duration-300 active:scale-95 flex items-center touch-action-manipulation [-webkit-tap-highlight-color:transparent]"
 				onclick={(e) =>
 				{
 					e.stopPropagation();
