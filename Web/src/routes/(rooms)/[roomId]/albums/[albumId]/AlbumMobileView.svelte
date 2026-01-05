@@ -1,49 +1,49 @@
 <script lang="ts">
-	import { Disc, ListEnd, Play, EllipsisVertical } from "lucide-svelte";
-	import Button from "$lib/components/ui/button/button.svelte";
-	import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
-	import AlbumCover from "~/components/album-cover.svelte";
-	import SongRow from "./SongRow.svelte";
-	import type { RegularSong } from "./queries";
+import { Disc, ListEnd, Play, EllipsisVertical } from "lucide-svelte";
+import Button from "$lib/components/ui/button/button.svelte";
+import * as DropdownMenu from "$lib/components/ui/dropdown-menu";
+import AlbumCover from "~/components/album-cover.svelte";
+import SongRow from "./SongRow.svelte";
+import type { RegularSong } from "./queries";
 
-	interface Props {
-		albumId: string;
-		albumName: string;
-		songs: RegularSong[];
-		currentSongId: string | null;
-		uniqueDiscs: number[];
-		getSongsForDisc: (discNumber: number) => RegularSong[];
-		getSongIndex: (song: RegularSong) => number;
-		onPlayAll: () => void;
-		onAddAllToQueue: () => void;
-		onPlayFromSong: (index: number) => void;
-		onAddLastSong: (song: RegularSong) => void;
-		onAddNextSong: (song: RegularSong) => void;
-		roomId: string;
-		artistId: string;
-		artistName: string;
-	}
+interface Props {
+	albumId: string;
+	albumName: string;
+	songs: RegularSong[];
+	currentSongId: string | null;
+	uniqueDiscs: number[];
+	getSongsForDisc: (discNumber: number) => RegularSong[];
+	getSongIndex: (song: RegularSong) => number;
+	onPlayAll: () => void;
+	onAddAllToQueue: () => void;
+	onPlayFromSong: (index: number) => void;
+	onAddLastSong: (song: RegularSong) => void;
+	onAddNextSong: (song: RegularSong) => void;
+	roomId: string;
+	artistId: string;
+	artistName: string;
+}
 
-	let {
-		albumId,
-		albumName,
-		currentSongId,
-		uniqueDiscs,
-		getSongsForDisc,
-		getSongIndex,
-		onPlayAll,
-		onAddAllToQueue,
-		onPlayFromSong,
-		onAddLastSong,
-		onAddNextSong,
-	}: Props = $props();
+let {
+	albumId,
+	albumName,
+	currentSongId,
+	uniqueDiscs,
+	getSongsForDisc,
+	getSongIndex,
+	onPlayAll,
+	onAddAllToQueue,
+	onPlayFromSong,
+	onAddLastSong,
+	onAddNextSong,
+}: Props = $props();
 
-	function copyTracklist(discNumber: number)
-	{
-		const songs = getSongsForDisc(discNumber);
-		const text = songs.map((s) => s.name).join("\n");
-		navigator.clipboard.writeText(text);
-	}
+function copyTracklist(discNumber: number)
+{
+	const songs = getSongsForDisc(discNumber);
+	const text = songs.map((s) => s.name).join("\n");
+	navigator.clipboard.writeText(text);
+}
 </script>
 
 <div class="relative">
@@ -85,7 +85,7 @@
 							Copy Tracklist
 						</DropdownMenu.Item>
 					{:else}
-						{#each uniqueDiscs as disc}
+						{#each uniqueDiscs as disc (disc)}
 							<DropdownMenu.Item onclick={() => copyTracklist(disc)}>
 								Copy Disc {disc} Tracklist
 							</DropdownMenu.Item>

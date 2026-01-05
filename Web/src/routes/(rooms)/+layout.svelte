@@ -2,14 +2,19 @@
 import * as Card from "$lib/components/ui/card";
 import { Disc3, Loader2, AlertCircle } from "lucide-svelte";
 import { goto } from "$app/navigation";
-import { SetPlayerManagerContext } from "~/context/music-player-context";
+import { SetPlayerManagerContext, SetSvelteManagerContext } from "~/context/music-player-context";
 import { SoloPlayerManager } from "~/audio-engine/managers/SoloPlayerManager";
-    import { UrlAudioSource } from "~/audio-engine/audio-sources/UrlAudioSource";
+import { UrlAudioSource } from "~/audio-engine/audio-sources/UrlAudioSource";
+import { SvPlayerManager } from "~/audio-engine/managers/SvPlayerManager.svelte";
 
 let { children } = $props();
 
 const playerManager = new SoloPlayerManager(new UrlAudioSource());
 SetPlayerManagerContext(playerManager);
+
+// Svelte manager with reactivity
+const svManager = new SvPlayerManager(playerManager);
+SetSvelteManagerContext(svManager);
 
 const syncStatus: string = $derived("connected");
 

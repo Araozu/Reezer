@@ -20,8 +20,16 @@ export interface IPlayerManager {
 	 */
 	HasPermission(action: Action): boolean;
 
-	/** Plays a song. May fail if the current user doesn't have permission to do so. */
+	/** Plays a single song. May fail if the current user doesn't have permission to do so. */
 	PlaySong(song: ISong): Promise<Result<void, unknown>>;
+
+	/**
+	 * Plays many songs. May fail if the current user doesn't have permission to do so.
+	 *
+	 * Clears the remaining queue, adds the list at the end,
+	 * and plays from the first element of that newly added list
+	 */
+	PlaySongList(songs: Array<ISong>): Promise<Result<void, unknown>>;
 
 	/**
 	 * Sets the volume, as a value between 0 and 1.

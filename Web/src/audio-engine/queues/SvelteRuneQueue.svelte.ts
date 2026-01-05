@@ -18,7 +18,8 @@ export class SvelteRuneQueue
 		this.currentSong = iqueue.currentSong;
 		this.loopMode = iqueue.loopMode;
 
-		iqueue.OnQueueChanged(() =>
+		// FIXME:
+		iqueue?.OnQueueChanged?.(() =>
 		{
 			this.queue = iqueue.queue;
 			this.currentIdx = iqueue.currentIdx;

@@ -8,10 +8,13 @@ import AlbumMobileSkeleton from "./AlbumMobileSkeleton.svelte";
 import AlbumDesktopSkeleton from "./AlbumDesktopSkeleton.svelte";
 import type { RegularSong } from "./queries";
 import { SvelteRuneQueue } from "~/audio-engine/queues/SvelteRuneQueue.svelte";
+    import { GetSvelteManagerContext } from "~/context/music-player-context";
 
 type AlbumWithTracklistDto = components["schemas"]["AlbumWithTracklistDto"];
 
 let { data }: PageProps = $props();
+
+const manager = GetSvelteManagerContext();
 
 const queue: any = {}; // FIXME: regression
 const svQueue = new SvelteRuneQueue(queue);
@@ -115,7 +118,7 @@ function playFromSong(songs: RegularSong[], index: number)
 			onPlayFromSong={(idx) => playFromSong(songs, idx)}
 			onAddLastSong={(song) => queue.AddLastSong(song)}
 			onAddNextSong={(song) => queue.AddNextSong(song)}
-			onPlayAll={() => queue.PlaySongList(songs)}
+			onPlayAll={() => manager.imanager.PlaySongList(songs)}
 			onAddAllToQueue={() => queue.AddLastSongList(songs)}
 			{roomId}
 			{artistId}

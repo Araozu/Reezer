@@ -30,6 +30,15 @@ export class SoloPlayerManager implements IPlayerManager
 		this.mediaSession.Init();
 	}
 
+	async PlaySongList(songs: Array<ISong>): Promise<Result<void, unknown>>
+	{
+		await this.Init();
+		// Checking for permission is not needed in solo player
+
+		this.queueManager.PlaySongList(songs);
+		return ok();
+	}
+
 	HasPermission(action: Action): boolean
 	{
 		void action;
@@ -38,6 +47,7 @@ export class SoloPlayerManager implements IPlayerManager
 
 	async PlaySong(song: ISong): Promise<Result<void, unknown>>
 	{
+		await this.Init();
 		this.queueManager.PlaySong(song);
 		return ok();
 	}
@@ -54,6 +64,7 @@ export class SoloPlayerManager implements IPlayerManager
 
 	async Init(): Promise<Result<void, unknown>>
 	{
+		this.audioBackend.Init();
 		return ok();
 	}
 

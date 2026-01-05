@@ -174,6 +174,11 @@ export class DualAudioBackend implements IAudioBackend
 	 */
 	Init(): void
 	{
+		if (this.player1)
+		{
+			return;
+		}
+
 		this.player1 = new Audio();
 		this.player2 = new Audio();
 		this.player1.volume = this._volume;

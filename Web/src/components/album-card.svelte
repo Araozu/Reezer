@@ -4,11 +4,11 @@ import * as Card from "~/lib/components/ui/card-plain";
 import AlbumCover from "./album-cover.svelte";
 import { page } from "$app/state";
 import { extractColorsFromImage } from "$lib/color-extractor";
-import { onMount } from "svelte";
 
 type Album = components["schemas"]["AlbumDto"];
 
 let { album }: { album: Album } = $props();
+const roomId = page.params.roomId;
 
 let isHovered = $state(false);
 let extractedColors = $state<string[]>([]);
@@ -18,13 +18,9 @@ let showGlow = $derived(isHovered && extractedColors.length > 0);
 
 const coverUrl = `/api/Albums/${album.id}/cover`;
 
-onMount(() =>
+$effect(() =>
 {
-	if (
-		isHovered &&
-			extractedColors.length === 0 &&
-			!hasTriedExtraction
-	)
+	if (isHovered && extractedColors.length === 0 && !hasTriedExtraction)
 	{
 		hasTriedExtraction = true;
 		extractColorsFromImage(coverUrl, 4).then((result) =>
@@ -35,20 +31,14 @@ onMount(() =>
 });
 </script>
 
-<a
-	bind:this={cardRef}
-	class="inline-block touch-action-manipulation [-webkit-tap-highlight-color:transparent]"
-	href={`/${roomId}/albums/${album.id}`}
->
+<a class="inline-block touch-action-manipulation [-webkit-tap-highlight-color:transparent]" href={`/${roomId}/albums/${album.id}`}>
 	<Card.Root
 		class="w-full transition-all duration-300 relative overflow-hidden"
 		onmouseenter={() => (isHovered = true)}
 		onmouseleave={() => (isHovered = false)}
 	>
 		<div
-			class="absolute inset-0 transition-opacity {showGlow
-				? "duration-500"
-				: "duration-[250ms]"}"
+			class="absolute inset-0 transition-opacity {showGlow ? "duration-500" : "duration-250"}"
 			style:opacity={showGlow ? 1 : 0}
 		>
 			{#if extractedColors.length > 0}
@@ -87,9 +77,7 @@ onMount(() =>
 				href={`/${roomId}/artists/${album.artistId}`}
 				class="touch-action-manipulation [-webkit-tap-highlight-color:transparent]"
 			>
-				<Card.Description
-					class="truncate hover:text-foreground transition-colors"
-				>
+				<Card.Description class="truncate hover:text-foreground transition-colors">
 					<span>{album.artistName}</span>
 				</Card.Description>
 			</a>

@@ -1,22 +1,22 @@
 <script lang="ts">
-	import type { components } from "~/api";
-	import { ListStart, Play, Plus } from "lucide-svelte";
+import type { components } from "~/api";
+import { ListStart, Play, Plus } from "lucide-svelte";
 
-	type SongDto = components["schemas"]["SongDto"];
+type SongDto = components["schemas"]["SongDto"];
 
-	interface Props {
-		song: SongDto;
-		isCurrentSong: boolean;
-		onPlay: () => void;
-		onAddLast: () => void;
-		onAddNext: () => void;
-	}
+interface Props {
+	song: SongDto;
+	isCurrentSong: boolean;
+	onPlay: () => void;
+	onAddLast: () => void;
+	onAddNext: () => void;
+}
 
-	let { song, isCurrentSong, onPlay, onAddLast, onAddNext }: Props = $props();
+let { song, isCurrentSong, onPlay, onAddLast, onAddNext }: Props = $props();
 
-	let currentSongClass = $derived(isCurrentSong
-		? "bg-primary/10 border border-primary/30 shadow-[0_0_0_1px_var(--glass-border),inset_0_1px_1px_var(--glass-highlight)]"
-		: "border border-transparent");
+let currentSongClass = $derived(isCurrentSong
+	? "bg-primary/10 border border-primary/30 shadow-[0_0_0_1px_var(--glass-border),inset_0_1px_1px_var(--glass-highlight)]"
+	: "border border-transparent");
 </script>
 
 <div class={`group/row grid grid-cols-[auto_2.5rem_2.5rem] rounded-xl transition-all duration-300 hover:bg-glass-bg-hover hover:backdrop-blur-lg hover:shadow-[inset_0_1px_1px_var(--glass-highlight)] ${currentSongClass}`}>
