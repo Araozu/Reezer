@@ -12,6 +12,7 @@ import {
 import VolumeSlider from "./volume-slider.svelte";
 import PositionSlider from "./position-slider.svelte";
 import type { ISong } from "~/audio-engine/types";
+import { GetSvelteManagerContext } from "~/context/music-player-context";
 
 let {
 	coverUrl = $bindable(),
@@ -21,13 +22,11 @@ let {
 	song: ISong | null;
 } = $props();
 
-// FIXME: regression
-let player : any = {};
-let queue: any = {};
+const svManager = GetSvelteManagerContext();
 const roomId = page.params.roomId;
 
-let isPaused = false;
-let isBuffering = false;
+let isPaused = $derived(svManager.playState === "paused");
+let isBuffering = $derived(svManager.playState === "buffering");
 
 let artistName = $derived.by(() =>
 {
@@ -78,13 +77,13 @@ let artistLink = $derived.by(() =>
 <div class={["flex items-center gap-1 my-6"]}>
 	<button
 		class="hover:bg-glass-bg-hover rounded-xl cursor-pointer transition-all duration-300 active:scale-95"
-		onclick={() => queue.Prev()}
+		onclick={() => svManager.imanager.Prev()}
 	>
 		<SkipBack class="m-2.5" size={18} />
 	</button>
 	<button
 		class="hover:bg-glass-bg-hover rounded-full cursor-pointer transition-all duration-300 active:scale-95 border border-glass-border"
-		onclick={() => player.TogglePlayPause()}
+		onclick={() => svManager.imanager.TogglePlayPause()}
 	>
 		{#if isBuffering}
 			<LoaderCircle class="m-2 animate-spin" size={32} />
@@ -96,7 +95,7 @@ let artistLink = $derived.by(() =>
 	</button>
 	<button
 		class="hover:bg-glass-bg-hover rounded-xl cursor-pointer transition-all duration-300 active:scale-95"
-		onclick={() => queue.Next()}
+		onclick={() => svManager.imanager.Next()}
 	>
 		<SkipForward class="m-2.5" size={18} />
 	</button>

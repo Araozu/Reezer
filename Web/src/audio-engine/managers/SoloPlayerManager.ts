@@ -1,7 +1,7 @@
 import { ok, type Result } from "neverthrow";
 import type { Action, IPlayerManager } from "../interfaces/IPlayerManager";
 import { type ISong, LoopMode } from "../types";
-import type { IAudioBackend } from "../interfaces/IAudioBackend";
+import type { IAudioBackend, PlayState } from "../interfaces/IAudioBackend";
 import type { IQueue } from "../interfaces/IQueue";
 import { DualAudioBackend } from "../backends/DualAudioBackend";
 import type { IAudioSource } from "../interfaces/IAudioSource";
@@ -16,7 +16,7 @@ import type { IMediaSession } from "../interfaces/IMediaSession";
  */
 export class SoloPlayerManager implements IPlayerManager
 {
-	private readonly audioBackend: IAudioBackend;
+	private readonly audioBackend: DualAudioBackend;
 	private readonly queueManager: IQueue;
 	private readonly mediaSession: IMediaSession;
 
@@ -116,6 +116,20 @@ export class SoloPlayerManager implements IPlayerManager
 		return ok();
 	}
 
+	async TogglePlayPause(): Promise<Result<void, unknown>>
+	{
+		await this.Init();
+		this.audioBackend.TogglePlayPause();
+		return ok();
+	}
+
+	async Seek(position: number): Promise<Result<void, unknown>>
+	{
+		await this.Init();
+		this.audioBackend.Seek(position);
+		return ok();
+	}
+
 	HasPermission(action: Action): boolean
 	{
 		void action;
@@ -170,8 +184,38 @@ export class SoloPlayerManager implements IPlayerManager
 		return this.queueManager.loopMode;
 	}
 
+	GetPlayState(): PlayState
+	{
+		return this.audioBackend.playState;
+	}
+
+	GetDuration(): number | null
+	{
+		return this.audioBackend.duration;
+	}
+
+	GetPosition(): number
+	{
+		return this.audioBackend.position;
+	}
+
 	OnQueueChanged(callback: () => void): void
 	{
 		this.queueManager.OnQueueChanged(callback);
+	}
+
+	OnPlayStateChanged(callback: (state: PlayState) => void): void
+	{
+		this.audioBackend.OnPlayStateChange(callback);
+	}
+
+	OnPositionUpdate(callback: (positionSeconds: number) => void): void
+	{
+		this.audioBackend.OnPositionUpdate(callback);
+	}
+
+	OnDurationChange(callback: (durationSeconds: number) => void): void
+	{
+		this.audioBackend.OnDurationChange(callback);
 	}
 }

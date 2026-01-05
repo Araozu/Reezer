@@ -2,10 +2,12 @@
 import * as Card from "$lib/components/ui/card";
 import { Disc3, Loader2, AlertCircle } from "lucide-svelte";
 import { goto } from "$app/navigation";
-import { SetPlayerManagerContext, SetSvelteManagerContext } from "~/context/music-player-context";
+import { SetPlayerManagerContext, SetSvelteManagerContext, SetSyncRoomManagerContext } from "~/context/music-player-context";
 import { SoloPlayerManager } from "~/audio-engine/managers/SoloPlayerManager";
 import { UrlAudioSource } from "~/audio-engine/audio-sources/UrlAudioSource";
 import { SvPlayerManager } from "~/audio-engine/managers/SvPlayerManager.svelte";
+import { SyncPlayerManager } from "~/audio-engine/managers/SyncPlayerManager.svelte";
+import { page } from "$app/state";
 
 let { children } = $props();
 
@@ -16,7 +18,11 @@ SetPlayerManagerContext(playerManager);
 const svManager = new SvPlayerManager(playerManager);
 SetSvelteManagerContext(svManager);
 
-const syncStatus: string = $derived("connected");
+// Sync manager for room features
+const syncRoomManager = new SyncPlayerManager(page.params.roomId);
+SetSyncRoomManagerContext(syncRoomManager);
+
+const syncStatus = $derived(syncRoomManager.status);
 
 let countdown = $state(5);
 
@@ -45,6 +51,7 @@ $effect(() => () =>
 {
 	console.log("[rooms layout] Cleanup called - cleaning up player manager");
 	// playerManager.destroy();
+	syncRoomManager.destroy();
 });
 </script>
 

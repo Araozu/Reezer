@@ -1,25 +1,11 @@
 <script lang="ts">
 import { Slider } from "$lib/components/ui/slider";
-import { onMount } from "svelte";
+import { GetSvelteManagerContext } from "~/context/music-player-context";
 
-// FIXME: regression
-let player: any = {};
+const svManager = GetSvelteManagerContext();
 
-let duration = $state(player.duration ?? 0);
-let currentTime = $state(0);
-
-onMount(() =>
-{
-	player.OnDurationChange((newDuration) =>
-	{
-		duration = newDuration;
-	});
-
-	player.OnPositionUpdate((newTime) =>
-	{
-		currentTime = newTime;
-	});
-});
+let duration = $derived(svManager.duration ?? 0);
+let currentTime = $derived(svManager.position);
 
 let positionValue = $derived(duration > 0 ? (currentTime / duration) * 100 : 0);
 
@@ -40,7 +26,7 @@ function HandleSliderClick(event: MouseEvent)
 	const percentage = clickX / rect.width;
 	const seekTime = percentage * duration;
 
-	player.Seek(seekTime);
+	svManager.imanager.Seek(seekTime);
 }
 
 function HandleValueCommit(newValue: number[] | number)
@@ -48,7 +34,7 @@ function HandleValueCommit(newValue: number[] | number)
 	let percentage = 0;
 	if (Array.isArray(newValue))
 	{
-		if (newValue.length > 0) percentage = newValue[0];
+		if (newValue.length > 0) percentage = newValue[0]!;
 	}
 	else
 	{
@@ -56,7 +42,7 @@ function HandleValueCommit(newValue: number[] | number)
 	}
 
 	const seekTime = (percentage / 100) * duration;
-	player.Seek(seekTime);
+	svManager.imanager.Seek(seekTime);
 }
 </script>
 

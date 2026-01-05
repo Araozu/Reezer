@@ -1,10 +1,11 @@
 <script lang="ts">
 import * as Dialog from "$lib/components/ui/dialog";
 import { Activity, Clock, Gauge, Signal, Timer } from "lucide-svelte";
+import { GetSyncRoomManagerContext } from "~/context/music-player-context";
 
 let { open = $bindable(false) } = $props();
 
-const playerManager : any = {};
+const playerManager = GetSyncRoomManagerContext();
 const syncResult = $derived(playerManager.syncResult);
 const status = $derived(playerManager.status);
 

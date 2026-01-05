@@ -1,5 +1,6 @@
 import type { Result } from "neverthrow";
-import type { ISong, LoopMode } from "../types";
+import { type ISong, LoopMode } from "../types";
+import type { PlayState } from "./IAudioBackend";
 
 /**
  * Abstracts over the player operations.
@@ -64,6 +65,12 @@ export interface IPlayerManager {
 	/** Sets the loop mode. May fail if no permission. */
 	SetLoopMode(mode: LoopMode): Promise<Result<void, unknown>>;
 
+	/** Toggles between play and pause. May fail if no permission. */
+	TogglePlayPause(): Promise<Result<void, unknown>>;
+
+	/** Seeks to a position in seconds. May fail if no permission. */
+	Seek(position: number): Promise<Result<void, unknown>>;
+
 	/**
 	 * Sets the volume, as a value between 0 and 1.
 	 *
@@ -78,7 +85,14 @@ export interface IPlayerManager {
 	GetCurrentIdx(): number;
 	GetLoopMode(): LoopMode;
 
+	GetPlayState(): PlayState;
+	GetDuration(): number | null;
+	GetPosition(): number;
+
 	OnQueueChanged(callback: () => void): void;
+	OnPlayStateChanged(callback: (state: PlayState) => void): void;
+	OnPositionUpdate(callback: (positionSeconds: number) => void): void;
+	OnDurationChange(callback: (durationSeconds: number) => void): void;
 }
 
 export type Action = "PlaySong"
@@ -95,4 +109,5 @@ export type Action = "PlaySong"
                    | "SetQueue"
                    | "SetLoopMode"
                    | "TogglePlayPause"
+                   | "Seek"
 

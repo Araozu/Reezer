@@ -9,6 +9,7 @@ import AlbumCover from "~/components/album-cover.svelte";
 import type { ISong } from "~/audio-engine/types";
 import YoutubeSearchDialog from "./youtube-search-dialog.svelte";
 import { derived, writable } from "svelte/store";
+import { GetSvelteManagerContext } from "~/context/music-player-context";
 
 type SongDto = components["schemas"]["SongDto"];
 type YtSongDto = components["schemas"]["YtSongDto"];
@@ -23,7 +24,7 @@ type UnifiedSearchResult = {
 };
 
 const roomId = page.params.roomId;
-const queue: any = {}; // FIXME: regression
+const svManager = GetSvelteManagerContext();
 
 let searchInput = $state("");
 const searchQuery = writable<string | null>(null);
@@ -70,7 +71,7 @@ function playSong(song: SongDto)
 		album: song.album,
 		albumId: song.albumId,
 	};
-	queue.PlaySong(queueSong);
+	svManager.imanager.PlaySong(queueSong);
 }
 
 function playYtSong(song: YtSongDto)
@@ -80,7 +81,7 @@ function playYtSong(song: YtSongDto)
 		name: song.name,
 		type: "youtube",
 	};
-	queue.PlaySong(queueSong);
+	svManager.imanager.PlaySong(queueSong);
 }
 
 const hasResults = $derived($searchResults.data &&

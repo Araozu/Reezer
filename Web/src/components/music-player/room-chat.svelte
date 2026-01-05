@@ -2,8 +2,9 @@
 import { Button } from "$lib/components/ui/button";
 import { Input } from "$lib/components/ui/input";
 import { Send } from "lucide-svelte";
+import { GetSyncRoomManagerContext } from "~/context/music-player-context";
 
-const playerManager: any = {};
+const playerManager = GetSyncRoomManagerContext();
 
 let newMessage = $state("");
 let chatContainer: HTMLDivElement;
