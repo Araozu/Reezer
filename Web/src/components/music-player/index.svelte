@@ -12,7 +12,7 @@ const player = GetPlayerContext();
 
 const VOLUME_STORAGE_KEY = "reezer-volume";
 
-onMount(() =>
+if (typeof window !== "undefined")
 {
 	const savedVolume = localStorage.getItem(VOLUME_STORAGE_KEY);
 	if (savedVolume !== null)
@@ -23,7 +23,7 @@ onMount(() =>
 			player.volume = volume;
 		}
 	}
-});
+}
 </script>
 
 {#if isDesktop.current}

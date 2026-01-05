@@ -176,6 +176,8 @@ export class DualAudioBackend implements IAudioBackend
 	{
 		this.player1 = new Audio();
 		this.player2 = new Audio();
+		this.player1.crossOrigin = "use-credentials";
+		this.player2.crossOrigin = "use-credentials";
 		this.player1.volume = this._volume;
 		this.player2.volume = this._volume;
 

@@ -314,7 +314,9 @@ export class WebAudioBackend implements IAudioBackend
 
 		try
 		{
-			const response = await fetch(url);
+			const response = await fetch(url, {
+				credentials: "include",
+			});
 			if (!response.ok)
 			{
 				throw new Error(`HTTP ${response.status}: ${response.statusText}`);

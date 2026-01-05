@@ -6,7 +6,6 @@ import { Textarea } from "$lib/components/ui/textarea";
 import { ytCookiesOpenState } from "./yt-cookies-dialog.impl.svelte";
 import { useSetYtCookies } from "./yt/queries";
 
-let open = $derived(ytCookiesOpenState.open);
 let cookiesText = $state("");
 let errorMessage = $state<string | null>(null);
 
@@ -43,7 +42,7 @@ async function handleSubmit(e: Event)
 }
 </script>
 
-<Dialog.Root bind:open>
+<Dialog.Root bind:open={ytCookiesOpenState.open}>
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title>Set YouTube Cookies</Dialog.Title>

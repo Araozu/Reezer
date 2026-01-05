@@ -7,7 +7,9 @@ export const load: PageLoad = async({params, fetch}) =>
 {
 	const albumId = params.albumId;
 
-	const albumDataPromise = fetch(`/api/Albums/${albumId}`)
+	const albumDataPromise = fetch(`/api/Albums/${albumId}`, {
+		credentials: "include",
+	})
 		.then((res) => res.json() as Promise<AlbumWithTracklistDto>);
 
 	return {

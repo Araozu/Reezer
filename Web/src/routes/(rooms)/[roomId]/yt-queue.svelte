@@ -8,7 +8,6 @@ import YtQueueItem from "./yt-queue-item.svelte";
 import {ytOpenState } from "./yt-queue.impl.svelte";
 import { openYtCookiesDialog } from "./yt-cookies-dialog.impl.svelte";
 
-let open = $derived(ytOpenState.open);
 let url = $state("");
 let errorMessage = $state<string | null>(null);
 
@@ -32,7 +31,7 @@ async function handleSubmit(e: Event)
 }
 </script>
 
-<Dialog.Root bind:open>
+<Dialog.Root bind:open={ytOpenState.open}>
 	<Dialog.Content>
 		<Dialog.Header>
 			<Dialog.Title class="flex items-center justify-between">
