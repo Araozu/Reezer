@@ -15,6 +15,8 @@ export interface IAudioBackend {
 	set volume(value: number)
 
 	get duration(): number | null;
+	get position(): number;
+	get playState(): PlayState;
 
 	/**
 	 * Plays the audio track with the given id.

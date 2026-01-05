@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { GetSyncPlayerManagerContext } from "~/context/music-player-context";
 	import { Users, User } from "lucide-svelte";
+	import { GetSyncRoomManagerContext } from "~/context/music-player-context";
 
-	const playerManager = GetSyncPlayerManagerContext();
+	const playerManager = GetSyncRoomManagerContext();
 	const connectedUsers = $derived(playerManager.connectedUsers);
 </script>
 

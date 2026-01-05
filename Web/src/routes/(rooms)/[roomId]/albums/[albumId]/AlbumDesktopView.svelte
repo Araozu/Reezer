@@ -41,7 +41,8 @@
 		artistName,
 	}: Props = $props();
 
-	function copyTracklist(discNumber: number) {
+	function copyTracklist(discNumber: number)
+	{
 		const songs = getSongsForDisc(discNumber);
 		const text = songs.map((s) => s.name).join("\n");
 		navigator.clipboard.writeText(text);
@@ -50,7 +51,7 @@
 
 <div class="grid grid-cols-[20rem_auto] xl:grid-cols-[35rem_auto]">
 	<div>
-	<div class="h-screen w-[20rem] xl:w-[35rem] flex flex-col items-center justify-center px-4 fixed top-0">
+	<div class="h-screen w-[20rem] xl:w-140 flex flex-col items-center justify-center px-4 fixed top-0">
 		<AlbumCover {albumId} {albumName} skipFadeIn />
 		<div class="w-full px-4 py-2 transform -translate-y-8">
 			<div class="py-1 font-display text-4xl font-bold text-center backdrop-blur-xl bg-glass-bg border border-glass-border rounded-2xl
@@ -93,7 +94,7 @@
 							Copy Tracklist
 						</DropdownMenu.Item>
 					{:else}
-						{#each uniqueDiscs as disc}
+						{#each uniqueDiscs as disc (disc)}
 							<DropdownMenu.Item onclick={() => copyTracklist(disc)}>
 								Copy Disc {disc} Tracklist
 							</DropdownMenu.Item>

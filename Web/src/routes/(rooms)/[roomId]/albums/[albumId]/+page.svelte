@@ -7,17 +7,15 @@ import AlbumDesktopView from "./AlbumDesktopView.svelte";
 import AlbumMobileSkeleton from "./AlbumMobileSkeleton.svelte";
 import AlbumDesktopSkeleton from "./AlbumDesktopSkeleton.svelte";
 import type { RegularSong } from "./queries";
-import { GetQueueContext } from "~/context/music-player-context";
-import { SvelteRuneQueue } from "~/audio-engine/queues/SvelteRuneQueue.svelte";
+import { GetSvelteManagerContext } from "~/context/music-player-context";
 
 type AlbumWithTracklistDto = components["schemas"]["AlbumWithTracklistDto"];
 
 let { data }: PageProps = $props();
 
-const queue = GetQueueContext();
-const svQueue = new SvelteRuneQueue(queue);
+const svManager = GetSvelteManagerContext();
 
-const currentSongId = $derived(svQueue.currentSong?.id ?? null);
+const currentSongId = $derived(svManager.currentSong?.id ?? null);
 
 let albumId = $derived(page.params.albumId ?? "-");
 let roomId = $derived(page.params.roomId ?? "-");
@@ -63,7 +61,7 @@ function getSongIndex(songs: RegularSong[], song: RegularSong): number
 
 function playFromSong(songs: RegularSong[], index: number)
 {
-	queue.PlaySongList(songs.slice(index));
+	svManager.imanager.PlaySongList(songs.slice(index));
 }
 </script>
 
@@ -94,11 +92,11 @@ function playFromSong(songs: RegularSong[], index: number)
 			{uniqueDiscs}
 			getSongsForDisc={(disc) => getSongsForDisc(songs, disc)}
 			getSongIndex={(song) => getSongIndex(songs, song)}
-			onPlayAll={() => queue.PlaySongList(songs)}
-			onAddAllToQueue={() => queue.AddLastSongList(songs)}
+			onPlayAll={() => svManager.imanager.PlaySongList(songs)}
+			onAddAllToQueue={() => svManager.imanager.AddLastSongList(songs)}
 			onPlayFromSong={(idx) => playFromSong(songs, idx)}
-			onAddLastSong={(song) => queue.AddLastSong(song)}
-			onAddNextSong={(song) => queue.AddNextSong(song)}
+			onAddLastSong={(song) => svManager.imanager.AddLastSong(song)}
+			onAddNextSong={(song) => svManager.imanager.AddNextSong(song)}
 			{roomId}
 			{artistId}
 			{artistName}
@@ -114,10 +112,10 @@ function playFromSong(songs: RegularSong[], index: number)
 			getSongsForDisc={(disc) => getSongsForDisc(songs, disc)}
 			getSongIndex={(song) => getSongIndex(songs, song)}
 			onPlayFromSong={(idx) => playFromSong(songs, idx)}
-			onAddLastSong={(song) => queue.AddLastSong(song)}
-			onAddNextSong={(song) => queue.AddNextSong(song)}
-			onPlayAll={() => queue.PlaySongList(songs)}
-			onAddAllToQueue={() => queue.AddLastSongList(songs)}
+			onAddLastSong={(song) => svManager.imanager.AddLastSong(song)}
+			onAddNextSong={(song) => svManager.imanager.AddNextSong(song)}
+			onPlayAll={() => svManager.imanager.PlaySongList(songs)}
+			onAddAllToQueue={() => svManager.imanager.AddLastSongList(songs)}
 			{roomId}
 			{artistId}
 			{artistName}

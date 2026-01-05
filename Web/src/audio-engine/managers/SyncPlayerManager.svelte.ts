@@ -1,5 +1,6 @@
 import { MusicRoomHubClient, type ChatMessage, type ConnectedUser } from "~/api/MusicRoomHubClient.svelte";
 import { type SyncResult, CalculateMAD } from "~/lib/sync-utils";
+import type { IPlayerManager } from "../interfaces/IPlayerManager";
 
 type ConnectionStatus = "disconnected" | "connecting" | "clock_sync" | "connected" | "reconnecting";
 
