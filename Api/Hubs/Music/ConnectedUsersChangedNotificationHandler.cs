@@ -39,10 +39,8 @@ public class ConnectedUsersChangedNotificationHandler(
             }
         }
 
-        await hubContext.Clients.All.SendAsync(
-            "ConnectedUsersChanged",
-            connectedUsers,
-            cancellationToken
-        );
+        await hubContext
+            .Clients.Group(notification.RoomCode)
+            .SendAsync("ConnectedUsersChanged", connectedUsers, cancellationToken);
     }
 }

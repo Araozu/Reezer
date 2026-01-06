@@ -3,7 +3,12 @@ using Reezer.Application.Notifications;
 
 namespace Reezer.Application.Commands;
 
-public record SendChatMessageCommand(string UserId, string UserName, string Message) : IRequest;
+public record SendChatMessageCommand(
+    string RoomCode,
+    string UserId,
+    string UserName,
+    string Message
+) : IRequest;
 
 public class SendChatMessageCommandHandler(IMediator mediator)
     : IRequestHandler<SendChatMessageCommand>
@@ -13,6 +18,7 @@ public class SendChatMessageCommandHandler(IMediator mediator)
         var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         await mediator.Publish(
             new ChatMessageNotification(
+                request.RoomCode,
                 request.UserId,
                 request.UserName,
                 request.Message,

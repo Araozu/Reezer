@@ -36,10 +36,12 @@ export class MultiplayerManager implements IPlayerManager
 		// Listen for remote queue changes
 		this.syncManager.onQueueChanged((queue, currentIdx) =>
 		{
+			console.log("[MultiplayerManager] Set queue from server");
 			this.isUpdatingFromRemote = true;
 			try
 			{
 				this.queueManager.SetQueue(queue, currentIdx);
+				console.log("[MultiplayerManager] Set queue from server: done");
 			}
 			finally
 			{
@@ -54,8 +56,10 @@ export class MultiplayerManager implements IPlayerManager
 		});
 	}
 
+	/** Sends the queue to the server */
 	private async syncQueue(): Promise<void>
 	{
+		console.log("[MultiplayerManager] Send queue to server", this.queueManager.queue);
 		if (this.isUpdatingFromRemote || this.syncManager.status !== "connected")
 		{
 			return;
@@ -238,3 +242,4 @@ export class MultiplayerManager implements IPlayerManager
 		this.audioBackend.OnDurationChange(callback);
 	}
 }
+

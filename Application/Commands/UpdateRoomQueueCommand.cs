@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.Extensions.Logging;
 using OneOf;
 using Reezer.Application.Notifications;
 using Reezer.Domain.Entities.Room;
@@ -12,7 +13,8 @@ public record UpdateRoomQueueCommand(string RoomCode, IEnumerable<RoomSong> Queu
 
 public class UpdateRoomQueueCommandHandler(
     IMusicRoomRepository roomRepository,
-    IPublisher publisher
+    IPublisher publisher,
+    ILogger<UpdateRoomQueueCommandHandler> logger
 ) : IRequestHandler<UpdateRoomQueueCommand, OneOf<Success, NotFound>>
 {
     public async Task<OneOf<Success, NotFound>> Handle(
@@ -22,9 +24,12 @@ public class UpdateRoomQueueCommandHandler(
     {
         var roomResult = await roomRepository.GetByCodeAsync(request.RoomCode, cancellationToken);
 
-        Console.WriteLine($"Updating room queue for room {request.RoomCode}");
-        Console.WriteLine($"Queue: {string.Join(", ", request.Queue.Select(q => q.Name))}");
-        Console.WriteLine($"CurrentIndex: {request.CurrentIndex}");
+        logger.LogInformation(
+            "Setting queue for Room:",
+            request.RoomCode,
+            string.Join(", ", request.Queue.Select(q => q.Name)),
+            request.CurrentIndex
+        );
 
         return await roomResult.Match<Task<OneOf<Success, NotFound>>>(
             async room =>

@@ -9,6 +9,15 @@ using Reezer.Infrastructure.Identity;
 
 namespace Reezer.Api.Hubs.Music;
 
+public enum MusicRoomResponses
+{
+    Connected,
+    RoomNotFound,
+    UserNotFound,
+    QueueChanged,
+    InvalidRequest,
+}
+
 [Authorize]
 public class MusicRoomHub(
     ILogger<MusicRoomHub> logger,
@@ -19,6 +28,10 @@ public class MusicRoomHub(
 {
     public const string Route = "/hub/MusicRoom";
 
+    /// <summary>
+    /// Connects a user to a room.
+    /// </summary>
+    /// <exception cref="HubException"></exception>
     public override async Task OnConnectedAsync()
     {
         var httpContext = Context.GetHttpContext();
@@ -42,8 +55,18 @@ public class MusicRoomHub(
                 ConnectionId: Context.ConnectionId
             )
         );
-        result.Switch(
-            ok => { },
+
+        await result.Match(
+            async room =>
+            {
+                // Send the current queue state to the caller
+                await Groups.AddToGroupAsync(Context.ConnectionId, room.Code);
+                await Clients.Caller.SendAsync(
+                    MusicRoomResponses.QueueChanged.ToString(),
+                    room.Queue,
+                    room.CurrentIndex
+                );
+            },
             notFound =>
             {
                 throw new HubException($"Room with ID {roomId} not found");
@@ -57,12 +80,6 @@ public class MusicRoomHub(
     {
         await mediator.Send(new DisconnectFromRoomCommand(Context.ConnectionId));
         await base.OnDisconnectedAsync(exception);
-    }
-
-    public async Task Hello(string name)
-    {
-        logger.LogInformation($"Data received in MusicRoomHub.Hello: {name}");
-        await mediator.Send(new MusicRoomHelloCommand(name));
     }
 
     public long SyncClock()
@@ -83,6 +100,12 @@ public class MusicRoomHub(
             throw new HubException("User is not authenticated");
         }
 
+        var room = roomRepository.GetRoomByConnectionId(Context.ConnectionId);
+        if (room == null)
+        {
+            throw new HubException("Room not found for this connection");
+        }
+
         var user = await userManager.FindByIdAsync(userId);
         if (user == null)
         {
@@ -91,9 +114,11 @@ public class MusicRoomHub(
 
         var userName = user.Name ?? user.UserName ?? "Unknown";
 
-        logger.LogInformation($"Chat message from {userName} ({userId}): {message}");
+        logger.LogInformation(
+            $"Chat message from {userName} ({userId}) in room {room.Code}: {message}"
+        );
 
-        await mediator.Send(new SendChatMessageCommand(userId, userName, message));
+        await mediator.Send(new SendChatMessageCommand(room.Code, userId, userName, message));
     }
 
     public async Task SetQueue(IEnumerable<RoomSong> queue, int currentIndex)

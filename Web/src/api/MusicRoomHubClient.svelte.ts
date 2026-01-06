@@ -137,12 +137,6 @@ export class MusicRoomHubClient
 		};
 	}
 
-	/** Call Hello method on the hub */
-	public async Hello(name: string): Promise<void>
-	{
-		await this.connection.invoke("Hello", name);
-	}
-
 	/** Call SyncClock method on the hub - returns server timestamp in milliseconds */
 	public async SyncClock(): Promise<number>
 	{
