@@ -1,6 +1,6 @@
 <script lang="ts">
 import * as Card from "$lib/components/ui/card";
-import { Disc3, Loader2, AlertCircle } from "lucide-svelte";
+import { Disc3, CircleAlert, LoaderCircle } from "lucide-svelte";
 import { goto } from "$app/navigation";
 import { SetPlayerManagerContext, SetSvelteManagerContext, SetSyncRoomManagerContext } from "~/context/music-player-context";
 import { SoloPlayerManager } from "~/audio-engine/managers/SoloPlayerManager";
@@ -60,7 +60,7 @@ $effect(() => () =>
 {#if syncStatus === "reconnecting"}
 	<div class="fixed top-0 left-0 right-0 z-50 bg-glass-bg/95 backdrop-blur-xl border-b border-glass-border shadow-[0_4px_12px_-2px_var(--glass-shadow)]">
 		<div class="flex items-center justify-center gap-2 py-2 px-4">
-			<Loader2 class="size-4 animate-spin" />
+			<LoaderCircle class="size-4 animate-spin" />
 			<span class="text-sm font-medium">Reconnecting...</span>
 		</div>
 	</div>
@@ -80,13 +80,13 @@ $effect(() => () =>
 				<Card.Header>
 					<Card.Title class="flex items-center gap-2">
 						{#if syncStatus === "connecting"}
-							<Loader2 class="size-5 animate-spin" />
+							<LoaderCircle class="size-5 animate-spin" />
 							Connecting...
 						{:else if syncStatus === "clock_sync"}
-							<Loader2 class="size-5 animate-spin" />
+							<LoaderCircle class="size-5 animate-spin" />
 							Synchronizing...
 						{:else if syncStatus === "disconnected"}
-							<AlertCircle class="size-5 text-destructive" />
+							<CircleAlert class="size-5 text-destructive" />
 							Connection Failed
 						{:else}
 							Status: {syncStatus}
