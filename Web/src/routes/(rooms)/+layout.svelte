@@ -6,7 +6,7 @@ import { SetPlayerManagerContext, SetSvelteManagerContext, SetSyncRoomManagerCon
 import { SoloPlayerManager } from "~/audio-engine/managers/SoloPlayerManager";
 import { UrlAudioSource } from "~/audio-engine/audio-sources/UrlAudioSource";
 import { SvPlayerManager } from "~/audio-engine/managers/SvPlayerManager.svelte";
-import { SyncPlayerManager } from "~/audio-engine/managers/SyncPlayerManager.svelte";
+import { SyncManager } from "~/audio-engine/managers/SyncManager.svelte";
 import { page } from "$app/state";
 
 let { children } = $props();
@@ -19,7 +19,7 @@ const svManager = new SvPlayerManager(playerManager);
 SetSvelteManagerContext(svManager);
 
 // Sync manager for room features
-const syncRoomManager = new SyncPlayerManager(page.params.roomId);
+const syncRoomManager = new SyncManager(page.params.roomId);
 SetSyncRoomManagerContext(syncRoomManager);
 
 const syncStatus = $derived(syncRoomManager.status);

@@ -6,8 +6,8 @@ type ConnectionStatus = "disconnected" | "connecting" | "clock_sync" | "connecte
 
 const RESYNC_INTERVAL_MS = 60_000;
 
-/** A player manager with Sync Play capabilities */
-export class SyncPlayerManager
+/** A manager for syncing the clock and other room features */
+export class SyncManager
 {
 	private hubClient: MusicRoomHubClient;
 	private resyncInterval: ReturnType<typeof setInterval> | null = null;
@@ -47,31 +47,17 @@ export class SyncPlayerManager
 
 			if (currentStatus === "connected")
 			{
-				if (this.status === "connecting")
+				if (this.status === "connecting" || this.status === "reconnecting")
 				{
-					// Initial connection
 					this.performClockSync().then(() =>
 					{
 						this.startResyncInterval();
 					})
 						.catch((error) =>
 						{
-							console.error("Clock sync failed after connection:", error);
+							console.error("Clock sync failed:", error);
 						});
 				}
-				else if (this.status === "reconnecting")
-				{
-					// Reconnected
-					this.performClockSync().then(() =>
-					{
-						this.startResyncInterval();
-					})
-						.catch((error) =>
-						{
-							console.error("Clock sync failed after reconnection:", error);
-						});
-				}
-				this.status = "connected";
 			}
 			else if (currentStatus === "reconnecting")
 			{
@@ -165,7 +151,7 @@ export class SyncPlayerManager
 
 			if (i < sampleCount - 1)
 			{
-				await new Promise((resolve) => setTimeout(resolve, 250));
+				await new Promise((resolve) => setTimeout(resolve, 500));
 			}
 		}
 

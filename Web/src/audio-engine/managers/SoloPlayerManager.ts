@@ -20,7 +20,7 @@ export class SoloPlayerManager implements IPlayerManager
 	private readonly queueManager: IQueue;
 	private readonly mediaSession: IMediaSession;
 
-	constructor(private readonly audioSource: IAudioSource)
+	constructor(audioSource: IAudioSource)
 	{
 		this.audioBackend = new DualAudioBackend(audioSource);
 		this.queueManager = new GeneralPurposeQueue(this.audioBackend);
