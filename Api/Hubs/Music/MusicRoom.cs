@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Reezer.Application.Commands;
+using Reezer.Domain.Entities.Room;
+using Reezer.Domain.Repositories.Room;
 using Reezer.Infrastructure.Identity;
 
 namespace Reezer.Api.Hubs.Music;
@@ -11,7 +13,8 @@ namespace Reezer.Api.Hubs.Music;
 public class MusicRoomHub(
     ILogger<MusicRoomHub> logger,
     ISender mediator,
-    UserManager<User> userManager
+    UserManager<User> userManager,
+    IMusicRoomRepository roomRepository
 ) : Hub
 {
     public const string Route = "/hub/MusicRoom";
@@ -34,9 +37,9 @@ public class MusicRoomHub(
         // Try connect to room
         var result = await mediator.Send(
             new ConnectToRoomCommand(
-                code: roomId!,
-                userId: Guid.Parse(userId),
-                connectionId: Context.ConnectionId
+                Code: roomId!,
+                UserId: Guid.Parse(userId),
+                ConnectionId: Context.ConnectionId
             )
         );
         result.Switch(
@@ -58,7 +61,7 @@ public class MusicRoomHub(
 
     public async Task Hello(string name)
     {
-        logger.LogInformation("Data received in MusicRoomHub.Hello: {Name}", name);
+        logger.LogInformation($"Data received in MusicRoomHub.Hello: {name}");
         await mediator.Send(new MusicRoomHelloCommand(name));
     }
 
@@ -88,13 +91,22 @@ public class MusicRoomHub(
 
         var userName = user.Name ?? user.UserName ?? "Unknown";
 
-        logger.LogInformation(
-            "Chat message from {UserName} ({UserId}): {Message}",
-            userName,
-            userId,
-            message
-        );
+        logger.LogInformation($"Chat message from {userName} ({userId}): {message}");
 
         await mediator.Send(new SendChatMessageCommand(userId, userName, message));
+    }
+
+    public async Task SetQueue(IEnumerable<RoomSong> queue, int currentIndex)
+    {
+        var room = roomRepository.GetRoomByConnectionId(Context.ConnectionId);
+        if (room == null)
+        {
+            throw new HubException("Room not found for this connection");
+        }
+
+        var result = await mediator.Send(
+            new UpdateRoomQueueCommand(room.Code, queue, currentIndex)
+        );
+        result.Switch(ok => { }, notFound => throw new HubException(notFound.Reason));
     }
 }

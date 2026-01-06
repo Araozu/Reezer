@@ -27,10 +27,21 @@ public class MusicRoom
     public string Name { get; private set; } = null!;
 
     /// <summary>
+    /// The current queue of songs in the room.
+    /// </summary>
+    private List<RoomSong> _queue = [];
+    public IReadOnlyList<RoomSong> Queue => _queue;
+
+    /// <summary>
+    /// The index of the currently playing song in the queue.
+    /// </summary>
+    public int CurrentIndex { get; private set; } = 0;
+
+    /// <summary>
     /// The participants in the room. Each participant is represented by their UserId and SignalR ConnectionId.
     /// This allows tracking multiple connections per user.
     /// </summary>
-    private HashSet<(Guid, string)> _participants = [];
+    private readonly HashSet<(Guid, string)> _participants = [];
 
     public IReadOnlyCollection<(Guid UserId, string ConnectionId)> Participants => _participants;
 
@@ -42,5 +53,11 @@ public class MusicRoom
     public void RemoveParticipant(Guid userId, string connectionId)
     {
         _participants.Remove((userId, connectionId));
+    }
+
+    public void SetQueue(IEnumerable<RoomSong> queue, int currentIndex)
+    {
+        _queue = queue.ToList();
+        CurrentIndex = currentIndex;
     }
 }

@@ -1,33 +1,57 @@
 <script lang="ts">
 import * as Card from "$lib/components/ui/card";
-import { Disc3, Loader2, AlertCircle } from "lucide-svelte";
+import { Button } from "$lib/components/ui/button";
+import { Disc3, CircleAlert, LoaderCircle, ChevronRight } from "lucide-svelte";
 import { goto } from "$app/navigation";
 import { SetPlayerManagerContext, SetSvelteManagerContext, SetSyncRoomManagerContext } from "~/context/music-player-context";
-import { SoloPlayerManager } from "~/audio-engine/managers/SoloPlayerManager";
+import { MultiplayerManager } from "~/audio-engine/managers/MultiplayerManager";
 import { UrlAudioSource } from "~/audio-engine/audio-sources/UrlAudioSource";
 import { SvPlayerManager } from "~/audio-engine/managers/SvPlayerManager.svelte";
-import { SyncPlayerManager } from "~/audio-engine/managers/SyncPlayerManager.svelte";
+import { SyncManager } from "~/audio-engine/managers/SyncManager.svelte";
 import { page } from "$app/state";
 
 let { children } = $props();
 
-const playerManager = new SoloPlayerManager(new UrlAudioSource());
+// Sync manager for room features
+const syncRoomManager = new SyncManager(page.params.roomId);
+SetSyncRoomManagerContext(syncRoomManager);
+
+const playerManager = new MultiplayerManager(new UrlAudioSource(), syncRoomManager);
 SetPlayerManagerContext(playerManager);
 
 // Svelte manager with reactivity
 const svManager = new SvPlayerManager(playerManager);
 SetSvelteManagerContext(svManager);
 
-// Sync manager for room features
-const syncRoomManager = new SyncPlayerManager(page.params.roomId);
-SetSyncRoomManagerContext(syncRoomManager);
-
 const syncStatus = $derived(syncRoomManager.status);
 
+let hasInitialized = $state(false);
+let isConnecting = $state(false);
 let countdown = $state(5);
+
+async function handleContinue()
+{
+	isConnecting = true;
+	try
+	{
+		await playerManager.Init();
+		await syncRoomManager.connect();
+		hasInitialized = true;
+	}
+	finally
+	{
+		isConnecting = false;
+	}
+}
 
 $effect(() =>
 {
+	if (syncStatus === "disconnected" && !isConnecting && !hasInitialized)
+	{
+		// We don't want to redirect if we haven't even tried to connect yet
+		return;
+	}
+
 	if (syncStatus === "disconnected")
 	{
 		const timer = setInterval(() =>
@@ -50,7 +74,6 @@ $effect(() =>
 $effect(() => () =>
 {
 	console.log("[rooms layout] Cleanup called - cleaning up player manager");
-	// playerManager.destroy();
 	syncRoomManager.destroy();
 });
 </script>
@@ -60,16 +83,16 @@ $effect(() => () =>
 {#if syncStatus === "reconnecting"}
 	<div class="fixed top-0 left-0 right-0 z-50 bg-glass-bg/95 backdrop-blur-xl border-b border-glass-border shadow-[0_4px_12px_-2px_var(--glass-shadow)]">
 		<div class="flex items-center justify-center gap-2 py-2 px-4">
-			<Loader2 class="size-4 animate-spin" />
+			<LoaderCircle class="size-4 animate-spin" />
 			<span class="text-sm font-medium">Reconnecting...</span>
 		</div>
 	</div>
 {/if}
 
-{#if syncStatus === "connecting" || syncStatus === "clock_sync" || syncStatus === "disconnected"}
+{#if syncStatus === "connecting" || syncStatus === "clock_sync" || syncStatus === "disconnected" || (syncStatus === "connected" && !hasInitialized)}
 	<div class="fixed inset-0 bg-black/50 backdrop-blur-sm flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10 z-50">
 		<div class="flex w-full flex-col justify-center items-center gap-6">
-			<div class="flex items-center gap-2 self-center font-medium">
+			<div class="flex items-center gap-2 self-center font-medium text-white">
 				<div class="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-lg">
 					<Disc3 class="size-4" />
 				</div>
@@ -79,28 +102,46 @@ $effect(() => () =>
 			<Card.Root class="w-full max-w-md bg-card border-border shadow-lg">
 				<Card.Header>
 					<Card.Title class="flex items-center gap-2">
-						{#if syncStatus === "connecting"}
-							<Loader2 class="size-5 animate-spin" />
+						{#if isConnecting || syncStatus === "connecting"}
+							<LoaderCircle class="size-5 animate-spin" />
 							Connecting...
 						{:else if syncStatus === "clock_sync"}
-							<Loader2 class="size-5 animate-spin" />
+							<LoaderCircle class="size-5 animate-spin" />
 							Synchronizing...
 						{:else if syncStatus === "disconnected"}
-							<AlertCircle class="size-5 text-destructive" />
-							Connection Failed
+							{#if !hasInitialized && !isConnecting}
+								<Disc3 class="size-5 text-primary" />
+								Join Room
+							{:else}
+								<CircleAlert class="size-5 text-destructive" />
+								Connection Failed
+							{/if}
+						{:else if syncStatus === "connected"}
+							<Disc3 class="size-5 text-primary" />
+							Ready to Play
 						{:else}
 							Status: {syncStatus}
 						{/if}
 					</Card.Title>
 				</Card.Header>
 				<Card.Content class="space-y-4">
-					{#if syncStatus === "connecting"}
+					{#if isConnecting || syncStatus === "connecting"}
 						<p class="text-muted-foreground">Establishing connection to the room...</p>
 					{:else if syncStatus === "clock_sync"}
 						<p class="text-muted-foreground">Synchronizing playback clock...</p>
 					{:else if syncStatus === "disconnected"}
-						<p>Lost connection to the server.</p>
-						<p class="text-sm text-muted-foreground">Redirecting to home in {countdown}s...</p>
+						{#if !hasInitialized && !isConnecting}
+							<p class="text-muted-foreground">Join the room to start listening and chatting with others.</p>
+							<Button class="w-full" onclick={handleContinue}>
+								Connect to Room
+								<ChevronRight class="ml-2 size-4" />
+							</Button>
+						{:else}
+							<p>Lost connection to the server.</p>
+							<p class="text-sm text-muted-foreground">Redirecting to home in {countdown}s...</p>
+						{/if}
+					{:else if syncStatus === "connected"}
+						<p class="text-muted-foreground">Successfully connected to the room. Preparing session...</p>
 					{:else}
 						<p>Unknown status encountered.</p>
 					{/if}

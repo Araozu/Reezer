@@ -1,13 +1,13 @@
 import { MusicRoomHubClient, type ChatMessage, type ConnectedUser } from "~/api/MusicRoomHubClient.svelte";
 import { type SyncResult, CalculateMAD } from "~/lib/sync-utils";
-import type { IPlayerManager } from "../interfaces/IPlayerManager";
+import type { ISong } from "../types";
 
 type ConnectionStatus = "disconnected" | "connecting" | "clock_sync" | "connected" | "reconnecting";
 
 const RESYNC_INTERVAL_MS = 60_000;
 
-/** A player manager with Sync Play capabilities */
-export class SyncPlayerManager
+/** A manager for syncing the clock and other room features */
+export class SyncManager
 {
 	private hubClient: MusicRoomHubClient;
 	private resyncInterval: ReturnType<typeof setInterval> | null = null;
@@ -18,7 +18,6 @@ export class SyncPlayerManager
 
 	constructor(roomId?: string)
 	{
-		this.status = "connecting";
 		this.hubClient = new MusicRoomHubClient(roomId);
 
 		// Subscribe to events
@@ -47,31 +46,18 @@ export class SyncPlayerManager
 
 			if (currentStatus === "connected")
 			{
-				if (this.status === "connecting")
+				if (this.status === "connecting" || this.status === "reconnecting")
 				{
-					// Initial connection
-					this.performClockSync().then(() =>
-					{
-						this.startResyncInterval();
-					})
+					this.performClockSync()
+						.then(() =>
+						{
+							this.startResyncInterval();
+						})
 						.catch((error) =>
 						{
-							console.error("Clock sync failed after connection:", error);
+							console.error("Clock sync failed:", error);
 						});
 				}
-				else if (this.status === "reconnecting")
-				{
-					// Reconnected
-					this.performClockSync().then(() =>
-					{
-						this.startResyncInterval();
-					})
-						.catch((error) =>
-						{
-							console.error("Clock sync failed after reconnection:", error);
-						});
-				}
-				this.status = "connected";
 			}
 			else if (currentStatus === "reconnecting")
 			{
@@ -83,11 +69,24 @@ export class SyncPlayerManager
 				this.stopResyncInterval();
 				this.status = "disconnected";
 			}
-			else if (currentStatus === "connecting")
-			{
-				this.status = "connecting";
-			}
 		});
+	}
+
+	public async connect(): Promise<void>
+	{
+		this.status = "connecting";
+		try
+		{
+			await this.hubClient.start();
+			await this.performClockSync();
+			this.startResyncInterval();
+		}
+		catch (error)
+		{
+			console.error("Connection/Sync failed:", error);
+			this.status = "disconnected";
+			throw error;
+		}
 	}
 
 	private async performClockSync(): Promise<void>
@@ -144,6 +143,16 @@ export class SyncPlayerManager
 		await this.hubClient.SendMessage(message);
 	}
 
+	public async sendQueue(queue: ISong[], currentIndex: number): Promise<void>
+	{
+		await this.hubClient.SetQueue(queue, currentIndex);
+	}
+
+	public onQueueChanged(handler: (queue: ISong[], currentIndex: number) => void): () => void
+	{
+		return this.hubClient.OnQueueChanged(handler);
+	}
+
 	private async syncClock(): Promise<SyncResult>
 	{
 		const samples: { rtt: number; offset: number }[] = [];
@@ -165,7 +174,7 @@ export class SyncPlayerManager
 
 			if (i < sampleCount - 1)
 			{
-				await new Promise((resolve) => setTimeout(resolve, 250));
+				await new Promise((resolve) => setTimeout(resolve, 500));
 			}
 		}
 

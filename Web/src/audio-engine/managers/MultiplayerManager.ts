@@ -1,33 +1,67 @@
 import { ok, type Result } from "neverthrow";
-import type { Action, IPlayerManager } from "../interfaces/IPlayerManager";
-import { type ISong, LoopMode } from "../types";
 import type { IAudioBackend, PlayState } from "../interfaces/IAudioBackend";
+import type { Action, IPlayerManager } from "../interfaces/IPlayerManager";
+import type { ISong, LoopMode } from "../types";
 import type { IQueue } from "../interfaces/IQueue";
-import { DualAudioBackend } from "../backends/DualAudioBackend";
+import type { IMediaSession } from "../interfaces/IMediaSession";
 import type { IAudioSource } from "../interfaces/IAudioSource";
+import { DualAudioBackend } from "../backends/DualAudioBackend";
 import { GeneralPurposeQueue } from "../queues/GeneralPurposeQueue";
 import { BrowserMediaSession } from "../backends/BrowserMediaSession";
-import type { IMediaSession } from "../interfaces/IMediaSession";
+import type { SyncManager } from "./SyncManager.svelte";
 
 /**
- * A player manager for solo (local) playback.
+ * A player manager for multiplayer playback.
  *
- * As this is a solo player, all actions are always allowed.
+ * This manager is responsible for playing music in a room and syncing the playback with other participants.
  */
-export class SoloPlayerManager implements IPlayerManager
+export class MultiplayerManager implements IPlayerManager
 {
 	private readonly audioBackend: IAudioBackend;
 	private readonly queueManager: IQueue;
 	private readonly mediaSession: IMediaSession;
+	private readonly syncManager: SyncManager;
+	private isUpdatingFromRemote = false;
 
-	constructor(audioSource: IAudioSource)
+	constructor(audioSource: IAudioSource, syncManager: SyncManager)
 	{
+		this.syncManager = syncManager;
 		this.audioBackend = new DualAudioBackend(audioSource);
 		this.queueManager = new GeneralPurposeQueue(this.audioBackend);
 
 		// Setup music player
 		this.mediaSession = new BrowserMediaSession(this.queueManager , this.audioBackend);
 		this.mediaSession.Init();
+
+		// Listen for remote queue changes
+		this.syncManager.onQueueChanged((queue, currentIdx) =>
+		{
+			this.isUpdatingFromRemote = true;
+			try
+			{
+				this.queueManager.SetQueue(queue, currentIdx);
+			}
+			finally
+			{
+				this.isUpdatingFromRemote = false;
+			}
+		});
+
+		// Listen for local queue changes to sync with backend
+		this.queueManager.OnQueueChanged(() =>
+		{
+			void this.syncQueue();
+		});
+	}
+
+	private async syncQueue(): Promise<void>
+	{
+		if (this.isUpdatingFromRemote || this.syncManager.status !== "connected")
+		{
+			return;
+		}
+
+		await this.syncManager.sendQueue([...this.queueManager.queue], this.queueManager.currentIdx);
 	}
 
 	async PlaySongList(songs: Array<ISong>): Promise<Result<void, unknown>>

@@ -29,6 +29,11 @@ export interface IAudioBackend {
 	TogglePlayPause(): void
 	Seek(position: number): void
 
+	/**
+	 * Loads the given song into the current player,
+	 * without playing it.
+	 */
+	LoadCurrentSong(track: ISong): Promise<void>;
 	Prefetch(track: ISong): Promise<void>
 	ClearPrefetch(): void;
 
