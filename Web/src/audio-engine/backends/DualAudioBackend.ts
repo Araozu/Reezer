@@ -61,6 +61,14 @@ export class DualAudioBackend implements IAudioBackend
 		}
 
 		this._volume = value;
+		if (this.player1)
+		{
+			this.player1.volume = value;
+		}
+		if (this.player2)
+		{
+			this.player2.volume = value;
+		}
 	}
 
 	async Play(track: ISong): Promise<void>
