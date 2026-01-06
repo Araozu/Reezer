@@ -35,6 +35,8 @@ async function handleContinue()
 	try
 	{
 		await playerManager.Init();
+		// wait some ms for player to settle
+		await new Promise((resolve) => setTimeout(resolve, 150));
 		await syncRoomManager.connect();
 		hasInitialized = true;
 	}

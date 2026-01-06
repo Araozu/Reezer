@@ -9,6 +9,15 @@ using Reezer.Infrastructure.Identity;
 
 namespace Reezer.Api.Hubs.Music;
 
+public enum MusicRoomResponses
+{
+    Connected,
+    RoomNotFound,
+    UserNotFound,
+    QueueChanged,
+    InvalidRequest,
+}
+
 [Authorize]
 public class MusicRoomHub(
     ILogger<MusicRoomHub> logger,
@@ -19,6 +28,10 @@ public class MusicRoomHub(
 {
     public const string Route = "/hub/MusicRoom";
 
+    /// <summary>
+    /// Connects a user to a room.
+    /// </summary>
+    /// <exception cref="HubException"></exception>
     public override async Task OnConnectedAsync()
     {
         var httpContext = Context.GetHttpContext();
@@ -46,8 +59,13 @@ public class MusicRoomHub(
         await result.Match(
             async room =>
             {
+                // Send the current queue state to the caller
                 await Groups.AddToGroupAsync(Context.ConnectionId, room.Code);
-                await Clients.Caller.SendAsync("QueueChanged", room.Queue, room.CurrentIndex);
+                await Clients.Caller.SendAsync(
+                    MusicRoomResponses.QueueChanged.ToString(),
+                    room.Queue,
+                    room.CurrentIndex
+                );
             },
             notFound =>
             {
