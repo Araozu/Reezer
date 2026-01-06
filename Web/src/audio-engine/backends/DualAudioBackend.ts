@@ -129,6 +129,22 @@ export class DualAudioBackend implements IAudioBackend
 		player.currentTime = position;
 	}
 
+	async LoadCurrentSong(track: ISong): Promise<void>
+	{
+		const player = this.GetCurrentPlayer();
+		const mediaUrlResult = await this.audioSource.GetTrack(track);
+		mediaUrlResult.match(
+			(mediaUrl) =>
+			{
+				player.src = mediaUrl;
+			},
+			(e) =>
+			{
+				console.error("Error fetching track:", e);
+			},
+		);
+	}
+
 	async Prefetch(track: ISong): Promise<void>
 	{
 		const nextPlayer = this.GetNextPlayer();
@@ -193,6 +209,7 @@ export class DualAudioBackend implements IAudioBackend
 			return;
 		}
 
+		console.log("[DualAudioBackend] Initializing players");
 		this.player1 = new Audio();
 		this.player2 = new Audio();
 		this.player1.crossOrigin = "use-credentials";

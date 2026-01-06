@@ -37,9 +37,9 @@ public class MusicRoomHub(
         // Try connect to room
         var result = await mediator.Send(
             new ConnectToRoomCommand(
-                code: roomId!,
-                userId: Guid.Parse(userId),
-                connectionId: Context.ConnectionId
+                Code: roomId!,
+                UserId: Guid.Parse(userId),
+                ConnectionId: Context.ConnectionId
             )
         );
         result.Switch(
@@ -61,7 +61,7 @@ public class MusicRoomHub(
 
     public async Task Hello(string name)
     {
-        logger.LogInformation("Data received in MusicRoomHub.Hello: {Name}", name);
+        logger.LogInformation($"Data received in MusicRoomHub.Hello: {name}");
         await mediator.Send(new MusicRoomHelloCommand(name));
     }
 
@@ -91,12 +91,7 @@ public class MusicRoomHub(
 
         var userName = user.Name ?? user.UserName ?? "Unknown";
 
-        logger.LogInformation(
-            "Chat message from {UserName} ({UserId}): {Message}",
-            userName,
-            userId,
-            message
-        );
+        logger.LogInformation($"Chat message from {userName} ({userId}): {message}");
 
         await mediator.Send(new SendChatMessageCommand(userId, userName, message));
     }

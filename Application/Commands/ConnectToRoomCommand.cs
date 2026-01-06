@@ -7,7 +7,7 @@ using Reezer.Domain.Repositories.Room;
 
 namespace Reezer.Application.Commands;
 
-public record ConnectToRoomCommand(string code, Guid userId, string connectionId)
+public record ConnectToRoomCommand(string Code, Guid UserId, string ConnectionId)
     : IRequest<OneOf<MusicRoom, Domain.Utils.NotFound>>;
 
 public class ConnectToRoomCommandHandler(
@@ -21,16 +21,12 @@ public class ConnectToRoomCommandHandler(
         CancellationToken cancellationToken
     )
     {
-        logger.LogInformation(
-            "User {UserId} is connecting to room with code {Code}",
-            request.userId,
-            request.code
-        );
+        logger.LogInformation($"User {request.UserId} is connecting to room with code {request.Code}");
 
         var addResult = await roomRepository.AddConnection(
-            roomCode: request.code,
-            userId: request.userId,
-            connectionId: request.connectionId
+            roomCode: request.Code,
+            userId: request.UserId,
+            connectionId: request.ConnectionId
         );
 
         await addResult.Match(

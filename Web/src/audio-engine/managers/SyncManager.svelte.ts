@@ -18,7 +18,6 @@ export class SyncManager
 
 	constructor(roomId?: string)
 	{
-		this.status = "connecting";
 		this.hubClient = new MusicRoomHubClient(roomId);
 
 		// Subscribe to events
@@ -49,10 +48,11 @@ export class SyncManager
 			{
 				if (this.status === "connecting" || this.status === "reconnecting")
 				{
-					this.performClockSync().then(() =>
-					{
-						this.startResyncInterval();
-					})
+					this.performClockSync()
+						.then(() =>
+						{
+							this.startResyncInterval();
+						})
 						.catch((error) =>
 						{
 							console.error("Clock sync failed:", error);
@@ -69,11 +69,24 @@ export class SyncManager
 				this.stopResyncInterval();
 				this.status = "disconnected";
 			}
-			else if (currentStatus === "connecting")
-			{
-				this.status = "connecting";
-			}
 		});
+	}
+
+	public async connect(): Promise<void>
+	{
+		this.status = "connecting";
+		try
+		{
+			await this.hubClient.start();
+			await this.performClockSync();
+			this.startResyncInterval();
+		}
+		catch (error)
+		{
+			console.error("Connection/Sync failed:", error);
+			this.status = "disconnected";
+			throw error;
+		}
 	}
 
 	private async performClockSync(): Promise<void>

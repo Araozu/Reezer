@@ -66,7 +66,6 @@ export class MultiplayerManager implements IPlayerManager
 
 	async PlaySongList(songs: Array<ISong>): Promise<Result<void, unknown>>
 	{
-		await this.Init();
 		// Checking for permission is not needed in solo player
 
 		this.queueManager.PlaySongList(songs);
@@ -75,91 +74,78 @@ export class MultiplayerManager implements IPlayerManager
 
 	async AddLastSong(song: ISong): Promise<Result<void, unknown>>
 	{
-		await this.Init();
 		this.queueManager.AddLastSong(song);
 		return ok();
 	}
 
 	async AddLastSongList(songs: Array<ISong>): Promise<Result<void, unknown>>
 	{
-		await this.Init();
 		this.queueManager.AddLastSongList(songs);
 		return ok();
 	}
 
 	async AddNextSong(song: ISong): Promise<Result<void, unknown>>
 	{
-		await this.Init();
 		this.queueManager.AddNextSong(song);
 		return ok();
 	}
 
 	async AddNextSongList(songs: Array<ISong>): Promise<Result<void, unknown>>
 	{
-		await this.Init();
 		this.queueManager.AddNextSongList(songs);
 		return ok();
 	}
 
 	async Next(): Promise<Result<void, unknown>>
 	{
-		await this.Init();
 		this.queueManager.Next();
 		return ok();
 	}
 
 	async Prev(): Promise<Result<void, unknown>>
 	{
-		await this.Init();
 		this.queueManager.Prev();
 		return ok();
 	}
 
 	async PlayAt(idx: number): Promise<Result<void, unknown>>
 	{
-		await this.Init();
 		this.queueManager.PlayAt(idx);
 		return ok();
 	}
 
 	async ClearQueue(): Promise<Result<void, unknown>>
 	{
-		await this.Init();
 		this.queueManager.ClearQueue();
 		return ok();
 	}
 
 	async RemoveAt(idx: number): Promise<Result<void, unknown>>
 	{
-		await this.Init();
 		this.queueManager.RemoveAt(idx);
 		return ok();
 	}
 
 	async SetQueue(newQueue: Array<ISong>, newCurrentIdx: number): Promise<Result<void, unknown>>
 	{
-		await this.Init();
 		this.queueManager.SetQueue(newQueue, newCurrentIdx);
 		return ok();
 	}
 
 	async SetLoopMode(mode: LoopMode): Promise<Result<void, unknown>>
 	{
-		await this.Init();
 		this.queueManager.SetLoopMode(mode);
 		return ok();
 	}
 
 	async TogglePlayPause(): Promise<Result<void, unknown>>
 	{
-		await this.Init();
 		this.audioBackend.TogglePlayPause();
 		return ok();
 	}
 
 	async Seek(position: number): Promise<Result<void, unknown>>
 	{
-		await this.Init();
 		this.audioBackend.Seek(position);
 		return ok();
 	}
@@ -172,7 +158,6 @@ export class MultiplayerManager implements IPlayerManager
 
 	async PlaySong(song: ISong): Promise<Result<void, unknown>>
 	{
-		await this.Init();
 		this.queueManager.PlaySong(song);
 		return ok();
 	}

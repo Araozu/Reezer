@@ -63,7 +63,7 @@ export class GeneralPurposeQueue implements IQueue
 	{
 		this._loopMode = mode;
 		this.notifyQueueChanged();
-		this.backendUpdate();
+		this.updateBackendPrefetch();
 	}
 
 	PlaySong(song: ISong): void
@@ -104,28 +104,28 @@ export class GeneralPurposeQueue implements IQueue
 	{
 		this._queueState.push(song);
 		this.notifyQueueChanged();
-		this.backendUpdate();
+		this.updateBackendPrefetch();
 	}
 
 	AddLastSongList(song: Array<ISong>): void
 	{
 		this._queueState.push(...song);
 		this.notifyQueueChanged();
-		this.backendUpdate();
+		this.updateBackendPrefetch();
 	}
 
 	AddNextSong(song: ISong): void
 	{
 		this._queueState.splice(this._currentIdx + 1, 0, song);
 		this.notifyQueueChanged();
-		this.backendUpdate();
+		this.updateBackendPrefetch();
 	}
 
 	AddNextSongList(song: Array<ISong>): void
 	{
 		this._queueState.splice(this._currentIdx + 1, 0, ...song);
 		this.notifyQueueChanged();
-		this.backendUpdate();
+		this.updateBackendPrefetch();
 	}
 
 	Next(): void
@@ -203,7 +203,7 @@ export class GeneralPurposeQueue implements IQueue
 		else
 		{
 			// Removed a song after current, just update prefetch
-			this.backendUpdate();
+			this.updateBackendPrefetch();
 		}
 
 		this.notifyQueueChanged();
@@ -248,7 +248,7 @@ export class GeneralPurposeQueue implements IQueue
 	/**
 	 * Updates the prefetched song in the backend. Doesn't alter current playback.
 	 */
-	private backendUpdate()
+	private updateBackendPrefetch()
 	{
 		if (this._currentIdx === -1 || this._currentIdx >= this._queueState.length) return;
 
@@ -267,12 +267,20 @@ export class GeneralPurposeQueue implements IQueue
 		else this.audioBackend.ClearPrefetch();
 	}
 
+	private loadBackendCurrentSong()
+	{
+		if (this._currentIdx === -1 || this._currentIdx >= this._queueState.length) return;
+		const currentSong = this._queueState[this._currentIdx];
+		this.audioBackend.LoadCurrentSong(currentSong);
+	}
+
 	SetQueue(newQueue: Array<ISong>, newCurrentIdx: number): void
 	{
 		this._queueState = newQueue;
 		this._currentIdx = newCurrentIdx;
 		this.notifyQueueChanged();
-		this.backendUpdate();
+		this.loadBackendCurrentSong();
+		this.updateBackendPrefetch();
 	}
 
 	OnQueueChanged(callback: () => void): void

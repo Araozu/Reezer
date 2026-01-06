@@ -28,7 +28,6 @@ export class MusicRoomHubClient
 
 	constructor(roomId?: string)
 	{
-		this.status = "connecting";
 		const url = `${import.meta.env.VITE_PUBLIC_BACKEND_URL}/hub/MusicRoom${roomId ? `?roomId=${encodeURIComponent(roomId)}` : ""}`;
 
 		this.connection = new SignalR.HubConnectionBuilder()
@@ -54,6 +53,7 @@ export class MusicRoomHubClient
 
 		this.connection.on("QueueChanged", (queue: ISong[], currentIndex: number) =>
 		{
+			console.log("[MusicRoomHubClient] QueueChanged called", queue, currentIndex);
 			this.queueChangedHandlers.forEach((handler) => handler(queue, currentIndex));
 		});
 
@@ -71,17 +71,25 @@ export class MusicRoomHubClient
 		{
 			this.status = "disconnected";
 		});
+	}
 
-		this.connection.start()
-			.then(() =>
-			{
-				this.status = "connected";
-			})
-			.catch((error) =>
-			{
-				console.error("Connection failed:", error);
-				this.status = "disconnected";
-			});
+	/** Start the connection */
+	public async start(): Promise<void>
+	{
+		if (this.status !== "disconnected") return;
+
+		this.status = "connecting";
+		try
+		{
+			await this.connection.start();
+			this.status = "connected";
+		}
+		catch (error)
+		{
+			console.error("Connection failed:", error);
+			this.status = "disconnected";
+			throw error;
+		}
 	}
 
 	/** Subscribe to MessageReceived events from the server */
