@@ -15,20 +15,20 @@ public class ChatMessageNotificationHandler(
     )
     {
         logger.LogInformation(
-            "ChatMessageNotification received from {UserName}: {Message}",
-            notification.UserName,
-            notification.Message
+            $"ChatMessageNotification received from {notification.UserId}: {notification.Message}"
         );
-        await hubContext.Clients.All.SendAsync(
-            "ChatMessage",
-            new
-            {
-                userId = notification.UserId,
-                userName = notification.UserName,
-                message = notification.Message,
-                timestamp = notification.Timestamp,
-            },
-            cancellationToken
-        );
+        await hubContext
+            .Clients.Group(notification.RoomCode)
+            .SendAsync(
+                "ChatMessage",
+                new
+                {
+                    userId = notification.UserId,
+                    userName = notification.UserName,
+                    message = notification.Message,
+                    timestamp = notification.Timestamp,
+                },
+                cancellationToken
+            );
     }
 }

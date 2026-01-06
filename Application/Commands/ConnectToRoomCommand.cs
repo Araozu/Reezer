@@ -21,7 +21,9 @@ public class ConnectToRoomCommandHandler(
         CancellationToken cancellationToken
     )
     {
-        logger.LogInformation($"User {request.UserId} is connecting to room with code {request.Code}");
+        logger.LogInformation(
+            $"User {request.UserId} is connecting to room with code {request.Code}"
+        );
 
         var addResult = await roomRepository.AddConnection(
             roomCode: request.Code,
