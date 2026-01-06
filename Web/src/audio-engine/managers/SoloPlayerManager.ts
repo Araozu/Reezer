@@ -16,7 +16,7 @@ import type { IMediaSession } from "../interfaces/IMediaSession";
  */
 export class SoloPlayerManager implements IPlayerManager
 {
-	private readonly audioBackend: DualAudioBackend;
+	private readonly audioBackend: IAudioBackend;
 	private readonly queueManager: IQueue;
 	private readonly mediaSession: IMediaSession;
 
