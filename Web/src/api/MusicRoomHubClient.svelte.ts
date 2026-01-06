@@ -1,4 +1,5 @@
 import * as SignalR from "@microsoft/signalr";
+import type { ISong } from "../audio-engine/types/song";
 
 type ConnectionStatus = "disconnected" | "connecting" | "connected" | "reconnecting";
 
@@ -23,6 +24,7 @@ export class MusicRoomHubClient
 	private messageReceivedHandlers: Array<(user: unknown, message: unknown) => void> = [];
 	private chatMessageHandlers: Array<(message: ChatMessage) => void> = [];
 	private connectedUsersChangedHandlers: Array<(users: ConnectedUser[]) => void> = [];
+	private queueChangedHandlers: Array<(queue: ISong[], currentIndex: number) => void> = [];
 
 	constructor(roomId?: string)
 	{
@@ -48,6 +50,11 @@ export class MusicRoomHubClient
 		this.connection.on("ConnectedUsersChanged", (users: ConnectedUser[]) =>
 		{
 			this.connectedUsersChangedHandlers.forEach((handler) => handler(users));
+		});
+
+		this.connection.on("QueueChanged", (queue: ISong[], currentIndex: number) =>
+		{
+			this.queueChangedHandlers.forEach((handler) => handler(queue, currentIndex));
 		});
 
 		this.connection.onreconnected(() =>
@@ -140,6 +147,26 @@ export class MusicRoomHubClient
 		await this.connection.invoke("SendMessage", message);
 	}
 
+	/** Set the room queue */
+	public async SetQueue(queue: ISong[], currentIndex: number): Promise<void>
+	{
+		await this.connection.invoke("SetQueue", queue, currentIndex);
+	}
+
+	/** Subscribe to QueueChanged events from the server */
+	public OnQueueChanged(handler: (queue: ISong[], currentIndex: number) => void): () => void
+	{
+		this.queueChangedHandlers.push(handler);
+		return () =>
+		{
+			const index = this.queueChangedHandlers.indexOf(handler);
+			if (index > -1)
+			{
+				this.queueChangedHandlers.splice(index, 1);
+			}
+		};
+	}
+
 	/** Stop the connection and cleanup */
 	public async destroy(): Promise<void>
 	{
@@ -147,6 +174,7 @@ export class MusicRoomHubClient
 		this.messageReceivedHandlers = [];
 		this.chatMessageHandlers = [];
 		this.connectedUsersChangedHandlers = [];
+		this.queueChangedHandlers = [];
 		this.status = "disconnected";
 	}
 }

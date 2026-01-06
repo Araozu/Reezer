@@ -3,7 +3,7 @@ import * as Card from "$lib/components/ui/card";
 import { Disc3, CircleAlert, LoaderCircle } from "lucide-svelte";
 import { goto } from "$app/navigation";
 import { SetPlayerManagerContext, SetSvelteManagerContext, SetSyncRoomManagerContext } from "~/context/music-player-context";
-import { SoloPlayerManager } from "~/audio-engine/managers/SoloPlayerManager";
+import { MultiplayerManager } from "~/audio-engine/managers/MultiplayerManager";
 import { UrlAudioSource } from "~/audio-engine/audio-sources/UrlAudioSource";
 import { SvPlayerManager } from "~/audio-engine/managers/SvPlayerManager.svelte";
 import { SyncManager } from "~/audio-engine/managers/SyncManager.svelte";
@@ -11,16 +11,16 @@ import { page } from "$app/state";
 
 let { children } = $props();
 
-const playerManager = new SoloPlayerManager(new UrlAudioSource());
+// Sync manager for room features
+const syncRoomManager = new SyncManager(page.params.roomId);
+SetSyncRoomManagerContext(syncRoomManager);
+
+const playerManager = new MultiplayerManager(new UrlAudioSource(), syncRoomManager);
 SetPlayerManagerContext(playerManager);
 
 // Svelte manager with reactivity
 const svManager = new SvPlayerManager(playerManager);
 SetSvelteManagerContext(svManager);
-
-// Sync manager for room features
-const syncRoomManager = new SyncManager(page.params.roomId);
-SetSyncRoomManagerContext(syncRoomManager);
 
 const syncStatus = $derived(syncRoomManager.status);
 

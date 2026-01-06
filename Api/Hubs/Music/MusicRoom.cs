@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Reezer.Application.Commands;
+using Reezer.Domain.Entities.Room;
+using Reezer.Domain.Repositories.Room;
 using Reezer.Infrastructure.Identity;
 
 namespace Reezer.Api.Hubs.Music;
@@ -11,7 +13,8 @@ namespace Reezer.Api.Hubs.Music;
 public class MusicRoomHub(
     ILogger<MusicRoomHub> logger,
     ISender mediator,
-    UserManager<User> userManager
+    UserManager<User> userManager,
+    IMusicRoomRepository roomRepository
 ) : Hub
 {
     public const string Route = "/hub/MusicRoom";
@@ -96,5 +99,19 @@ public class MusicRoomHub(
         );
 
         await mediator.Send(new SendChatMessageCommand(userId, userName, message));
+    }
+
+    public async Task SetQueue(IEnumerable<RoomSong> queue, int currentIndex)
+    {
+        var room = roomRepository.GetRoomByConnectionId(Context.ConnectionId);
+        if (room == null)
+        {
+            throw new HubException("Room not found for this connection");
+        }
+
+        var result = await mediator.Send(
+            new UpdateRoomQueueCommand(room.Code, queue, currentIndex)
+        );
+        result.Switch(ok => { }, notFound => throw new HubException(notFound.Reason));
     }
 }

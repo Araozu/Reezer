@@ -1,6 +1,6 @@
 import { MusicRoomHubClient, type ChatMessage, type ConnectedUser } from "~/api/MusicRoomHubClient.svelte";
 import { type SyncResult, CalculateMAD } from "~/lib/sync-utils";
-import type { IPlayerManager } from "../interfaces/IPlayerManager";
+import type { ISong } from "../types";
 
 type ConnectionStatus = "disconnected" | "connecting" | "clock_sync" | "connected" | "reconnecting";
 
@@ -128,6 +128,16 @@ export class SyncManager
 	public async sendChatMessage(message: string): Promise<void>
 	{
 		await this.hubClient.SendMessage(message);
+	}
+
+	public async sendQueue(queue: ISong[], currentIndex: number): Promise<void>
+	{
+		await this.hubClient.SetQueue(queue, currentIndex);
+	}
+
+	public onQueueChanged(handler: (queue: ISong[], currentIndex: number) => void): () => void
+	{
+		return this.hubClient.OnQueueChanged(handler);
 	}
 
 	private async syncClock(): Promise<SyncResult>
