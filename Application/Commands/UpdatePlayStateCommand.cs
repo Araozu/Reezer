@@ -22,6 +22,11 @@ public class UpdatePlayStateHandler(IMusicRoomRepository roomRepository, IPublis
         return await roomResult.Match<Task<OneOf<Success, NotFound>>>(
             async room =>
             {
+                if (room.IsPlaying == request.IsPlaying)
+                {
+                    return new Success();
+                }
+
                 room.SetPlayState(request.IsPlaying);
                 await publisher.Publish(
                     new PlayStateChangedNotification(room.Code, room.IsPlaying),

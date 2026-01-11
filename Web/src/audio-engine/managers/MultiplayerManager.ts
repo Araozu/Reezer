@@ -158,7 +158,9 @@ export class MultiplayerManager implements IPlayerManager
 
 	async TogglePlayPause(): Promise<Result<void, unknown>>
 	{
-		this.audioBackend.TogglePlayPause();
+		const isPlaying = this.audioBackend.playState === "playing";
+		await this.syncManager.sendPlayState(!isPlaying);
+
 		return ok();
 	}
 
