@@ -39,7 +39,9 @@ public class PlaySongListCommandHandler(
                 room.Code,
                 room.Queue,
                 room.CurrentIndex,
-                room.IsPlaying
+                room.IsPlaying,
+                room.CurrentPosition,
+                room.LastUpdateServerTime
             ),
             cancellationToken
         );

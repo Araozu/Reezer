@@ -41,7 +41,9 @@ public class UpdateRoomQueueCommandHandler(
                         room.Code,
                         room.Queue,
                         room.CurrentIndex,
-                        room.IsPlaying
+                        room.IsPlaying,
+                        room.CurrentPosition,
+                        room.LastUpdateServerTime
                     ),
                     cancellationToken
                 );

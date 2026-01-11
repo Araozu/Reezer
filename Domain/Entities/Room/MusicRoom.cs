@@ -36,6 +36,17 @@ public class MusicRoom(Guid maestroId, string name, string code)
     public bool IsPlaying { get; private set; } = false;
 
     /// <summary>
+    /// The current position in seconds of the song.
+    /// </summary>
+    public double CurrentPosition { get; private set; } = 0;
+
+    /// <summary>
+    /// The server time when the play state or position was last updated (Unix milliseconds).
+    /// </summary>
+    public long LastUpdateServerTime { get; private set; } =
+        DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+    /// <summary>
     /// The participants in the room. Each participant is represented by their UserId and SignalR ConnectionId.
     /// This allows tracking multiple connections per user.
     /// </summary>
@@ -62,17 +73,31 @@ public class MusicRoom(Guid maestroId, string name, string code)
         var currentLen = _queue.Count;
         _queue.AddRange(songs);
         CurrentIndex = currentLen;
+        CurrentPosition = 0;
         IsPlaying = true;
+        LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     }
 
     public void SetQueue(IEnumerable<RoomSong> queue, int currentIndex)
     {
         _queue = [.. queue];
         CurrentIndex = currentIndex;
+        LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     }
 
-    public void SetPlayState(bool isPlaying)
+    public void SetPlayState(bool isPlaying, double? position = null)
     {
+        if (position.HasValue)
+        {
+            CurrentPosition = position.Value;
+        }
         IsPlaying = isPlaying;
+        LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+    }
+
+    public void SetPosition(double position)
+    {
+        CurrentPosition = position;
+        LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     }
 }

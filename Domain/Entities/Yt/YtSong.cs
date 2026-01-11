@@ -6,11 +6,13 @@ public class YtSong
     public string Name { get; private set; }
     public string? CachedPath { get; private set; }
     public string? ThumbnailPath { get; private set; }
+    public double Duration { get; private set; }
 
-    public YtSong(string ytId, string name)
+    public YtSong(string ytId, string name, double duration = 0)
     {
         YtId = ytId;
         Name = name;
+        Duration = duration;
         CachedPath = null;
         ThumbnailPath = null;
     }

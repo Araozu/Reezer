@@ -24,9 +24,25 @@ export class MusicRoomHubClient
 	private messageReceivedHandlers: Array<(user: unknown, message: unknown) => void> = [];
 	private chatMessageHandlers: Array<(message: ChatMessage) => void> = [];
 	private connectedUsersChangedHandlers: Array<(users: ConnectedUser[]) => void> = [];
-	private queueChangedHandlers: Array<(queue: ISong[], currentIndex: number, isPlaying: boolean) => void> = [];
-	private playStateChangedHandlers: Array<(isPlaying: boolean) => void> = [];
-	private roomStateHandlers: Array<(state: { queue: ISong[], currentIndex: number, isPlaying: boolean }) => void> = [];
+	private queueChangedHandlers: Array<(
+		queue: ISong[],
+		currentIndex: number,
+		isPlaying: boolean,
+		position: number,
+		serverTime: number
+	) => void> = [];
+	private playStateChangedHandlers: Array<(
+		isPlaying: boolean,
+		position: number,
+		serverTime: number
+	) => void> = [];
+	private roomStateHandlers: Array<(state: {
+		queue: ISong[],
+		currentIndex: number,
+		isPlaying: boolean,
+		currentPosition: number,
+		lastUpdateServerTime: number
+	}) => void> = [];
 
 	constructor(roomId?: string)
 	{
@@ -53,23 +69,44 @@ export class MusicRoomHubClient
 			this.connectedUsersChangedHandlers.forEach((handler) => handler(users));
 		});
 
-		this.connection.on("QueueChanged", (queue: ISong[], currentIndex: number, isPlaying: boolean) =>
-		{
-			console.log("[MusicRoomHubClient] -> Received QueueChanged event", queue, currentIndex);
-			this.queueChangedHandlers.forEach((handler) => handler(queue, currentIndex, isPlaying));
-		});
+		this.connection.on(
+			"QueueChanged",
+			(
+				queue: ISong[],
+				currentIndex: number,
+				isPlaying: boolean,
+				position: number,
+				serverTime: number,
+			) =>
+			{
+				console.log("[MusicRoomHubClient] -> Received QueueChanged event", queue, currentIndex);
+				this.queueChangedHandlers.forEach((handler) => handler(queue, currentIndex, isPlaying, position, serverTime));
+			},
+		);
 
-		this.connection.on("PlayStateChanged", (isPlaying: boolean) =>
-		{
-			console.log("[MusicRoomHubClient] -> Received PlayStateChanged event", isPlaying);
-			this.playStateChangedHandlers.forEach((handler) => handler(isPlaying));
-		});
+		this.connection.on(
+			"PlayStateChanged",
+			(isPlaying: boolean, position: number, serverTime: number) =>
+			{
+				console.log(">> [MusicRoomHubClient] Received PlayStateChanged event, isPlaying: ", isPlaying);
+				this.playStateChangedHandlers.forEach((handler) => handler(isPlaying, position, serverTime));
+			},
+		);
 
-		this.connection.on("RoomState", (state: { queue: ISong[], currentIndex: number, isPlaying: boolean }) =>
-		{
-			console.log("[MusicRoomHubClient] -> Received RoomState event", state);
-			this.roomStateHandlers.forEach((handler) => handler(state));
-		});
+		this.connection.on(
+			"RoomState",
+			(state: {
+				queue: ISong[],
+				currentIndex: number,
+				isPlaying: boolean,
+				currentPosition: number,
+				lastUpdateServerTime: number
+			}) =>
+			{
+				console.log("[MusicRoomHubClient] -> Received RoomState event", state);
+				this.roomStateHandlers.forEach((handler) => handler(state));
+			},
+		);
 
 		this.connection.onreconnected(() =>
 		{
@@ -170,7 +207,13 @@ export class MusicRoomHubClient
 	}
 
 	/** Subscribe to QueueChanged events from the server */
-	public OnQueueChanged(handler: (queue: ISong[], currentIndex: number, isPlaying: boolean) => void): () => void
+	public OnQueueChanged(handler: (
+			queue: ISong[],
+			currentIndex: number,
+			isPlaying: boolean,
+			position: number,
+			serverTime: number
+		) => void): () => void
 	{
 		this.queueChangedHandlers.push(handler);
 		return () =>
@@ -184,7 +227,7 @@ export class MusicRoomHubClient
 	}
 
 	/** Subscribe to PlayStateChanged events from the server */
-	public OnPlayStateChanged(handler: (isPlaying: boolean) => void): () => void
+	public OnPlayStateChanged(handler: (isPlaying: boolean, position: number, serverTime: number) => void): () => void
 	{
 		this.playStateChangedHandlers.push(handler);
 		return () =>
@@ -198,7 +241,13 @@ export class MusicRoomHubClient
 	}
 
 	/** Subscribe to RoomState events from the server */
-	public OnRoomState(handler: (state: { queue: ISong[], currentIndex: number, isPlaying: boolean }) => void): () => void
+	public OnRoomState(handler: (state: {
+			queue: ISong[],
+			currentIndex: number,
+			isPlaying: boolean,
+			currentPosition: number,
+			lastUpdateServerTime: number
+		}) => void): () => void
 	{
 		this.roomStateHandlers.push(handler);
 		return () =>
@@ -211,9 +260,14 @@ export class MusicRoomHubClient
 		};
 	}
 
-	public async SetPlayState(isPlaying: boolean): Promise<void>
+	public async SetPlayState(isPlaying: boolean, position?: number): Promise<void>
 	{
-		await this.connection.invoke("SetPlayState", isPlaying);
+		await this.connection.invoke("SetPlayState", isPlaying, position);
+	}
+
+	public async SetSeek(position: number): Promise<void>
+	{
+		await this.connection.invoke("SetSeek", position);
 	}
 
 	public async PlaySongList(songs: ISong[]): Promise<void>

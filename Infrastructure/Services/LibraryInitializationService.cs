@@ -145,6 +145,7 @@ public partial class LibraryInitializationService(
                     songInfo.SongName,
                     audioFile,
                     album,
+                    songInfo.Duration,
                     songInfo.TrackNumber,
                     songInfo.DiscNumber
                 );
@@ -239,6 +240,7 @@ public partial class LibraryInitializationService(
         try
         {
             var mediaInfo = await FFProbe.AnalyseAsync(audioFilePath);
+            var duration = mediaInfo.Duration.TotalSeconds;
             var tags = mediaInfo.Format.Tags;
 
             if (tags != null)
@@ -292,12 +294,18 @@ public partial class LibraryInitializationService(
                         Artist = pathInfo.Artist,
                         Album = album!,
                         SongName = title!,
+                        Duration = duration,
                         TrackNumber = trackNumber ?? pathInfo.TrackNumber,
                         DiscNumber = discNumber ?? pathInfo.DiscNumber,
                         FromMetadata = true,
                     };
                 }
             }
+
+            return pathInfo with
+            {
+                Duration = duration,
+            };
         }
         catch (Exception ex)
         {
@@ -356,6 +364,7 @@ public partial class LibraryInitializationService(
             DiscNumber = discNumber,
             TrackNumber = trackNumber,
             SongName = songName,
+            Duration = 0.0,
             FromMetadata = false,
         };
     }
@@ -417,6 +426,7 @@ public partial class LibraryInitializationService(
         public int? DiscNumber { get; init; }
         public int? TrackNumber { get; init; }
         public required string SongName { get; init; }
+        public double Duration { get; init; }
         public bool FromMetadata { get; init; }
     }
 }

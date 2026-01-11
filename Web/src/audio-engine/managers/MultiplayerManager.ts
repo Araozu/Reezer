@@ -29,56 +29,69 @@ export class MultiplayerManager implements IPlayerManager
 		this.queueManager = new GeneralPurposeQueue(this.audioBackend);
 
 		// Setup music player
-		this.mediaSession = new BrowserMediaSession(this.queueManager , this.audioBackend);
+		this.mediaSession = new BrowserMediaSession(this.queueManager, this.audioBackend);
 		this.mediaSession.Init();
 
 		// Listen for remote queue changes
-		this.syncManager.onQueueChanged((queue, currentIdx) =>
+		this.syncManager.onQueueChanged((queue, currentIdx, isPlaying, position, serverTime) =>
 		{
 			console.log("[MultiplayerManager] Set queue from server", queue, currentIdx);
 
 			this.queueManager.SetQueue(queue, currentIdx);
-			console.log("[MultiplayerManager] Set queue from server: done");
+
+			const projectedPosition = this.calculateProjectedPosition(
+				isPlaying,
+				position,
+				serverTime,
+			);
+			console.log("[MultiplayerManager] Projected position (queue change):", projectedPosition);
+
+			this.audioBackend.Seek(projectedPosition);
+
+			if (isPlaying) this.audioBackend.Resume();
+			else this.audioBackend.Pause();
 		});
 
 		// Listen for initial room state
-		this.syncManager.onRoomState(async (state) =>
+		this.syncManager.onRoomState(async(state) =>
 		{
 			console.log("[MultiplayerManager] Set initial room state from server", state);
 
 			this.queueManager.SetQueue(state.queue, state.currentIndex);
 
 			// Wait a bit for the queue to be set and the backend to be ready
-			await new Promise(resolve => setTimeout(resolve, 100));
-			
+			await new Promise((resolve) => setTimeout(resolve, 100));
+
+			const projectedPosition = this.calculateProjectedPosition(
+				state.isPlaying,
+				state.currentPosition,
+				state.lastUpdateServerTime,
+			);
+			console.log("[MultiplayerManager] Projected position (initial):", projectedPosition);
+
+			this.audioBackend.Seek(projectedPosition);
+
 			if (state.isPlaying) this.audioBackend.Resume();
-			else                 this.audioBackend.Pause();
+			else this.audioBackend.Pause();
 		});
 
 		// Listen for remote play state changes
-		this.syncManager.onPlayStateChanged((isPlaying) =>
+		this.syncManager.onPlayStateChanged((isPlaying, position, serverTime) =>
 		{
-			console.log("[MultiplayerManager] Set play state from server, isPlaying: ", isPlaying);
-				if (isPlaying)
-				{
-					this.audioBackend.Resume();
-				}
-				else
-				{
-					this.audioBackend.Pause();
-				}
-		});
+			console.log(
+				">> [MultiplayerManager]    Set play state from server, isPlaying: ",
+				isPlaying,
+				"position:",
+				position,
+			);
 
-		// Listen for local play state changes to sync with backend
-		this.audioBackend.OnPlayStateChange((state) =>
-		{
-			if (this.syncManager.status !== "connected")
-			{
-				return;
-			}
+			const projectedPosition = this.calculateProjectedPosition(isPlaying, position, serverTime);
+			console.log(">> [MultiplayerManager]    Projected position (play state):", projectedPosition);
 
-			console.log("[MultiplayerManager] Send play state to server", state);
-			void this.syncManager.sendPlayState(state === "playing");
+			this.audioBackend.Seek(projectedPosition);
+
+			if (isPlaying) this.audioBackend.Resume();
+			else this.audioBackend.Pause();
 		});
 	}
 
@@ -158,14 +171,36 @@ export class MultiplayerManager implements IPlayerManager
 
 	async TogglePlayPause(): Promise<Result<void, unknown>>
 	{
-		this.audioBackend.TogglePlayPause();
+		const isPlaying = this.audioBackend.playState === "playing";
+		console.log("[MultiplayerManager] >> TogglePlayPause, sending isPlaying:", !isPlaying);
+		await this.syncManager.sendPlayState(!isPlaying);
+
 		return ok();
 	}
 
 	async Seek(position: number): Promise<Result<void, unknown>>
 	{
-		this.audioBackend.Seek(position);
+		console.log("   [MultiplayerManager] >> Seek to", position);
+		await this.syncManager.sendSeek(position);
 		return ok();
+	}
+
+	private calculateProjectedPosition(
+		isPlaying: boolean,
+		serverPosition: number,
+		lastUpdateServerTime: number,
+	): number
+	{
+		if (!isPlaying || !this.syncManager.syncResult)
+		{
+			return serverPosition;
+		}
+
+		const currentServerTime = Date.now() + this.syncManager.syncResult.clockOffset;
+		const timeSinceUpdateMs = currentServerTime - lastUpdateServerTime;
+		const timeSinceUpdateSec = timeSinceUpdateMs / 1000;
+
+		return serverPosition + timeSinceUpdateSec;
 	}
 
 	HasPermission(action: Action): boolean

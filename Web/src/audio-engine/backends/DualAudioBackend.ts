@@ -130,7 +130,7 @@ export class DualAudioBackend implements IAudioBackend
 	Resume(): void
 	{
 		const player = this.GetCurrentPlayer();
-		console.log("[DualAudioBackend] Resuming player");
+		console.log(">> [DualAudioBackend] Resuming player");
 
 		if (player.src)
 		{
