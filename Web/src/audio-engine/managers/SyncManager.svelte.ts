@@ -153,9 +153,24 @@ export class SyncManager
 		await this.hubClient.SetQueue(queue, currentIndex);
 	}
 
+	public async sendPlayState(isPlaying: boolean): Promise<void>
+	{
+		await this.hubClient.SetPlayState(isPlaying);
+	}
+
 	public onQueueChanged(handler: (queue: ISong[], currentIndex: number) => void): () => void
 	{
 		return this.hubClient.OnQueueChanged(handler);
+	}
+
+	public onPlayStateChanged(handler: (isPlaying: boolean) => void): () => void
+	{
+		return this.hubClient.OnPlayStateChanged(handler);
+	}
+
+	public onRoomState(handler: (state: { queue: ISong[], currentIndex: number, isPlaying: boolean }) => void): () => void
+	{
+		return this.hubClient.OnRoomState(handler);
 	}
 
 	private async syncClock(): Promise<SyncResult>

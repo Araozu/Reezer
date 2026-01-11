@@ -111,15 +111,36 @@ export class DualAudioBackend implements IAudioBackend
 		const player = this.GetCurrentPlayer();
 		if (player.paused)
 		{
+			this.Resume();
+		}
+		else
+		{
+			this.Pause();
+		}
+	}
+
+	Pause(): void
+	{
+		const player = this.GetCurrentPlayer();
+		player.pause();
+		this.notifyPlayStateChange("paused");
+		this.stopPositionTracking();
+	}
+
+	Resume(): void
+	{
+		const player = this.GetCurrentPlayer();
+		console.log("[DualAudioBackend] Resuming player");
+
+		if (player.src)
+		{
 			player.play();
 			this.notifyPlayStateChange("playing");
 			this.startPositionTracking();
 		}
 		else
 		{
-			player.pause();
-			this.notifyPlayStateChange("paused");
-			this.stopPositionTracking();
+			console.warn("Player is not ready to resume, skipping");
 		}
 	}
 

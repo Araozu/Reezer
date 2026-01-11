@@ -269,7 +269,14 @@ export class GeneralPurposeQueue implements IQueue
 
 	private loadBackendCurrentSong()
 	{
-		if (this._currentIdx === -1 || this._currentIdx >= this._queueState.length) return;
+		console.log("[GeneralPurposeQueue] loading current song")
+
+		if (this._currentIdx === -1 || this._currentIdx >= this._queueState.length)
+		{
+			console.error("Queue is empty or currentIdx is out of bounds, cannot load current song");
+			return;
+		}
+
 		const currentSong = this._queueState[this._currentIdx];
 		this.audioBackend.LoadCurrentSong(currentSong);
 	}

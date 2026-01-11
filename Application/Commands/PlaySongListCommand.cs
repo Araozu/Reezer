@@ -6,6 +6,8 @@ using Reezer.Domain.Entities.Room;
 using Reezer.Domain.Repositories.Room;
 using Reezer.Domain.Utils;
 
+namespace Reezer.Application.Commands;
+
 public record PlaySongListCommand(string ConnectionId, IEnumerable<RoomSong> Songs)
     : IRequest<OneOf<Success, NotFound>>;
 
@@ -33,7 +35,12 @@ public class PlaySongListCommandHandler(
 
         // notify the room
         await publisher.Publish(
-            new RoomQueueChangedNotification(room.Code, room.Queue, room.CurrentIndex),
+            new RoomQueueChangedNotification(
+                room.Code,
+                room.Queue,
+                room.CurrentIndex,
+                room.IsPlaying
+            ),
             cancellationToken
         );
 

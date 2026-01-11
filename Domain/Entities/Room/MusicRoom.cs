@@ -31,6 +31,11 @@ public class MusicRoom(Guid maestroId, string name, string code)
     public int CurrentIndex { get; private set; } = 0;
 
     /// <summary>
+    /// Whether the music is currently playing.
+    /// </summary>
+    public bool IsPlaying { get; private set; } = false;
+
+    /// <summary>
     /// The participants in the room. Each participant is represented by their UserId and SignalR ConnectionId.
     /// This allows tracking multiple connections per user.
     /// </summary>
@@ -57,11 +62,17 @@ public class MusicRoom(Guid maestroId, string name, string code)
         var currentLen = _queue.Count;
         _queue.AddRange(songs);
         CurrentIndex = currentLen;
+        IsPlaying = true;
     }
 
     public void SetQueue(IEnumerable<RoomSong> queue, int currentIndex)
     {
         _queue = [.. queue];
         CurrentIndex = currentIndex;
+    }
+
+    public void SetPlayState(bool isPlaying)
+    {
+        IsPlaying = isPlaying;
     }
 }
