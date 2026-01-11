@@ -27,6 +27,8 @@ export interface IAudioBackend {
 	 * Pauses or resumes playback.
 	 */
 	TogglePlayPause(): void
+	Pause(): void
+	Resume(): void
 	Seek(position: number): void
 
 	/**

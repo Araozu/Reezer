@@ -4,20 +4,18 @@ using Reezer.Application.Notifications;
 
 namespace Reezer.Api.Hubs.Music;
 
-public class RoomQueueChangedNotificationHandler(IHubContext<MusicRoomHub> hubContext)
-    : INotificationHandler<RoomQueueChangedNotification>
+public class PlayStateChangedNotificationHandler(IHubContext<MusicRoomHub> hubContext)
+    : INotificationHandler<PlayStateChangedNotification>
 {
     public async Task Handle(
-        RoomQueueChangedNotification notification,
+        PlayStateChangedNotification notification,
         CancellationToken cancellationToken
     )
     {
         await hubContext
             .Clients.Group(notification.RoomCode)
             .SendAsync(
-                MusicRoomResponses.QueueChanged.ToString(),
-                notification.Queue,
-                notification.CurrentIndex,
+                MusicRoomResponses.PlayStateChanged.ToString(),
                 notification.IsPlaying,
                 cancellationToken
             );

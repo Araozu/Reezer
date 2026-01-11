@@ -6,5 +6,6 @@ namespace Reezer.Application.Notifications;
 public record RoomQueueChangedNotification(
     string RoomCode,
     IEnumerable<RoomSong> Queue,
-    int CurrentIndex
+    int CurrentIndex,
+    bool IsPlaying
 ) : INotification;

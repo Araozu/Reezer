@@ -24,7 +24,9 @@ export class MusicRoomHubClient
 	private messageReceivedHandlers: Array<(user: unknown, message: unknown) => void> = [];
 	private chatMessageHandlers: Array<(message: ChatMessage) => void> = [];
 	private connectedUsersChangedHandlers: Array<(users: ConnectedUser[]) => void> = [];
-	private queueChangedHandlers: Array<(queue: ISong[], currentIndex: number) => void> = [];
+	private queueChangedHandlers: Array<(queue: ISong[], currentIndex: number, isPlaying: boolean) => void> = [];
+	private playStateChangedHandlers: Array<(isPlaying: boolean) => void> = [];
+	private roomStateHandlers: Array<(state: { queue: ISong[], currentIndex: number, isPlaying: boolean }) => void> = [];
 
 	constructor(roomId?: string)
 	{
@@ -51,10 +53,22 @@ export class MusicRoomHubClient
 			this.connectedUsersChangedHandlers.forEach((handler) => handler(users));
 		});
 
-		this.connection.on("QueueChanged", (queue: ISong[], currentIndex: number) =>
+		this.connection.on("QueueChanged", (queue: ISong[], currentIndex: number, isPlaying: boolean) =>
 		{
-			console.log("[MusicRoomHubClient] QueueChanged called", queue, currentIndex);
-			this.queueChangedHandlers.forEach((handler) => handler(queue, currentIndex));
+			console.log("[MusicRoomHubClient] -> Received QueueChanged event", queue, currentIndex);
+			this.queueChangedHandlers.forEach((handler) => handler(queue, currentIndex, isPlaying));
+		});
+
+		this.connection.on("PlayStateChanged", (isPlaying: boolean) =>
+		{
+			console.log("[MusicRoomHubClient] -> Received PlayStateChanged event", isPlaying);
+			this.playStateChangedHandlers.forEach((handler) => handler(isPlaying));
+		});
+
+		this.connection.on("RoomState", (state: { queue: ISong[], currentIndex: number, isPlaying: boolean }) =>
+		{
+			console.log("[MusicRoomHubClient] -> Received RoomState event", state);
+			this.roomStateHandlers.forEach((handler) => handler(state));
 		});
 
 		this.connection.onreconnected(() =>
@@ -156,7 +170,7 @@ export class MusicRoomHubClient
 	}
 
 	/** Subscribe to QueueChanged events from the server */
-	public OnQueueChanged(handler: (queue: ISong[], currentIndex: number) => void): () => void
+	public OnQueueChanged(handler: (queue: ISong[], currentIndex: number, isPlaying: boolean) => void): () => void
 	{
 		this.queueChangedHandlers.push(handler);
 		return () =>
@@ -167,6 +181,44 @@ export class MusicRoomHubClient
 				this.queueChangedHandlers.splice(index, 1);
 			}
 		};
+	}
+
+	/** Subscribe to PlayStateChanged events from the server */
+	public OnPlayStateChanged(handler: (isPlaying: boolean) => void): () => void
+	{
+		this.playStateChangedHandlers.push(handler);
+		return () =>
+		{
+			const index = this.playStateChangedHandlers.indexOf(handler);
+			if (index > -1)
+			{
+				this.playStateChangedHandlers.splice(index, 1);
+			}
+		};
+	}
+
+	/** Subscribe to RoomState events from the server */
+	public OnRoomState(handler: (state: { queue: ISong[], currentIndex: number, isPlaying: boolean }) => void): () => void
+	{
+		this.roomStateHandlers.push(handler);
+		return () =>
+		{
+			const index = this.roomStateHandlers.indexOf(handler);
+			if (index > -1)
+			{
+				this.roomStateHandlers.splice(index, 1);
+			}
+		};
+	}
+
+	public async SetPlayState(isPlaying: boolean): Promise<void>
+	{
+		await this.connection.invoke("SetPlayState", isPlaying);
+	}
+
+	public async PlaySongList(songs: ISong[]): Promise<void>
+	{
+		await this.connection.invoke("PlaySongList", songs);
 	}
 
 	/** Stop the connection and cleanup */

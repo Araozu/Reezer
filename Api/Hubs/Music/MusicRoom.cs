@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Reezer.Application.Commands;
+using Reezer.Application.DTOs;
 using Reezer.Domain.Entities.Room;
 using Reezer.Domain.Repositories.Room;
 using Reezer.Infrastructure.Identity;
@@ -16,6 +17,8 @@ public enum MusicRoomResponses
     UserNotFound,
     QueueChanged,
     InvalidRequest,
+    PlayStateChanged,
+    RoomState,
 }
 
 [Authorize]
@@ -59,12 +62,11 @@ public class MusicRoomHub(
         await result.Match(
             async room =>
             {
-                // Send the current queue state to the caller
+                // Send the current room state to the caller in one go
                 await Groups.AddToGroupAsync(Context.ConnectionId, room.Code);
                 await Clients.Caller.SendAsync(
-                    MusicRoomResponses.QueueChanged.ToString(),
-                    room.Queue,
-                    room.CurrentIndex
+                    MusicRoomResponses.RoomState.ToString(),
+                    new MusicRoomStateDto(room.Queue, room.CurrentIndex, room.IsPlaying)
                 );
             },
             notFound =>
@@ -121,6 +123,22 @@ public class MusicRoomHub(
         await mediator.Send(new SendChatMessageCommand(room.Code, userId, userName, message));
     }
 
+    /// <summary>
+    /// Receives a list of songs to play, adds them to the queue and plays them.
+    /// </summary>
+    /// <param name="songs"></param>
+    /// <returns></returns>
+    public async Task PlaySongList(IEnumerable<RoomSong> songs)
+    {
+        logger.LogInformation(
+            "Playing song list: {}",
+            string.Join(", ", songs.Select(s => s.Name))
+        );
+
+        var result = await mediator.Send(new PlaySongListCommand(Context.ConnectionId, songs));
+        result.Switch(ok => { }, notFound => throw new HubException(notFound.Reason));
+    }
+
     public async Task SetQueue(IEnumerable<RoomSong> queue, int currentIndex)
     {
         var room = roomRepository.GetRoomByConnectionId(Context.ConnectionId);
@@ -132,6 +150,18 @@ public class MusicRoomHub(
         var result = await mediator.Send(
             new UpdateRoomQueueCommand(room.Code, queue, currentIndex)
         );
+        result.Switch(ok => { }, notFound => throw new HubException(notFound.Reason));
+    }
+
+    public async Task SetPlayState(bool isPlaying)
+    {
+        var room = roomRepository.GetRoomByConnectionId(Context.ConnectionId);
+        if (room == null)
+        {
+            throw new HubException("Room not found for this connection");
+        }
+
+        var result = await mediator.Send(new UpdatePlayStateCommand(room.Code, isPlaying));
         result.Switch(ok => { }, notFound => throw new HubException(notFound.Reason));
     }
 }

@@ -37,7 +37,12 @@ public class UpdateRoomQueueCommandHandler(
                 room.SetQueue(request.Queue, request.CurrentIndex);
 
                 await publisher.Publish(
-                    new RoomQueueChangedNotification(room.Code, room.Queue, room.CurrentIndex),
+                    new RoomQueueChangedNotification(
+                        room.Code,
+                        room.Queue,
+                        room.CurrentIndex,
+                        room.IsPlaying
+                    ),
                     cancellationToken
                 );
 

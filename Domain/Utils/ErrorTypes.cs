@@ -2,6 +2,9 @@ namespace Reezer.Domain.Utils;
 
 public record Success;
 
+public record Success<T>(T Data)
+    where T : notnull;
+
 public record BadRequest(string Reason);
 
 public record BadRequest<T>(T data)

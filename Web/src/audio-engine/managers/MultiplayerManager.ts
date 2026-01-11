@@ -21,7 +21,6 @@ export class MultiplayerManager implements IPlayerManager
 	private readonly queueManager: IQueue;
 	private readonly mediaSession: IMediaSession;
 	private readonly syncManager: SyncManager;
-	private isUpdatingFromRemote = false;
 
 	constructor(audioSource: IAudioSource, syncManager: SyncManager)
 	{
@@ -36,43 +35,58 @@ export class MultiplayerManager implements IPlayerManager
 		// Listen for remote queue changes
 		this.syncManager.onQueueChanged((queue, currentIdx) =>
 		{
-			console.log("[MultiplayerManager] Set queue from server");
-			this.isUpdatingFromRemote = true;
-			try
-			{
-				this.queueManager.SetQueue(queue, currentIdx);
-				console.log("[MultiplayerManager] Set queue from server: done");
-			}
-			finally
-			{
-				this.isUpdatingFromRemote = false;
-			}
+			console.log("[MultiplayerManager] Set queue from server", queue, currentIdx);
+
+			this.queueManager.SetQueue(queue, currentIdx);
+			console.log("[MultiplayerManager] Set queue from server: done");
 		});
 
-		// Listen for local queue changes to sync with backend
-		this.queueManager.OnQueueChanged(() =>
+		// Listen for initial room state
+		this.syncManager.onRoomState(async (state) =>
 		{
-			void this.syncQueue();
+			console.log("[MultiplayerManager] Set initial room state from server", state);
+
+			this.queueManager.SetQueue(state.queue, state.currentIndex);
+
+			// Wait a bit for the queue to be set and the backend to be ready
+			await new Promise(resolve => setTimeout(resolve, 100));
+			
+			if (state.isPlaying) this.audioBackend.Resume();
+			else                 this.audioBackend.Pause();
 		});
-	}
 
-	/** Sends the queue to the server */
-	private async syncQueue(): Promise<void>
-	{
-		console.log("[MultiplayerManager] Send queue to server", this.queueManager.queue);
-		if (this.isUpdatingFromRemote || this.syncManager.status !== "connected")
+		// Listen for remote play state changes
+		this.syncManager.onPlayStateChanged((isPlaying) =>
 		{
-			return;
-		}
+			console.log("[MultiplayerManager] Set play state from server, isPlaying: ", isPlaying);
+				if (isPlaying)
+				{
+					this.audioBackend.Resume();
+				}
+				else
+				{
+					this.audioBackend.Pause();
+				}
+		});
 
-		await this.syncManager.sendQueue([...this.queueManager.queue], this.queueManager.currentIdx);
+		// Listen for local play state changes to sync with backend
+		this.audioBackend.OnPlayStateChange((state) =>
+		{
+			if (this.syncManager.status !== "connected")
+			{
+				return;
+			}
+
+			console.log("[MultiplayerManager] Send play state to server", state);
+			void this.syncManager.sendPlayState(state === "playing");
+		});
 	}
 
 	async PlaySongList(songs: Array<ISong>): Promise<Result<void, unknown>>
 	{
-		// Checking for permission is not needed in solo player
+		console.log("[MultiplayerManager] Play song list", songs);
 
-		this.queueManager.PlaySongList(songs);
+		await this.syncManager.sendPlaySongList(songs);
 		return ok();
 	}
 
