@@ -180,7 +180,7 @@ export class MultiplayerManager implements IPlayerManager
 
 	async Seek(position: number): Promise<Result<void, unknown>>
 	{
-		console.log("[MultiplayerManager] Seek to", position);
+		console.log("   [MultiplayerManager] >> Seek to", position);
 		await this.syncManager.sendSeek(position);
 		return ok();
 	}
