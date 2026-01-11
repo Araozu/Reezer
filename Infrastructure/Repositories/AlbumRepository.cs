@@ -161,7 +161,7 @@ public class AlbumRepository(ReezerDbContext dbContext, IOptions<StorageOptions>
 
         var totalCount = await dbContext.Albums.CountAsync(cancellationToken);
 
-        var normalizedSeed = (seed % MaxSeedValue) / (double)MaxSeedValue;
+        var normalizedSeed = seed % MaxSeedValue / (double)MaxSeedValue;
         var offset = (page - 1) * pageSize;
 
         var albumIds = await dbContext

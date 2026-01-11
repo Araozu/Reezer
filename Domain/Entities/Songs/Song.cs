@@ -6,6 +6,7 @@ public partial class Song
     public string Name { get; private set; }
     public int? TrackNumber { get; private set; }
     public int? DiscNumber { get; private set; }
+    public double Duration { get; private set; }
     public string? TranscodedPath { get; private set; } = null;
     public string? RawPath { get; private set; } = null;
     public bool Raw => TranscodedPath is null;

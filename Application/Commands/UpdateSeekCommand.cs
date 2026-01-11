@@ -6,14 +6,14 @@ using Reezer.Domain.Utils;
 
 namespace Reezer.Application.Commands;
 
-public record UpdatePlayStateCommand(string RoomCode, bool IsPlaying, double? Position = null)
+public record UpdateSeekCommand(string RoomCode, double Position)
     : IRequest<OneOf<Success, NotFound>>;
 
-public class UpdatePlayStateHandler(IMusicRoomRepository roomRepository, IPublisher publisher)
-    : IRequestHandler<UpdatePlayStateCommand, OneOf<Success, NotFound>>
+public class UpdateSeekHandler(IMusicRoomRepository roomRepository, IPublisher publisher)
+    : IRequestHandler<UpdateSeekCommand, OneOf<Success, NotFound>>
 {
     public async Task<OneOf<Success, NotFound>> Handle(
-        UpdatePlayStateCommand request,
+        UpdateSeekCommand request,
         CancellationToken cancellationToken
     )
     {
@@ -22,7 +22,7 @@ public class UpdatePlayStateHandler(IMusicRoomRepository roomRepository, IPublis
         return await roomResult.Match<Task<OneOf<Success, NotFound>>>(
             async room =>
             {
-                room.SetPlayState(request.IsPlaying, request.Position);
+                room.SetPosition(request.Position);
                 await publisher.Publish(
                     new PlayStateChangedNotification(
                         room.Code,

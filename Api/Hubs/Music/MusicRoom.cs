@@ -66,7 +66,13 @@ public class MusicRoomHub(
                 await Groups.AddToGroupAsync(Context.ConnectionId, room.Code);
                 await Clients.Caller.SendAsync(
                     MusicRoomResponses.RoomState.ToString(),
-                    new MusicRoomStateDto(room.Queue, room.CurrentIndex, room.IsPlaying)
+                    new MusicRoomStateDto(
+                        room.Queue,
+                        room.CurrentIndex,
+                        room.IsPlaying,
+                        room.CurrentPosition,
+                        room.LastUpdateServerTime
+                    )
                 );
             },
             notFound =>
@@ -153,7 +159,7 @@ public class MusicRoomHub(
         result.Switch(ok => { }, notFound => throw new HubException(notFound.Reason));
     }
 
-    public async Task SetPlayState(bool isPlaying)
+    public async Task SetPlayState(bool isPlaying, double? position = null)
     {
         var room = roomRepository.GetRoomByConnectionId(Context.ConnectionId);
         if (room == null)
@@ -161,7 +167,21 @@ public class MusicRoomHub(
             throw new HubException("Room not found for this connection");
         }
 
-        var result = await mediator.Send(new UpdatePlayStateCommand(room.Code, isPlaying));
+        var result = await mediator.Send(
+            new UpdatePlayStateCommand(room.Code, isPlaying, position)
+        );
+        result.Switch(ok => { }, notFound => throw new HubException(notFound.Reason));
+    }
+
+    public async Task SetSeek(double position)
+    {
+        var room = roomRepository.GetRoomByConnectionId(Context.ConnectionId);
+        if (room == null)
+        {
+            throw new HubException("Room not found for this connection");
+        }
+
+        var result = await mediator.Send(new UpdateSeekCommand(room.Code, position));
         result.Switch(ok => { }, notFound => throw new HubException(notFound.Reason));
     }
 }

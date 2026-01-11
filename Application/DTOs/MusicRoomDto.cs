@@ -7,5 +7,7 @@ public record CreateMusicRoomDto(string? RoomName);
 public record MusicRoomStateDto(
     IEnumerable<Domain.Entities.Room.RoomSong> Queue,
     int CurrentIndex,
-    bool IsPlaying
+    bool IsPlaying,
+    double CurrentPosition,
+    long LastUpdateServerTime
 );

@@ -17,6 +17,8 @@ public class PlayStateChangedNotificationHandler(IHubContext<MusicRoomHub> hubCo
             .SendAsync(
                 MusicRoomResponses.PlayStateChanged.ToString(),
                 notification.IsPlaying,
+                notification.Position,
+                notification.ServerTime,
                 cancellationToken
             );
     }

@@ -13,10 +13,13 @@ const deleteMutation = useDeleteYtSong();
 
 async function deleteSong()
 {
-	try {
+	try
+	{
 		await $deleteMutation.mutateAsync(song.id);
 		toast.success("Song deleted");
-	} catch (error) {
+	}
+	catch (error)
+	{
 		const details =
 			typeof error === "object" && error && "detail" in error
 				? (error as { detail?: string }).detail

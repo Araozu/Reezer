@@ -7,5 +7,7 @@ public record RoomQueueChangedNotification(
     string RoomCode,
     IEnumerable<RoomSong> Queue,
     int CurrentIndex,
-    bool IsPlaying
+    bool IsPlaying,
+    double Position,
+    long ServerTime
 ) : INotification;

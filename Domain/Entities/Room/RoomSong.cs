@@ -7,5 +7,6 @@ public record RoomSong(
     string? Album,
     string? ArtistId,
     string? AlbumId,
+    double Duration,
     string Type // "regular" or "youtube"
 );
