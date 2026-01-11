@@ -143,6 +143,11 @@ export class SyncManager
 		await this.hubClient.SendMessage(message);
 	}
 
+	public async sendPlaySongList(songs: ISong[]): Promise<void>
+	{
+		await this.hubClient.PlaySongList(songs);
+	}
+
 	public async sendQueue(queue: ISong[], currentIndex: number): Promise<void>
 	{
 		await this.hubClient.SetQueue(queue, currentIndex);

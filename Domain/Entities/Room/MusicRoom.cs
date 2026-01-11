@@ -1,30 +1,23 @@
 namespace Reezer.Domain.Entities.Room;
 
-public class MusicRoom
+public class MusicRoom(Guid maestroId, string name, string code)
 {
-    public MusicRoom(Guid maestroId, string name, string code)
-    {
-        MaestroId = maestroId;
-        Name = name;
-        Code = code;
-    }
-
     public Guid Id { get; private set; }
 
     /// <summary>
     /// The Maestro of the room. Has full control.
     /// </summary>
-    public Guid MaestroId { get; private set; }
+    public Guid MaestroId { get; private set; } = maestroId;
 
     /// <summary>
     /// 6 hex character code used to join the room.
     /// </summary>
-    public string Code { get; private set; } = null!;
+    public string Code { get; private set; } = code;
 
     /// <summary>
     /// A friendly name for the room.
     /// </summary>
-    public string Name { get; private set; } = null!;
+    public string Name { get; private set; } = name;
 
     /// <summary>
     /// The current queue of songs in the room.
@@ -55,9 +48,20 @@ public class MusicRoom
         _participants.Remove((userId, connectionId));
     }
 
+    /// <summary>
+    ///  Adds a list of songs to the queue & plays them.
+    /// </summary>
+    /// <param name="songs"></param>
+    public void PlaySongList(IEnumerable<RoomSong> songs)
+    {
+        var currentLen = _queue.Count;
+        _queue.AddRange(songs);
+        CurrentIndex = currentLen;
+    }
+
     public void SetQueue(IEnumerable<RoomSong> queue, int currentIndex)
     {
-        _queue = queue.ToList();
+        _queue = [.. queue];
         CurrentIndex = currentIndex;
     }
 }

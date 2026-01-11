@@ -53,7 +53,7 @@ export class MusicRoomHubClient
 
 		this.connection.on("QueueChanged", (queue: ISong[], currentIndex: number) =>
 		{
-			console.log("[MusicRoomHubClient] QueueChanged called", queue, currentIndex);
+			console.log("[MusicRoomHubClient] -> Received QueueChanged event", queue, currentIndex);
 			this.queueChangedHandlers.forEach((handler) => handler(queue, currentIndex));
 		});
 
@@ -167,6 +167,11 @@ export class MusicRoomHubClient
 				this.queueChangedHandlers.splice(index, 1);
 			}
 		};
+	}
+
+	public async PlaySongList(songs: ISong[]): Promise<void>
+	{
+		await this.connection.invoke("PlaySongList", songs);
 	}
 
 	/** Stop the connection and cleanup */

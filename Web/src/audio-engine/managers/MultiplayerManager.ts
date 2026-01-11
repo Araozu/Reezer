@@ -36,7 +36,7 @@ export class MultiplayerManager implements IPlayerManager
 		// Listen for remote queue changes
 		this.syncManager.onQueueChanged((queue, currentIdx) =>
 		{
-			console.log("[MultiplayerManager] Set queue from server");
+			console.log("[MultiplayerManager] Set queue from server", queue, currentIdx);
 			this.isUpdatingFromRemote = true;
 			try
 			{
@@ -47,12 +47,6 @@ export class MultiplayerManager implements IPlayerManager
 			{
 				this.isUpdatingFromRemote = false;
 			}
-		});
-
-		// Listen for local queue changes to sync with backend
-		this.queueManager.OnQueueChanged(() =>
-		{
-			void this.syncQueue();
 		});
 	}
 
@@ -70,9 +64,9 @@ export class MultiplayerManager implements IPlayerManager
 
 	async PlaySongList(songs: Array<ISong>): Promise<Result<void, unknown>>
 	{
-		// Checking for permission is not needed in solo player
+		console.log("[MultiplayerManager] Play song list", songs);
 
-		this.queueManager.PlaySongList(songs);
+		await this.syncManager.sendPlaySongList(songs);
 		return ok();
 	}
 
