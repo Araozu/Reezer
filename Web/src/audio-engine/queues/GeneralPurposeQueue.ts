@@ -267,7 +267,7 @@ export class GeneralPurposeQueue implements IQueue
 		else this.audioBackend.ClearPrefetch();
 	}
 
-	private loadBackendCurrentSong()
+	private async loadBackendCurrentSong()
 	{
 		console.log("[GeneralPurposeQueue] loading current song");
 
@@ -278,15 +278,15 @@ export class GeneralPurposeQueue implements IQueue
 		}
 
 		const currentSong = this._queueState[this._currentIdx];
-		this.audioBackend.LoadCurrentSong(currentSong);
+		await this.audioBackend.LoadCurrentSong(currentSong);
 	}
 
-	SetQueue(newQueue: Array<ISong>, newCurrentIdx: number): void
+	async SetQueue(newQueue: Array<ISong>, newCurrentIdx: number): Promise<void>
 	{
 		this._queueState = newQueue;
 		this._currentIdx = newCurrentIdx;
 		this.notifyQueueChanged();
-		this.loadBackendCurrentSong();
+		await this.loadBackendCurrentSong();
 		this.updateBackendPrefetch();
 	}
 

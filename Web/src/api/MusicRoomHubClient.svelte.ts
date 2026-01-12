@@ -275,6 +275,13 @@ export class MusicRoomHubClient
 		await this.connection.invoke("PlaySongList", songs);
 	}
 
+	public async AddSongsToQueue(songs: ISong[], position: "Next" | "Last"): Promise<void>
+	{
+		// C# enum AddPosition: Next = 0, Last = 1
+		const positionValue = position === "Next" ? 0 : 1;
+		await this.connection.invoke("AddSongsToQueue", songs, positionValue);
+	}
+
 	/** Stop the connection and cleanup */
 	public async destroy(): Promise<void>
 	{

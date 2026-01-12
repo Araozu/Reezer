@@ -145,6 +145,14 @@ public class MusicRoomHub(
         result.Switch(ok => { }, notFound => throw new HubException(notFound.Reason));
     }
 
+    public async Task AddSongsToQueue(IEnumerable<RoomSong> songs, AddPosition position)
+    {
+        var result = await mediator.Send(
+            new AddSongsToQueueCommand(Context.ConnectionId, songs, position)
+        );
+        result.Switch(ok => { }, notFound => throw new HubException(notFound.Reason));
+    }
+
     public async Task SetQueue(IEnumerable<RoomSong> queue, int currentIndex)
     {
         var room = roomRepository.GetRoomByConnectionId(Context.ConnectionId);

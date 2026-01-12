@@ -95,8 +95,7 @@ export class DualAudioBackend implements IAudioBackend
 				player.src = mediaUrl;
 				this.SetCurrentSongId(id);
 				this.currentSongStartTime = Date.now();
-				player.play();
-				this.notifyPlayStateChange("playing");
+				player.play().catch((e) => console.error("[DualAudioBackend] play() failed:", e));
 				this.startPositionTracking();
 			},
 			(e) =>
@@ -134,8 +133,7 @@ export class DualAudioBackend implements IAudioBackend
 
 		if (player.src)
 		{
-			player.play();
-			this.notifyPlayStateChange("playing");
+			player.play().catch((e) => console.error("[DualAudioBackend] Resume play() failed:", e));
 			this.startPositionTracking();
 		}
 		else
@@ -200,9 +198,8 @@ export class DualAudioBackend implements IAudioBackend
 			this.SwitchPlayers();
 			const currentPlayer = this.GetCurrentPlayer();
 			this.currentSongStartTime = Date.now();
-			currentPlayer.play();
+			currentPlayer.play().catch((e) => console.error("[DualAudioBackend] autoPlayNext play() failed:", e));
 			this.hasPrefetch = false;
-			this.notifyPlayStateChange("playing");
 			this.startPositionTracking();
 		}
 		else
@@ -240,6 +237,34 @@ export class DualAudioBackend implements IAudioBackend
 
 		this.player1.addEventListener("ended", this.autoPlayNext);
 		this.player2.addEventListener("ended", this.autoPlayNext);
+
+		const setupBufferingEvents = (player: HTMLAudioElement) =>
+		{
+			player.addEventListener("waiting", () =>
+			{
+				if (this._playState !== "paused") this.notifyPlayStateChange("buffering");
+			});
+			player.addEventListener("playing", () =>
+			{
+				if (this._playState !== "paused") this.notifyPlayStateChange("playing");
+			});
+			player.addEventListener("canplay", () =>
+			{
+				if (this._playState === "buffering") this.notifyPlayStateChange("playing");
+			});
+			player.addEventListener("stalled", () =>
+			{
+				if (this._playState !== "paused") this.notifyPlayStateChange("buffering");
+			});
+			player.addEventListener("error", (e) =>
+			{
+				console.error("[DualAudioBackend] player error:", e);
+				this.notifyPlayStateChange("paused");
+			});
+		};
+
+		setupBufferingEvents(this.player1);
+		setupBufferingEvents(this.player2);
 
 		this.player1.addEventListener("loadedmetadata", () => this.notifyDurationChange(this.player1.duration));
 		this.player2.addEventListener("loadedmetadata", () => this.notifyDurationChange(this.player2.duration));
