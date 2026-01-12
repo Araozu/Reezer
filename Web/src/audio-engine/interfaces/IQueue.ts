@@ -74,7 +74,7 @@ export interface IQueue
 	/**
 	 * Replaces the entire queue and sets the current index
 	 */
-	SetQueue(newQueue: Array<ISong>, newCurrentIdx: number): void;
+	SetQueue(newQueue: Array<ISong>, newCurrentIdx: number): Promise<void>;
 
 	SetLoopMode(mode: LoopMode): void;
 

@@ -26,6 +26,7 @@ export class WebAudioBackend implements IAudioBackend
 	private isPaused = false;
 	private pausedAt = 0;
 	private startedAt = 0;
+	private _playState: PlayState = "paused";
 
 	// Prevents duplicate play calls and race conditions
 	private currentSongStartTime = 0;
@@ -65,6 +66,18 @@ export class WebAudioBackend implements IAudioBackend
 	get duration(): number | null
 	{
 		return this.currentBuffer ? this.currentBuffer.duration : null;
+	}
+
+	get playState(): PlayState
+	{
+		return this._playState;
+	}
+
+	get position(): number
+	{
+		if (!this.audioContext) return 0;
+		if (this.isPaused) return this.pausedAt;
+		return Math.max(0, this.audioContext.currentTime - this.startedAt);
 	}
 
 	async Play(track: ISong): Promise<void>
@@ -134,10 +147,15 @@ export class WebAudioBackend implements IAudioBackend
 						this.notifyPlayStateChange("playing");
 						this.startPositionTracking();
 					}
+					else
+					{
+						this.notifyPlayStateChange("paused");
+					}
 				},
 				(e) =>
 				{
 					console.error("Error fetching track:", e);
+					this.notifyPlayStateChange("paused");
 				},
 			);
 		}
@@ -149,29 +167,44 @@ export class WebAudioBackend implements IAudioBackend
 
 	TogglePlayPause(): void
 	{
-		this.ensureInitialized();
+		if (this.isPaused)
+		{
+			this.Resume();
+		}
+		else
+		{
+			this.Pause();
+		}
+	}
 
-		if (!this.audioContext || !this.currentBuffer)
+	Pause(): void
+	{
+		if (!this.audioContext || !this.currentBuffer || this.isPaused)
 		{
 			return;
 		}
 
-		if (this.isPaused)
+		this.isPaused = true;
+		this.pausedAt = this.audioContext.currentTime - this.startedAt;
+		this.stopCurrentSource();
+		this.notifyPlayStateChange("paused");
+		this.stopPositionTracking();
+	}
+
+	Resume(): void
+	{
+		this.ensureInitialized();
+
+		if (!this.audioContext || !this.currentBuffer || !this.isPaused)
 		{
-			this.ensureAudioContextResumed();
-			this.isPaused = false;
-			this.playBuffer(this.currentBuffer, this.pausedAt);
-			this.notifyPlayStateChange("playing");
-			this.startPositionTracking();
+			return;
 		}
-		else
-		{
-			this.isPaused = true;
-			this.pausedAt = this.audioContext.currentTime - this.startedAt;
-			this.stopCurrentSource();
-			this.notifyPlayStateChange("paused");
-			this.stopPositionTracking();
-		}
+
+		this.ensureAudioContextResumed();
+		this.isPaused = false;
+		this.playBuffer(this.currentBuffer, this.pausedAt);
+		this.notifyPlayStateChange("playing");
+		this.startPositionTracking();
 	}
 
 	Seek(position: number): void
@@ -189,6 +222,54 @@ export class WebAudioBackend implements IAudioBackend
 		if (!this.isPaused)
 		{
 			this.playBuffer(this.currentBuffer, clampedPosition);
+		}
+	}
+
+	async LoadCurrentSong(track: ISong): Promise<void>
+	{
+		this.ensureInitialized();
+
+		const id = track.id;
+		if (!this.audioContext)
+		{
+			return;
+		}
+
+		this.isLoading = true;
+		this.stopCurrentSource();
+		this.notifyPlayStateChange("buffering");
+
+		try
+		{
+			const mediaUrlResult = await this.audioSource.GetTrack(track);
+			await mediaUrlResult.match(
+				async(mediaUrl) =>
+				{
+					const buffer = await this.fetchAndDecodeAudio(mediaUrl);
+					if (buffer)
+					{
+						this.currentBuffer = buffer;
+						this.currentSongId = id;
+						this.pausedAt = 0;
+						this.isPaused = true;
+						this.notifyDurationChange(buffer.duration);
+						this.notifyPlayStateChange("paused");
+					}
+					else
+					{
+						this.notifyPlayStateChange("paused");
+					}
+				},
+				(e) =>
+				{
+					console.error("Error loading track:", e);
+					this.notifyPlayStateChange("paused");
+				},
+			);
+		}
+		finally
+		{
+			this.isLoading = false;
 		}
 	}
 
@@ -447,6 +528,7 @@ export class WebAudioBackend implements IAudioBackend
 
 	private notifyPlayStateChange(state: PlayState): void
 	{
+		this._playState = state;
 		this.playStateChangeCallbacks.forEach((cb) => cb(state));
 	}
 }

@@ -5,10 +5,10 @@ import type { ISong, LoopMode } from "../types";
 import type { IQueue } from "../interfaces/IQueue";
 import type { IMediaSession } from "../interfaces/IMediaSession";
 import type { IAudioSource } from "../interfaces/IAudioSource";
-import { DualAudioBackend } from "../backends/DualAudioBackend";
 import { GeneralPurposeQueue } from "../queues/GeneralPurposeQueue";
 import { BrowserMediaSession } from "../backends/BrowserMediaSession";
 import type { SyncManager } from "./SyncManager.svelte";
+import { WebAudioBackend } from "../backends/WebAudioBackend";
 
 /**
  * A player manager for multiplayer playback.
@@ -25,7 +25,7 @@ export class MultiplayerManager implements IPlayerManager
 	constructor(audioSource: IAudioSource, syncManager: SyncManager)
 	{
 		this.syncManager = syncManager;
-		this.audioBackend = new DualAudioBackend(audioSource);
+		this.audioBackend = new WebAudioBackend(audioSource);
 		this.queueManager = new GeneralPurposeQueue(this.audioBackend);
 
 		// Setup music player
@@ -33,11 +33,11 @@ export class MultiplayerManager implements IPlayerManager
 		this.mediaSession.Init();
 
 		// Listen for remote queue changes
-		this.syncManager.onQueueChanged((queue, currentIdx, isPlaying, position, serverTime) =>
+		this.syncManager.onQueueChanged(async(queue, currentIdx, isPlaying, position, serverTime) =>
 		{
 			console.log("[MultiplayerManager] Set queue from server", queue, currentIdx);
 
-			this.queueManager.SetQueue(queue, currentIdx);
+			await this.queueManager.SetQueue(queue, currentIdx);
 
 			const projectedPosition = this.calculateProjectedPosition(
 				isPlaying,
@@ -57,10 +57,7 @@ export class MultiplayerManager implements IPlayerManager
 		{
 			console.log("[MultiplayerManager] Set initial room state from server", state);
 
-			this.queueManager.SetQueue(state.queue, state.currentIndex);
-
-			// Wait a bit for the queue to be set and the backend to be ready
-			await new Promise((resolve) => setTimeout(resolve, 100));
+			await this.queueManager.SetQueue(state.queue, state.currentIndex);
 
 			const projectedPosition = this.calculateProjectedPosition(
 				state.isPlaying,
@@ -97,7 +94,7 @@ export class MultiplayerManager implements IPlayerManager
 
 	async PlaySongList(songs: Array<ISong>): Promise<Result<void, unknown>>
 	{
-		console.log("[MultiplayerManager] Play song list", songs);
+		console.log("   [MultiplayerManager] >> Play song list:", songs);
 
 		await this.syncManager.sendPlaySongList(songs);
 		return ok();
@@ -105,67 +102,71 @@ export class MultiplayerManager implements IPlayerManager
 
 	async AddLastSong(song: ISong): Promise<Result<void, unknown>>
 	{
-		this.queueManager.AddLastSong(song);
+		console.log("   [MultiplayerManager] >> Add last song:", song);
+		await this.syncManager.sendAddSongsToQueue([song], "Last");
 		return ok();
 	}
 
 	async AddLastSongList(songs: Array<ISong>): Promise<Result<void, unknown>>
 	{
-		this.queueManager.AddLastSongList(songs);
+		console.log("   [MultiplayerManager] >> Add last song list:", songs);
+		await this.syncManager.sendAddSongsToQueue(songs, "Last");
 		return ok();
 	}
 
 	async AddNextSong(song: ISong): Promise<Result<void, unknown>>
 	{
-		this.queueManager.AddNextSong(song);
+		console.log("   [MultiplayerManager] >> Add next song:", song);
+		await this.syncManager.sendAddSongsToQueue([song], "Next");
 		return ok();
 	}
 
 	async AddNextSongList(songs: Array<ISong>): Promise<Result<void, unknown>>
 	{
-		this.queueManager.AddNextSongList(songs);
+		console.log("   [MultiplayerManager] >> Add next song list:", songs);
+		await this.syncManager.sendAddSongsToQueue(songs, "Next");
 		return ok();
 	}
 
 	async Next(): Promise<Result<void, unknown>>
 	{
-		this.queueManager.Next();
+		throw new Error("Not migrated to server")
 		return ok();
 	}
 
 	async Prev(): Promise<Result<void, unknown>>
 	{
-		this.queueManager.Prev();
+		throw new Error("Not migrated to server")
 		return ok();
 	}
 
 	async PlayAt(idx: number): Promise<Result<void, unknown>>
 	{
-		this.queueManager.PlayAt(idx);
+		throw new Error("Not migrated to server")
 		return ok();
 	}
 
 	async ClearQueue(): Promise<Result<void, unknown>>
 	{
-		this.queueManager.ClearQueue();
+		throw new Error("Not migrated to server")
 		return ok();
 	}
 
 	async RemoveAt(idx: number): Promise<Result<void, unknown>>
 	{
-		this.queueManager.RemoveAt(idx);
+		throw new Error("Not migrated to server")
 		return ok();
 	}
 
 	async SetQueue(newQueue: Array<ISong>, newCurrentIdx: number): Promise<Result<void, unknown>>
 	{
-		this.queueManager.SetQueue(newQueue, newCurrentIdx);
+		throw new Error("Not migrated to server")
 		return ok();
 	}
 
 	async SetLoopMode(mode: LoopMode): Promise<Result<void, unknown>>
 	{
-		this.queueManager.SetLoopMode(mode);
+		throw new Error("Not migrated to server")
 		return ok();
 	}
 

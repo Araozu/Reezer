@@ -100,4 +100,28 @@ public class MusicRoom(Guid maestroId, string name, string code)
         CurrentPosition = position;
         LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     }
+
+    public void AddLastSong(RoomSong song)
+    {
+        _queue.Add(song);
+        LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+    }
+
+    public void AddLastSongList(IEnumerable<RoomSong> songs)
+    {
+        _queue.AddRange(songs);
+        LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+    }
+
+    public void AddNextSong(RoomSong song)
+    {
+        _queue.Insert(CurrentIndex + 1, song);
+        LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+    }
+
+    public void AddNextSongList(IEnumerable<RoomSong> songs)
+    {
+        _queue.InsertRange(CurrentIndex + 1, songs);
+        LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+    }
 }

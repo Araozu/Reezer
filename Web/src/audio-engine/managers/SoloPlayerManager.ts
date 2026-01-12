@@ -94,7 +94,7 @@ export class SoloPlayerManager implements IPlayerManager
 
 	async SetQueue(newQueue: Array<ISong>, newCurrentIdx: number): Promise<Result<void, unknown>>
 	{
-		this.queueManager.SetQueue(newQueue, newCurrentIdx);
+		await this.queueManager.SetQueue(newQueue, newCurrentIdx);
 		return ok();
 	}
 
