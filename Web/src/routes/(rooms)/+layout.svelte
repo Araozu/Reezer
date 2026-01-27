@@ -7,23 +7,23 @@ import { SetPlayerManagerContext, SetSvelteManagerContext, SetSyncRoomManagerCon
 import { MultiplayerManager } from "~/audio-engine/managers/MultiplayerManager";
 import { UrlAudioSource } from "~/audio-engine/audio-sources/UrlAudioSource";
 import { SvPlayerManager } from "~/audio-engine/managers/SvPlayerManager.svelte";
-import { SyncManager } from "~/audio-engine/managers/SyncManager.svelte";
+import { MusicRoomHubClient } from "~/api/MusicRoomHubClient.svelte";
 import { page } from "$app/state";
 
 let { children } = $props();
 
-// Sync manager for room features
-const syncRoomManager = new SyncManager(page.params.roomId);
-SetSyncRoomManagerContext(syncRoomManager);
+// Hub client for room features
+const hubClient = new MusicRoomHubClient(page.params.roomId);
+SetSyncRoomManagerContext(hubClient);
 
-const playerManager = new MultiplayerManager(new UrlAudioSource(), syncRoomManager);
+const playerManager = new MultiplayerManager(new UrlAudioSource(), hubClient);
 SetPlayerManagerContext(playerManager);
 
 // Svelte manager with reactivity
 const svManager = new SvPlayerManager(playerManager);
 SetSvelteManagerContext(svManager);
 
-const syncStatus = $derived(syncRoomManager.status);
+const syncStatus = $derived(hubClient.status);
 
 let hasInitialized = $state(false);
 let isConnecting = $state(false);
@@ -37,7 +37,7 @@ async function handleContinue()
 		await playerManager.Init();
 		// wait some ms for player to settle
 		await new Promise((resolve) => setTimeout(resolve, 150));
-		await syncRoomManager.connect();
+		await hubClient.start();
 		hasInitialized = true;
 	}
 	finally
@@ -76,7 +76,7 @@ $effect(() =>
 $effect(() => () =>
 {
 	console.log("[rooms layout] Cleanup called - cleaning up player manager");
-	syncRoomManager.destroy();
+	hubClient.destroy();
 });
 </script>
 

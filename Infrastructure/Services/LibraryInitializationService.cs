@@ -11,7 +11,7 @@ using Reezer.Infrastructure.Options;
 
 namespace Reezer.Infrastructure.Services;
 
-public partial class LibraryInitializationService(
+public class LibraryInitializationService(
     ReezerDbContext dbContext,
     IOptions<StorageOptions> storageOptions,
     ILogger<LibraryInitializationService> logger
@@ -39,8 +39,10 @@ public partial class LibraryInitializationService(
         "front.png",
     ];
 
-    [GeneratedRegex(@"(?:CD|Disc|Disk)\s*(\d+)", RegexOptions.IgnoreCase)]
-    private static partial Regex DiscFolderRegex();
+    private static readonly Regex DiscFolderRegex = new(
+        @"(?:CD|Disc|Disk)\s*(\d+)",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled
+    );
 
     private StorageOptions StorageOptions => storageOptions.Value;
 
@@ -339,7 +341,7 @@ public partial class LibraryInitializationService(
             if (pathParts.Length == 4)
             {
                 var discFolder = pathParts[2];
-                var match = DiscFolderRegex().Match(discFolder);
+                var match = DiscFolderRegex.Match(discFolder);
                 if (match.Success && int.TryParse(match.Groups[1].Value, out var disc))
                 {
                     discNumber = disc;

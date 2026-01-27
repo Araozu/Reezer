@@ -1,7 +1,7 @@
 import { getContext, setContext } from "svelte";
 import type { IPlayerManager } from "~/audio-engine/interfaces/IPlayerManager";
 import type { SvPlayerManager } from "~/audio-engine/managers/SvPlayerManager.svelte";
-import type { SyncManager } from "~/audio-engine/managers/SyncManager.svelte";
+import type { MusicRoomHubClient } from "~/api/MusicRoomHubClient.svelte";
 
 const SYNC_PLAYER_MANAGER_KEY = "sync-player-manager";
 const SYNC_SV_MANAGER_KEY = "sync-sv-manager";
@@ -27,13 +27,12 @@ export function GetSvelteManagerContext(): SvPlayerManager
 	return getContext<SvPlayerManager>(SYNC_SV_MANAGER_KEY);
 }
 
-export function SetSyncRoomManagerContext(manager: SyncManager)
+export function SetSyncRoomManagerContext(manager: MusicRoomHubClient)
 {
 	setContext(SYNC_ROOM_MANAGER_KEY, manager);
 }
 
-export function GetSyncRoomManagerContext(): SyncManager
+export function GetSyncRoomManagerContext(): MusicRoomHubClient
 {
-	return getContext<SyncManager>(SYNC_ROOM_MANAGER_KEY);
+	return getContext<MusicRoomHubClient>(SYNC_ROOM_MANAGER_KEY);
 }
-

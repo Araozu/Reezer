@@ -4,13 +4,13 @@ import { Input } from "$lib/components/ui/input";
 import { Send } from "lucide-svelte";
 import { GetSyncRoomManagerContext } from "~/context/music-player-context";
 
-const playerManager = GetSyncRoomManagerContext();
+const hubClient = GetSyncRoomManagerContext();
 
 let newMessage = $state("");
 let chatContainer: HTMLDivElement;
 
-const messages = $derived(playerManager.messages);
-const status = $derived(playerManager.status);
+const messages = $derived(hubClient.messages);
+const status = $derived(hubClient.status);
 
 $effect(() =>
 {
@@ -37,7 +37,7 @@ async function sendMessage()
 
 	try
 	{
-		await playerManager.sendChatMessage(newMessage);
+		await hubClient.SendMessage(newMessage);
 		newMessage = "";
 	}
 	catch (e)

@@ -2,8 +2,8 @@
 	import { Users, User } from "lucide-svelte";
 	import { GetSyncRoomManagerContext } from "~/context/music-player-context";
 
-	const playerManager = GetSyncRoomManagerContext();
-	const connectedUsers = $derived(playerManager.connectedUsers);
+	const hubClient = GetSyncRoomManagerContext();
+	const connectedUsers = $derived(hubClient.connectedUsers);
 </script>
 
 <div class="flex flex-col gap-3 p-4">

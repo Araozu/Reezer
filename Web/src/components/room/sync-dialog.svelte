@@ -5,9 +5,9 @@ import { GetSyncRoomManagerContext } from "~/context/music-player-context";
 
 let { open = $bindable(false) } = $props();
 
-const playerManager = GetSyncRoomManagerContext();
-const syncResult = $derived(playerManager.syncResult);
-const status = $derived(playerManager.status);
+const hubClient = GetSyncRoomManagerContext();
+const syncResult = $derived(hubClient.syncResult);
+const status = $derived(hubClient.status);
 
 let serverTime = $state(Date.now());
 

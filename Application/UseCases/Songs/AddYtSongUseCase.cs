@@ -4,9 +4,9 @@ using Reezer.Domain.Entities.Yt;
 using Reezer.Domain.Repositories;
 using Reezer.Domain.Utils;
 
-namespace Reezer.Application.UseCases;
+namespace Reezer.Application.UseCases.Songs;
 
-public partial class AddYtSongUseCase(IYtService ytService, IYtSongRepository ytSongRepository)
+public class AddYtSongUseCase(IYtService ytService, IYtSongRepository ytSongRepository)
 {
     public async Task<OneOf<YtSong, BadRequest, NotFound, InternalError>> ExecuteAsync(
         string ytUrl,
@@ -46,13 +46,12 @@ public partial class AddYtSongUseCase(IYtService ytService, IYtSongRepository yt
 
     private static string? ExtractVideoId(string url)
     {
-        var match = YoutubeVideoIdPattern().Match(url);
+        var match = YoutubeVideoIdPattern.Match(url);
         return match.Success ? match.Groups["id"].Value : null;
     }
 
-    [GeneratedRegex(
+    private static readonly Regex YoutubeVideoIdPattern = new(
         @"(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/)(?<id>[a-zA-Z0-9_-]{11})",
-        RegexOptions.IgnoreCase
-    )]
-    private static partial Regex YoutubeVideoIdPattern();
+        RegexOptions.IgnoreCase | RegexOptions.Compiled
+    );
 }

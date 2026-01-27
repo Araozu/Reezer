@@ -5,10 +5,10 @@
 	import { Users, MessageCircle } from "lucide-svelte";
 	import { GetSyncRoomManagerContext } from "~/context/music-player-context";
 
-	const playerManager = GetSyncRoomManagerContext();
+	const hubClient = GetSyncRoomManagerContext();
 
-	const status = $derived(playerManager.status);
-	const connectedUsers = $derived(playerManager.connectedUsers);
+	const status = $derived(hubClient.status);
+	const connectedUsers = $derived(hubClient.connectedUsers);
 
 	let activeTab = $state<"chat" | "users">("chat");
 </script>

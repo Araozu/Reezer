@@ -7,7 +7,7 @@ import type { IMediaSession } from "../interfaces/IMediaSession";
 import type { IAudioSource } from "../interfaces/IAudioSource";
 import { GeneralPurposeQueue } from "../queues/GeneralPurposeQueue";
 import { BrowserMediaSession } from "../backends/BrowserMediaSession";
-import type { SyncManager } from "./SyncManager.svelte";
+import { MusicRoomHubClient } from "~/api/MusicRoomHubClient.svelte";
 import { WebAudioBackend } from "../backends/WebAudioBackend";
 
 /**
@@ -20,11 +20,11 @@ export class MultiplayerManager implements IPlayerManager
 	private readonly audioBackend: IAudioBackend;
 	private readonly queueManager: IQueue;
 	private readonly mediaSession: IMediaSession;
-	private readonly syncManager: SyncManager;
+	private readonly hubClient: MusicRoomHubClient;
 
-	constructor(audioSource: IAudioSource, syncManager: SyncManager)
+	constructor(audioSource: IAudioSource, hubClient: MusicRoomHubClient)
 	{
-		this.syncManager = syncManager;
+		this.hubClient = hubClient;
 		this.audioBackend = new WebAudioBackend(audioSource);
 		this.queueManager = new GeneralPurposeQueue(this.audioBackend);
 
@@ -33,7 +33,7 @@ export class MultiplayerManager implements IPlayerManager
 		this.mediaSession.Init();
 
 		// Listen for remote queue changes
-		this.syncManager.onQueueChanged(async(queue, currentIdx, isPlaying, position, serverTime) =>
+		this.hubClient.OnQueueChanged(async(queue, currentIdx, isPlaying, position, serverTime) =>
 		{
 			console.log("[MultiplayerManager] Set queue from server", queue, currentIdx);
 
@@ -53,7 +53,7 @@ export class MultiplayerManager implements IPlayerManager
 		});
 
 		// Listen for initial room state
-		this.syncManager.onRoomState(async(state) =>
+		this.hubClient.OnRoomState(async(state) =>
 		{
 			console.log("[MultiplayerManager] Set initial room state from server", state);
 
@@ -73,7 +73,7 @@ export class MultiplayerManager implements IPlayerManager
 		});
 
 		// Listen for remote play state changes
-		this.syncManager.onPlayStateChanged((isPlaying, position, serverTime) =>
+		this.hubClient.OnPlayStateChanged((isPlaying, position, serverTime) =>
 		{
 			console.log(
 				">> [MultiplayerManager]    Set play state from server, isPlaying: ",
@@ -96,77 +96,77 @@ export class MultiplayerManager implements IPlayerManager
 	{
 		console.log("   [MultiplayerManager] >> Play song list:", songs);
 
-		await this.syncManager.sendPlaySongList(songs);
+		await this.hubClient.PlaySongList(songs);
 		return ok();
 	}
 
 	async AddLastSong(song: ISong): Promise<Result<void, unknown>>
 	{
 		console.log("   [MultiplayerManager] >> Add last song:", song);
-		await this.syncManager.sendAddSongsToQueue([song], "Last");
+		await this.hubClient.AddSongsToQueue([song], "Last");
 		return ok();
 	}
 
 	async AddLastSongList(songs: Array<ISong>): Promise<Result<void, unknown>>
 	{
 		console.log("   [MultiplayerManager] >> Add last song list:", songs);
-		await this.syncManager.sendAddSongsToQueue(songs, "Last");
+		await this.hubClient.AddSongsToQueue(songs, "Last");
 		return ok();
 	}
 
 	async AddNextSong(song: ISong): Promise<Result<void, unknown>>
 	{
 		console.log("   [MultiplayerManager] >> Add next song:", song);
-		await this.syncManager.sendAddSongsToQueue([song], "Next");
+		await this.hubClient.AddSongsToQueue([song], "Next");
 		return ok();
 	}
 
 	async AddNextSongList(songs: Array<ISong>): Promise<Result<void, unknown>>
 	{
 		console.log("   [MultiplayerManager] >> Add next song list:", songs);
-		await this.syncManager.sendAddSongsToQueue(songs, "Next");
+		await this.hubClient.AddSongsToQueue(songs, "Next");
 		return ok();
 	}
 
 	async Next(): Promise<Result<void, unknown>>
 	{
-		throw new Error("Not migrated to server")
+		throw new Error("Not migrated to server");
 		return ok();
 	}
 
 	async Prev(): Promise<Result<void, unknown>>
 	{
-		throw new Error("Not migrated to server")
+		throw new Error("Not migrated to server");
 		return ok();
 	}
 
 	async PlayAt(idx: number): Promise<Result<void, unknown>>
 	{
-		throw new Error("Not migrated to server")
+		throw new Error("Not migrated to server");
 		return ok();
 	}
 
 	async ClearQueue(): Promise<Result<void, unknown>>
 	{
-		throw new Error("Not migrated to server")
+		throw new Error("Not migrated to server");
 		return ok();
 	}
 
 	async RemoveAt(idx: number): Promise<Result<void, unknown>>
 	{
-		throw new Error("Not migrated to server")
+		throw new Error("Not migrated to server");
 		return ok();
 	}
 
 	async SetQueue(newQueue: Array<ISong>, newCurrentIdx: number): Promise<Result<void, unknown>>
 	{
-		throw new Error("Not migrated to server")
+		throw new Error("Not migrated to server");
 		return ok();
 	}
 
 	async SetLoopMode(mode: LoopMode): Promise<Result<void, unknown>>
 	{
-		throw new Error("Not migrated to server")
+		throw new Error("Not migrated to server");
 		return ok();
 	}
 
@@ -174,7 +174,7 @@ export class MultiplayerManager implements IPlayerManager
 	{
 		const isPlaying = this.audioBackend.playState === "playing";
 		console.log("[MultiplayerManager] >> TogglePlayPause, sending isPlaying:", !isPlaying);
-		await this.syncManager.sendPlayState(!isPlaying);
+		await this.hubClient.SetPlayState(!isPlaying);
 
 		return ok();
 	}
@@ -182,7 +182,7 @@ export class MultiplayerManager implements IPlayerManager
 	async Seek(position: number): Promise<Result<void, unknown>>
 	{
 		console.log("   [MultiplayerManager] >> Seek to", position);
-		await this.syncManager.sendSeek(position);
+		await this.hubClient.SetSeek(position);
 		return ok();
 	}
 
@@ -192,12 +192,12 @@ export class MultiplayerManager implements IPlayerManager
 		lastUpdateServerTime: number,
 	): number
 	{
-		if (!isPlaying || !this.syncManager.syncResult)
+		if (!isPlaying || !this.hubClient.syncResult)
 		{
 			return serverPosition;
 		}
 
-		const currentServerTime = Date.now() + this.syncManager.syncResult.clockOffset;
+		const currentServerTime = Date.now() + this.hubClient.syncResult.clockOffset;
 		const timeSinceUpdateMs = currentServerTime - lastUpdateServerTime;
 		const timeSinceUpdateSec = timeSinceUpdateMs / 1000;
 
@@ -292,4 +292,3 @@ export class MultiplayerManager implements IPlayerManager
 		this.audioBackend.OnDurationChange(callback);
 	}
 }
-

@@ -1,7 +1,8 @@
 import * as SignalR from "@microsoft/signalr";
 import type { ISong } from "../audio-engine/types/song";
+import { CalculateMAD, type SyncResult } from "~/lib/sync-utils";
 
-type ConnectionStatus = "disconnected" | "connecting" | "connected" | "reconnecting";
+export type ConnectionStatus = "disconnected" | "connecting" | "clock_sync" | "connected" | "reconnecting";
 
 export interface ChatMessage {
 	userId: string;
@@ -15,11 +16,17 @@ export interface ConnectedUser {
 	userName: string;
 }
 
+const RESYNC_INTERVAL_MS = 60_000;
+
 /** Client wrapper for MusicRoomHub that mirrors C# hub methods and events */
 export class MusicRoomHubClient
 {
 	private connection: SignalR.HubConnection;
 	public status: ConnectionStatus = $state("disconnected");
+	public syncResult: SyncResult | null = $state(null);
+	public messages: ChatMessage[] = $state([]);
+	public connectedUsers: ConnectedUser[] = $state([]);
+	private resyncInterval: ReturnType<typeof setInterval> | null = null;
 
 	private messageReceivedHandlers: Array<(user: unknown, message: unknown) => void> = [];
 	private chatMessageHandlers: Array<(message: ChatMessage) => void> = [];
@@ -61,11 +68,13 @@ export class MusicRoomHubClient
 
 		this.connection.on("ChatMessage", (message: ChatMessage) =>
 		{
+			this.messages.push(message);
 			this.chatMessageHandlers.forEach((handler) => handler(message));
 		});
 
 		this.connection.on("ConnectedUsersChanged", (users: ConnectedUser[]) =>
 		{
+			this.connectedUsers = users;
 			this.connectedUsersChangedHandlers.forEach((handler) => handler(users));
 		});
 
@@ -108,23 +117,26 @@ export class MusicRoomHubClient
 			},
 		);
 
-		this.connection.onreconnected(() =>
+		this.connection.onreconnected(async() =>
 		{
-			this.status = "connected";
+			await this.performClockSync();
+			this.startResyncInterval();
 		});
 
 		this.connection.onreconnecting(() =>
 		{
+			this.stopResyncInterval();
 			this.status = "reconnecting";
 		});
 
 		this.connection.onclose(() =>
 		{
+			this.stopResyncInterval();
 			this.status = "disconnected";
 		});
 	}
 
-	/** Start the connection */
+	/** Start the connection and perform initial clock sync */
 	public async start(): Promise<void>
 	{
 		if (this.status !== "disconnected") return;
@@ -133,7 +145,8 @@ export class MusicRoomHubClient
 		try
 		{
 			await this.connection.start();
-			this.status = "connected";
+			await this.performClockSync();
+			this.startResyncInterval();
 		}
 		catch (error)
 		{
@@ -143,18 +156,98 @@ export class MusicRoomHubClient
 		}
 	}
 
+	private async performClockSync(): Promise<void>
+	{
+		this.status = "clock_sync";
+		try
+		{
+			this.syncResult = await this.syncClock();
+			console.log("Clock sync result:", JSON.stringify(this.syncResult, null, 4));
+			this.status = "connected";
+		}
+		catch (error)
+		{
+			console.error("Clock sync failed:", error);
+			this.status = "disconnected";
+		}
+	}
+
+	private async syncClock(): Promise<SyncResult>
+	{
+		const samples: { rtt: number; offset: number }[] = [];
+		const sampleCount = 5;
+
+		for (let i = 0; i < sampleCount; i += 1)
+		{
+			const t0 = Date.now();
+			const serverT2 = await this.connection.invoke<number>("SyncClock");
+			const t3 = Date.now();
+
+			const rtt = t3 - t0;
+			const clientMidpoint = (t0 + t3) / 2;
+			const offset = serverT2 - clientMidpoint;
+
+			samples.push({ rtt, offset });
+
+			if (i < sampleCount - 1)
+			{
+				await new Promise((resolve) => setTimeout(resolve, 500));
+			}
+		}
+
+		const sortedRtts = samples.map((s) => s.rtt).sort((a, b) => a - b);
+		const sortedOffsets = samples.map((s) => s.offset).sort((a, b) => a - b);
+		const medianRtt = sortedRtts[Math.floor(sortedRtts.length / 2)]!;
+		const medianOffset = sortedOffsets[Math.floor(sortedOffsets.length / 2)]!;
+
+		const mad = CalculateMAD(samples.map((s) => s.rtt));
+		let accuracy: "high" | "medium" | "low";
+		if (mad < 2) accuracy = "high";
+		else if (mad < 5) accuracy = "medium";
+		else accuracy = "low";
+
+		return {
+			roundTripTime: medianRtt,
+			clockOffset: medianOffset,
+			serverTime: Date.now() + medianOffset,
+			accuracy,
+		};
+	}
+
+	private startResyncInterval(): void
+	{
+		this.stopResyncInterval();
+		this.resyncInterval = setInterval(async() =>
+		{
+			if (this.status !== "connected") return;
+			try
+			{
+				this.syncResult = await this.syncClock();
+			}
+			catch (error)
+			{
+				console.error("Clock resync failed:", error);
+			}
+		}, RESYNC_INTERVAL_MS);
+	}
+
+	private stopResyncInterval(): void
+	{
+		if (this.resyncInterval)
+		{
+			clearInterval(this.resyncInterval);
+			this.resyncInterval = null;
+		}
+	}
+
 	/** Subscribe to MessageReceived events from the server */
 	public OnMessageReceived(handler: (user: unknown, message: unknown) => void): () => void
 	{
 		this.messageReceivedHandlers.push(handler);
-		// Return unsubscribe function
 		return () =>
 		{
 			const index = this.messageReceivedHandlers.indexOf(handler);
-			if (index > -1)
-			{
-				this.messageReceivedHandlers.splice(index, 1);
-			}
+			if (index > -1) this.messageReceivedHandlers.splice(index, 1);
 		};
 	}
 
@@ -162,14 +255,10 @@ export class MusicRoomHubClient
 	public OnChatMessage(handler: (message: ChatMessage) => void): () => void
 	{
 		this.chatMessageHandlers.push(handler);
-		// Return unsubscribe function
 		return () =>
 		{
 			const index = this.chatMessageHandlers.indexOf(handler);
-			if (index > -1)
-			{
-				this.chatMessageHandlers.splice(index, 1);
-			}
+			if (index > -1) this.chatMessageHandlers.splice(index, 1);
 		};
 	}
 
@@ -177,21 +266,11 @@ export class MusicRoomHubClient
 	public OnConnectedUsersChanged(handler: (users: ConnectedUser[]) => void): () => void
 	{
 		this.connectedUsersChangedHandlers.push(handler);
-		// Return unsubscribe function
 		return () =>
 		{
 			const index = this.connectedUsersChangedHandlers.indexOf(handler);
-			if (index > -1)
-			{
-				this.connectedUsersChangedHandlers.splice(index, 1);
-			}
+			if (index > -1) this.connectedUsersChangedHandlers.splice(index, 1);
 		};
-	}
-
-	/** Call SyncClock method on the hub - returns server timestamp in milliseconds */
-	public async SyncClock(): Promise<number>
-	{
-		return await this.connection.invoke<number>("SyncClock");
 	}
 
 	/** Send a chat message to the room */
@@ -219,10 +298,7 @@ export class MusicRoomHubClient
 		return () =>
 		{
 			const index = this.queueChangedHandlers.indexOf(handler);
-			if (index > -1)
-			{
-				this.queueChangedHandlers.splice(index, 1);
-			}
+			if (index > -1) this.queueChangedHandlers.splice(index, 1);
 		};
 	}
 
@@ -233,10 +309,7 @@ export class MusicRoomHubClient
 		return () =>
 		{
 			const index = this.playStateChangedHandlers.indexOf(handler);
-			if (index > -1)
-			{
-				this.playStateChangedHandlers.splice(index, 1);
-			}
+			if (index > -1) this.playStateChangedHandlers.splice(index, 1);
 		};
 	}
 
@@ -253,10 +326,7 @@ export class MusicRoomHubClient
 		return () =>
 		{
 			const index = this.roomStateHandlers.indexOf(handler);
-			if (index > -1)
-			{
-				this.roomStateHandlers.splice(index, 1);
-			}
+			if (index > -1) this.roomStateHandlers.splice(index, 1);
 		};
 	}
 
@@ -277,7 +347,6 @@ export class MusicRoomHubClient
 
 	public async AddSongsToQueue(songs: ISong[], position: "Next" | "Last"): Promise<void>
 	{
-		// C# enum AddPosition: Next = 0, Last = 1
 		const positionValue = position === "Next" ? 0 : 1;
 		await this.connection.invoke("AddSongsToQueue", songs, positionValue);
 	}
@@ -285,6 +354,7 @@ export class MusicRoomHubClient
 	/** Stop the connection and cleanup */
 	public async destroy(): Promise<void>
 	{
+		this.stopResyncInterval();
 		await this.connection.stop();
 		this.messageReceivedHandlers = [];
 		this.chatMessageHandlers = [];

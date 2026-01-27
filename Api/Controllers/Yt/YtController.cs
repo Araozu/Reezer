@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Reezer.Application.DTOs;
 using Reezer.Application.UseCases;
+using Reezer.Application.UseCases.Songs;
 using Reezer.Application.UseCases.Yt;
 
 namespace Reezer.Api.Controllers.Yt;
