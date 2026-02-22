@@ -85,12 +85,17 @@ public class MusicRoom(Guid maestroId, string name, string code)
         LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     }
 
+    public double GetEffectivePosition()
+    {
+        if (!IsPlaying) return CurrentPosition;
+        var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        var elapsedSec = (now - LastUpdateServerTime) / 1000.0;
+        return CurrentPosition + elapsedSec;
+    }
+
     public void SetPlayState(bool isPlaying, double? position = null)
     {
-        if (position.HasValue)
-        {
-            CurrentPosition = position.Value;
-        }
+        CurrentPosition = position ?? GetEffectivePosition();
         IsPlaying = isPlaying;
         LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     }
