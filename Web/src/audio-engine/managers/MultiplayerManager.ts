@@ -212,7 +212,8 @@ export class MultiplayerManager implements IPlayerManager
 
 	async PlaySong(song: ISong): Promise<Result<void, unknown>>
 	{
-		this.queueManager.PlaySong(song);
+		console.log("   [MultiplayerManager] >> Play song:", song);
+		await this.syncManager.sendPlaySongList([song]);
 		return ok();
 	}
 
