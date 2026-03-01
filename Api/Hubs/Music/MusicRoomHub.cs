@@ -175,6 +175,7 @@ public class MusicRoomHub(
             throw new HubException("Room not found for this connection");
         }
 
+        logger.LogInformation("[Hub] SetPlayState: isPlaying={IsPlaying}, position={Position}", isPlaying, position);
         var result = await mediator.Send(
             new UpdatePlayStateCommand(room.Code, isPlaying, position)
         );
@@ -189,6 +190,7 @@ public class MusicRoomHub(
             throw new HubException("Room not found for this connection");
         }
 
+        logger.LogInformation("[Hub] SetSeek: position={Position}", position);
         var result = await mediator.Send(new UpdateSeekCommand(room.Code, position));
         result.Switch(ok => { }, notFound => throw new HubException(notFound.Reason));
     }

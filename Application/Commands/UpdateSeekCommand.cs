@@ -23,11 +23,16 @@ public class UpdateSeekHandler(IMusicRoomRepository roomRepository, IPublisher p
             async room =>
             {
                 room.SetPosition(request.Position);
+                // Use PositionAtLastUpdate (the exact clamped value just set) rather than
+                // CurrentPosition, which recomputes `now - SongStartTime` and can race with
+                // concurrent updates or return a slightly drifted value.
+                var currentPos = room.PositionAtLastUpdate;
+                
                 await publisher.Publish(
                     new PlayStateChangedNotification(
                         room.Code,
                         room.IsPlaying,
-                        room.CurrentPosition,
+                        currentPos,
                         room.LastUpdateServerTime
                     ),
                     cancellationToken

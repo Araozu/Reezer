@@ -29,7 +29,15 @@ function getSongs(albumData: AlbumWithTracklistDto): RegularSong[]
 {
 	return (albumData.songs ?? []).map((s) => ({
 		...s,
-		type: "regular",
+		id: s.id as string,
+		artist: s.artist ?? "",
+		album: s.album ?? "",
+		artistId: s.artistId ?? "",
+		albumId: s.albumId ?? "",
+		trackNumber: s.trackNumber ?? null,
+		discNumber: s.discNumber ?? null,
+		duration: Number(s.duration),
+		type: "regular" as const,
 	}));
 }
 

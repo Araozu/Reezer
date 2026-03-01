@@ -1004,6 +1004,8 @@ export interface components {
             artistId: string;
             /** Format: uuid */
             albumId: string;
+            /** Format: int64 */
+            duration: number | string;
         };
         UnifiedSearchResultDto: {
             songs: components["schemas"]["SongDto"][];
@@ -1021,6 +1023,8 @@ export interface components {
             ytId: string;
             name: string;
             cachedPath: null | string;
+            /** Format: int64 */
+            duration: number | string;
         };
         YtSongResponse: {
             ytId: string;

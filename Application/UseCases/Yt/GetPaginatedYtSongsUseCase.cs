@@ -18,7 +18,7 @@ public class GetPaginatedYtSongsUseCase(IYtSongRepository ytSongRepository)
         return result.Match<OneOf<PaginatedResult<YtSongDto>, InternalError>>(
             songs =>
             {
-                var dtos = songs.Select(s => new YtSongDto(s.YtId, s.Name, s.CachedPath, (long)s.Duration));
+                var dtos = songs.Select(s => new YtSongDto(s.YtId, s.Name, s.CachedPath, (long)(s.Duration * 1000)));
                 return new PaginatedResult<YtSongDto>(dtos, page, pageSize, dtos.Count());
             },
             error => error

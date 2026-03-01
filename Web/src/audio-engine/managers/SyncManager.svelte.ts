@@ -95,6 +95,7 @@ export class SyncManager
 		try
 		{
 			this.syncResult = await this.syncClock();
+			this.hubClient.Offset = this.syncResult.clockOffset;
 			console.log("Clock sync result:", JSON.stringify(this.syncResult, null, 4));
 			this.status = "connected";
 		}
@@ -114,6 +115,7 @@ export class SyncManager
 			try
 			{
 				this.syncResult = await this.syncClock();
+				this.hubClient.Offset = this.syncResult.clockOffset;
 			}
 			catch (error)
 			{
@@ -193,6 +195,17 @@ export class SyncManager
 		}) => void): () => void
 	{
 		return this.hubClient.OnRoomState(handler);
+	}
+
+	public getInterpolatedPosition(isPlaying: boolean, anchorPosition: number, lastUpdateServerTime: number): number
+	{
+		return this.hubClient.getInterpolatedPosition(isPlaying, anchorPosition, lastUpdateServerTime);
+	}
+
+	/** Converts a local timestamp (Date.now()) to estimated server time using the current clock offset */
+	public localToServerTime(localMs: number): number
+	{
+		return localMs + this.hubClient.Offset;
 	}
 
 	private async syncClock(): Promise<SyncResult>

@@ -21,6 +21,19 @@ export class MusicRoomHubClient
 	private connection: SignalR.HubConnection;
 	public status: ConnectionStatus = $state("disconnected");
 
+	/** The estimated difference between server time and local time (Server - Local) */
+	private serverTimeOffset: number = 0;
+
+	public get Offset(): number
+	{
+		return this.serverTimeOffset;
+	}
+
+	public set Offset(value: number)
+	{
+		this.serverTimeOffset = value;
+	}
+
 	private messageReceivedHandlers: Array<(user: unknown, message: unknown) => void> = [];
 	private chatMessageHandlers: Array<(message: ChatMessage) => void> = [];
 	private connectedUsersChangedHandlers: Array<(users: ConnectedUser[]) => void> = [];
@@ -134,6 +147,14 @@ export class MusicRoomHubClient
 		{
 			await this.connection.start();
 			this.status = "connected";
+
+			// Perform initial clock sync
+			const start = Date.now();
+			const serverTime = await this.SyncClock();
+			const end = Date.now();
+			const latency = (end - start) / 2;
+			this.serverTimeOffset = serverTime - (end - latency);
+			console.log(`[MusicRoomHubClient] Clock synced. Offset: ${this.serverTimeOffset}ms, Latency: ${latency}ms`);
 		}
 		catch (error)
 		{
@@ -141,6 +162,24 @@ export class MusicRoomHubClient
 			this.status = "disconnected";
 			throw error;
 		}
+	}
+
+	/** 
+	 * Calculates the current playback position based on server state and local clock.
+	 * Returns position in milliseconds.
+	 */
+	public getInterpolatedPosition(isPlaying: boolean, anchorPosition: number, lastUpdateServerTime: number): number
+	{
+		if (!isPlaying)
+		{
+			return anchorPosition;
+		}
+
+		const localNow = Date.now();
+		const serverNow = localNow + this.serverTimeOffset;
+		const elapsedSinceUpdate = serverNow - lastUpdateServerTime;
+		
+		return anchorPosition + elapsedSinceUpdate;
 	}
 
 	/** Subscribe to MessageReceived events from the server */
@@ -262,12 +301,14 @@ export class MusicRoomHubClient
 
 	public async SetPlayState(isPlaying: boolean, position?: number): Promise<void>
 	{
-		await this.connection.invoke("SetPlayState", isPlaying, position);
+		console.log("[HubClient] SetPlayState:", isPlaying, position);
+		await this.connection.invoke("SetPlayState", isPlaying, position !== undefined ? Math.floor(position) : null);
 	}
 
 	public async SetSeek(position: number): Promise<void>
 	{
-		await this.connection.invoke("SetSeek", position);
+		console.log("[HubClient] SetSeek:", position);
+		await this.connection.invoke("SetSeek", Math.floor(position));
 	}
 
 	public async PlaySongList(songs: ISong[]): Promise<void>

@@ -39,7 +39,12 @@ public class MusicRoom(Guid maestroId, string name, string code)
     /// The server time when the current song started playing (Unix milliseconds).
     /// Used to calculate the current position for new participants.
     /// </summary>
-    private long _songStartTime = 0;
+    public long SongStartTime { get; private set; } = 0;
+
+    /// <summary>
+    /// The position of the song when it was last paused or updated (Unix milliseconds).
+    /// </summary>
+    public long PositionAtLastUpdate { get; private set; } = 0;
 
     /// <summary>
     /// The current position of the song, in milliseconds.
@@ -48,12 +53,21 @@ public class MusicRoom(Guid maestroId, string name, string code)
     {
         get
         {
-            if (_queue.Count == 0)
+            if (_queue.Count == 0 || CurrentIndex < 0 || CurrentIndex >= _queue.Count)
             {
                 return 0;
             }
 
-            return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - _songStartTime;
+            if (!IsPlaying)
+            {
+                return PositionAtLastUpdate;
+            }
+
+            var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            var position = now - SongStartTime;
+            var duration = _queue[CurrentIndex].Duration;
+
+            return Math.Clamp(position, 0, duration);
         }
     }
 
@@ -86,19 +100,30 @@ public class MusicRoom(Guid maestroId, string name, string code)
     /// </summary>
     public void PlaySongList(IEnumerable<RoomSong> songs)
     {
-        var currentLen = _queue.Count;
-        _queue.AddRange(songs);
-        CurrentIndex = currentLen;
-        _songStartTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        IsPlaying = true;
-        LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        this._queue.Clear();
+        this._queue.AddRange(songs);
+        this.CurrentIndex = 0;
+        this.PositionAtLastUpdate = 0;
+        this.SongStartTime = now;
+        this.IsPlaying = true;
+        this.LastUpdateServerTime = now;
     }
 
     public void SetQueue(IEnumerable<RoomSong> queue, int currentIndex)
     {
-        _queue = [.. queue];
-        CurrentIndex = currentIndex;
-        LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        this._queue.Clear();
+        this._queue.AddRange(queue);
+        this.CurrentIndex = currentIndex;
+        
+        // Reset anchor points to the current position to keep interpolation stable
+        if (IsPlaying) 
+        {
+            this.SongStartTime = now - this.PositionAtLastUpdate;
+        }
+        
+        this.LastUpdateServerTime = now;
     }
 
     /// <summary>
@@ -106,12 +131,38 @@ public class MusicRoom(Guid maestroId, string name, string code)
     /// </summary>
     public void SetPlayState(bool isPlaying, long? position = null)
     {
+        var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        
         if (position.HasValue)
         {
-            SetPosition(position.Value);
+            var duration = (_queue.Count > 0 && CurrentIndex >= 0 && CurrentIndex < _queue.Count) 
+                ? _queue[CurrentIndex].Duration 
+                : long.MaxValue;
+                
+            this.PositionAtLastUpdate = Math.Clamp(position.Value, 0, duration);
+            this.SongStartTime = now - this.PositionAtLastUpdate;
         }
-        IsPlaying = isPlaying;
-        LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        else if (isPlaying != IsPlaying)
+        {
+            // If toggling state without a new position, sync the anchor points
+            if (isPlaying)
+            {
+                // Resuming: move the start time anchor to account for the time spent paused
+                this.SongStartTime = now - this.PositionAtLastUpdate;
+            }
+            else
+            {
+                // Pausing: capture the exact position at the moment of pause
+                // Ensure we clamp it so we don't save a negative or past-duration position
+                var duration = (_queue.Count > 0 && CurrentIndex >= 0 && CurrentIndex < _queue.Count) 
+                    ? _queue[CurrentIndex].Duration 
+                    : long.MaxValue;
+                this.PositionAtLastUpdate = Math.Clamp(now - this.SongStartTime, 0, duration);
+            }
+        }
+
+        this.IsPlaying = isPlaying;
+        this.LastUpdateServerTime = now;
     }
 
     /// <summary>
@@ -119,9 +170,24 @@ public class MusicRoom(Guid maestroId, string name, string code)
     /// </summary>
     public void SetPosition(long position)
     {
-        // To set the position, we just alter the song start time based on the new position.
-        _songStartTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - position;
-        LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        if (_queue.Count == 0 || CurrentIndex < 0 || CurrentIndex >= _queue.Count)
+        {
+            return;
+        }
+
+        var duration = _queue[CurrentIndex].Duration;
+        // Clamp position between 0 and song duration
+        var clampedPosition = Math.Clamp(position, 0, duration);
+
+        var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        this.PositionAtLastUpdate = clampedPosition;
+        
+        if (IsPlaying)
+        {
+            this.SongStartTime = now - clampedPosition;
+        }
+        
+        this.LastUpdateServerTime = now;
     }
 
     public void AddLastSong(RoomSong song)

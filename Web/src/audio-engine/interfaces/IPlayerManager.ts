@@ -68,7 +68,7 @@ export interface IPlayerManager {
 	/** Toggles between play and pause. May fail if no permission. */
 	TogglePlayPause(): Promise<Result<void, unknown>>;
 
-	/** Seeks to a position in seconds. May fail if no permission. */
+	/** Seeks to a position in milliseconds. May fail if no permission. */
 	Seek(position: number): Promise<Result<void, unknown>>;
 
 	/**
@@ -91,8 +91,8 @@ export interface IPlayerManager {
 
 	OnQueueChanged(callback: () => void): void;
 	OnPlayStateChanged(callback: (state: PlayState) => void): void;
-	OnPositionUpdate(callback: (positionSeconds: number) => void): void;
-	OnDurationChange(callback: (durationSeconds: number) => void): void;
+	OnPositionUpdate(callback: (positionMs: number) => void): void;
+	OnDurationChange(callback: (durationMs: number) => void): void;
 }
 
 export type Action = "PlaySong"

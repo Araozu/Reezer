@@ -22,7 +22,12 @@ const ytSongsQuery = useYtSongs(
 	toStore(() => requestPage),
 	toStore(() => requestPageSize),
 );
-const annotatedYtSongsQuery = $derived($ytSongsQuery.data ? $ytSongsQuery.data.items.map((t): ISong => ({...t, id: t.ytId, type: "youtube"})) : null);
+const annotatedYtSongsQuery = $derived($ytSongsQuery.data ? $ytSongsQuery.data.items.map((t): ISong => ({
+	...t,
+	id: t.ytId,
+	duration: Number(t.duration),
+	type: "youtube"
+})) : null);
 
 $effect(() =>
 {

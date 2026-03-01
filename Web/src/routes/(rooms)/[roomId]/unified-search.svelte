@@ -70,6 +70,7 @@ function playSong(song: SongDto)
 		artist: song.artist,
 		album: song.album,
 		albumId: song.albumId,
+		duration: Number(song.duration),
 	};
 	svManager.imanager.PlaySong(queueSong);
 }
@@ -80,6 +81,7 @@ function playYtSong(song: YtSongDto)
 		id: song.ytId,
 		name: song.name,
 		type: "youtube",
+		duration: Number(song.duration),
 	};
 	svManager.imanager.PlaySong(queueSong);
 }

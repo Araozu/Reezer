@@ -15,6 +15,7 @@ export interface IAudioBackend {
 	set volume(value: number)
 
 	get duration(): number | null;
+	/** Current position in milliseconds */
 	get position(): number;
 	get playState(): PlayState;
 
@@ -29,6 +30,7 @@ export interface IAudioBackend {
 	TogglePlayPause(): void
 	Pause(): void
 	Resume(): void
+	/** Seek to position in milliseconds */
 	Seek(position: number): void
 
 	/**
@@ -59,16 +61,16 @@ export interface IAudioBackend {
 	OnSongEnd(callback: (endedSongId: string) => void): void;
 
 	/**
-	 * Registers a callback to be called when the current position updates (second precision).
-	 * Position is in seconds.
+	 * Registers a callback to be called when the current position updates.
+	 * Position is in milliseconds.
 	 */
-	OnPositionUpdate(callback: (positionSeconds: number) => void): void;
+	OnPositionUpdate(callback: (positionMs: number) => void): void;
 
 	/**
 	 * Registers a callback to be called when the current song's duration is known.
-	 * Duration is in seconds.
+	 * Duration is in milliseconds.
 	 */
-	OnDurationChange(callback: (durationSeconds: number) => void): void;
+	OnDurationChange(callback: (durationMs: number) => void): void;
 
 	/**
 	 * Registers a callback to be called when the play state changes.

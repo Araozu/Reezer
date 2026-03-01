@@ -8,6 +8,7 @@ export interface ISong {
     album?: string;
     artistId?: string;
     albumId?: string;
+    /** Duration in milliseconds */
     duration: number;
     type: SongType;
 }

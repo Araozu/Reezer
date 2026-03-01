@@ -20,8 +20,7 @@ public class RoomQueueChangedNotificationHandler(IHubContext<MusicRoomHub> hubCo
                 notification.CurrentIndex,
                 notification.IsPlaying,
                 notification.Position,
-                notification.ServerTime,
-                cancellationToken
+                notification.ServerTime
             );
     }
 }
