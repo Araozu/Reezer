@@ -36,9 +36,26 @@ public class MusicRoom(Guid maestroId, string name, string code)
     public bool IsPlaying { get; private set; } = false;
 
     /// <summary>
-    /// The current position in seconds of the song.
+    /// The server time when the current song started playing (Unix milliseconds).
+    /// Used to calculate the current position for new participants.
     /// </summary>
-    public double CurrentPosition { get; private set; } = 0;
+    private long _songStartTime = 0;
+
+    /// <summary>
+    /// The current position of the song, in milliseconds.
+    /// </summary>
+    public long CurrentPosition
+    {
+        get
+        {
+            if (_queue.Count == 0)
+            {
+                return 0;
+            }
+
+            return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - _songStartTime;
+        }
+    }
 
     /// <summary>
     /// The server time when the play state or position was last updated (Unix milliseconds).
@@ -67,13 +84,12 @@ public class MusicRoom(Guid maestroId, string name, string code)
     /// <summary>
     ///  Adds a list of songs to the queue & plays them.
     /// </summary>
-    /// <param name="songs"></param>
     public void PlaySongList(IEnumerable<RoomSong> songs)
     {
         var currentLen = _queue.Count;
         _queue.AddRange(songs);
         CurrentIndex = currentLen;
-        CurrentPosition = 0;
+        _songStartTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         IsPlaying = true;
         LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     }
@@ -85,19 +101,27 @@ public class MusicRoom(Guid maestroId, string name, string code)
         LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     }
 
+    /// <summary>
+    /// Sets play/pause state, and optionally the position. If `position` is provided, it is in seconds.
+    /// </summary>
     public void SetPlayState(bool isPlaying, double? position = null)
     {
         if (position.HasValue)
         {
-            CurrentPosition = position.Value;
+            SetPosition(position.Value);
         }
         IsPlaying = isPlaying;
         LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     }
 
+    /// <summary>
+    /// Sets the current position of the song. `position` is in seconds
+    /// </summary>
     public void SetPosition(double position)
     {
-        CurrentPosition = position;
+        // To set the position, we just alter the song start time based on the new position.
+        var positionMs = (long)(position * 1000);
+        _songStartTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - positionMs;
         LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     }
 
