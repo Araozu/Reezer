@@ -167,7 +167,7 @@ public class MusicRoomHub(
         result.Switch(ok => { }, notFound => throw new HubException(notFound.Reason));
     }
 
-    public async Task SetPlayState(bool isPlaying, double? position = null)
+    public async Task SetPlayState(bool isPlaying, long? position = null)
     {
         var room = roomRepository.GetRoomByConnectionId(Context.ConnectionId);
         if (room == null)
@@ -181,7 +181,7 @@ public class MusicRoomHub(
         result.Switch(ok => { }, notFound => throw new HubException(notFound.Reason));
     }
 
-    public async Task SetSeek(double position)
+    public async Task SetSeek(long position)
     {
         var room = roomRepository.GetRoomByConnectionId(Context.ConnectionId);
         if (room == null)

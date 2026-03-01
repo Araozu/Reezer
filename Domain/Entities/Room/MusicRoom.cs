@@ -102,9 +102,9 @@ public class MusicRoom(Guid maestroId, string name, string code)
     }
 
     /// <summary>
-    /// Sets play/pause state, and optionally the position. If `position` is provided, it is in seconds.
+    /// Sets play/pause state, and optionally the position. If `position` is provided, it is in milliseconds.
     /// </summary>
-    public void SetPlayState(bool isPlaying, double? position = null)
+    public void SetPlayState(bool isPlaying, long? position = null)
     {
         if (position.HasValue)
         {
@@ -115,13 +115,12 @@ public class MusicRoom(Guid maestroId, string name, string code)
     }
 
     /// <summary>
-    /// Sets the current position of the song. `position` is in seconds
+    /// Sets the current position of the song. `position` is in milliseconds.
     /// </summary>
-    public void SetPosition(double position)
+    public void SetPosition(long position)
     {
         // To set the position, we just alter the song start time based on the new position.
-        var positionMs = (long)(position * 1000);
-        _songStartTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - positionMs;
+        _songStartTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - position;
         LastUpdateServerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
     }
 

@@ -5,6 +5,6 @@ namespace Reezer.Application.Notifications;
 public record PlayStateChangedNotification(
     string RoomCode,
     bool IsPlaying,
-    double Position,
+    long Position,
     long ServerTime
 ) : INotification;

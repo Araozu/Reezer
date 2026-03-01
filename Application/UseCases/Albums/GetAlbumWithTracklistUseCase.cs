@@ -27,7 +27,8 @@ public class GetAlbumWithTracklistUseCase(IAlbumRepository albumRepository)
                     album.Artist.Name,
                     album.Name,
                     album.ArtistId,
-                    album.Id
+                    album.Id,
+                    (long)song.Duration
                 ));
 
             return new AlbumWithTracklistDto(

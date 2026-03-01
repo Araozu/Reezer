@@ -6,7 +6,7 @@ using Reezer.Domain.Utils;
 
 namespace Reezer.Application.Commands;
 
-public record UpdatePlayStateCommand(string RoomCode, bool IsPlaying, double? Position = null)
+public record UpdatePlayStateCommand(string RoomCode, bool IsPlaying, long? Position = null)
     : IRequest<OneOf<Success, NotFound>>;
 
 public class UpdatePlayStateHandler(IMusicRoomRepository roomRepository, IPublisher publisher)

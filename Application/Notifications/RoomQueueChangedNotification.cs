@@ -8,6 +8,6 @@ public record RoomQueueChangedNotification(
     IEnumerable<RoomSong> Queue,
     int CurrentIndex,
     bool IsPlaying,
-    double Position,
+    long Position,
     long ServerTime
 ) : INotification;

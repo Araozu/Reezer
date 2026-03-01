@@ -18,7 +18,8 @@ public class GetAllSongsUseCase(ISongRepository songRepository)
             s.Album.Artist.Name,
             s.Album.Name,
             s.Album.Artist.Id,
-            s.Album.Id
+            s.Album.Id,
+            (long)s.Duration
         ));
     }
 }

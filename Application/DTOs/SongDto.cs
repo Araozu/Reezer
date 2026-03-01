@@ -8,7 +8,8 @@ public record SongDto(
     string Artist,
     string Album,
     Guid ArtistId,
-    Guid AlbumId
+    Guid AlbumId,
+    long Duration
 );
 
 public record AlbumDto(Guid Id, string Name, Guid ArtistId, string ArtistName, string? CoverPath);
