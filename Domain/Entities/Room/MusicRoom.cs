@@ -120,6 +120,7 @@ public class MusicRoom(Guid maestroId, string name, string code)
         // Reset anchor points to the current position to keep interpolation stable
         if (IsPlaying) 
         {
+            this.PositionAtLastUpdate = now - this.SongStartTime;
             this.SongStartTime = now - this.PositionAtLastUpdate;
         }
         
