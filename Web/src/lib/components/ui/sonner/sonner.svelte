@@ -10,7 +10,8 @@
 	class="toaster group"
 	toastOptions={{
 		classes: {
-			toast: "bg-glass-bg backdrop-blur-xl border-glass-border shadow-[0_8px_32px_-8px_var(--glass-shadow),inset_0_1px_1px_var(--glass-highlight)] rounded-2xl",
+			toast:
+				"bg-glass-bg backdrop-blur-xl border-glass-border shadow-[0_8px_32px_-8px_var(--glass-shadow),inset_0_1px_1px_var(--glass-highlight)] rounded-2xl",
 			title: "text-foreground",
 			description: "text-muted-foreground",
 			actionButton: "bg-primary/20 text-foreground border-primary/30",

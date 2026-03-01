@@ -1,20 +1,14 @@
 <script lang="ts">
-import {
-	Play,
-	Pause,
-	SkipForward,
-	SkipBack,
-	LoaderCircle,
-} from "lucide-svelte";
-import VolumeSlider from "./volume-slider.svelte";
-import { GetSvelteManagerContext } from "~/context/music-player-context";
+	import { Play, Pause, SkipForward, SkipBack, LoaderCircle } from "lucide-svelte";
+	import VolumeSlider from "./volume-slider.svelte";
+	import { GetSvelteManagerContext } from "~/context/music-player-context";
 
-let { coverUrl = $bindable() }: { coverUrl: string; } = $props();
+	let { coverUrl = $bindable() }: { coverUrl: string } = $props();
 
-const svManager = GetSvelteManagerContext();
+	const svManager = GetSvelteManagerContext();
 
-let isPaused = $derived(svManager.playState === "paused");
-let isBuffering = $derived(svManager.playState === "buffering");
+	let isPaused = $derived(svManager.playState === "paused");
+	let isBuffering = $derived(svManager.playState === "buffering");
 </script>
 
 <img
@@ -23,7 +17,7 @@ let isBuffering = $derived(svManager.playState === "buffering");
 	alt="Album portrait"
 />
 
-<div class={["flex items-center gap-1 my-8", "flex-col"]}>
+<div class={["gap-1 my-8 flex items-center", "flex-col"]}>
 	<button
 		class="hover:bg-glass-bg-hover rounded-xl cursor-pointer transition-all duration-300 active:scale-95"
 		onclick={() => svManager.imanager.Prev()}
@@ -31,7 +25,7 @@ let isBuffering = $derived(svManager.playState === "buffering");
 		<SkipBack class="m-2" size={16} />
 	</button>
 	<button
-		class="hover:bg-glass-bg-hover rounded-full cursor-pointer transition-all duration-300 active:scale-95"
+		class="hover:bg-glass-bg-hover cursor-pointer rounded-full transition-all duration-300 active:scale-95"
 		onclick={() => svManager.imanager.TogglePlayPause()}
 	>
 		{#if isBuffering}

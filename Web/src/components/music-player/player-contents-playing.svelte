@@ -1,50 +1,49 @@
 <script lang="ts">
-import { page } from "$app/state";
-import {
-	Play,
-	Pause,
-	SkipForward,
-	SkipBack,
-	Volume2,
-	Volume1,
-	LoaderCircle,
-} from "lucide-svelte";
-import VolumeSlider from "./volume-slider.svelte";
-import PositionSlider from "./position-slider.svelte";
-import type { ISong } from "~/audio-engine/types";
-import { GetSvelteManagerContext } from "~/context/music-player-context";
+	import { page } from "$app/state";
+	import {
+		Play,
+		Pause,
+		SkipForward,
+		SkipBack,
+		Volume2,
+		Volume1,
+		LoaderCircle,
+	} from "lucide-svelte";
+	import VolumeSlider from "./volume-slider.svelte";
+	import PositionSlider from "./position-slider.svelte";
+	import type { ISong } from "~/audio-engine/types";
+	import { GetSvelteManagerContext } from "~/context/music-player-context";
 
-let {
-	coverUrl = $bindable(),
-	song,
-}: {
-	coverUrl: string;
-	song: ISong | null;
-} = $props();
+	let {
+		coverUrl = $bindable(),
+		song,
+	}: {
+		coverUrl: string;
+		song: ISong | null;
+	} = $props();
 
-const svManager = GetSvelteManagerContext();
-const roomId = page.params.roomId;
+	const svManager = GetSvelteManagerContext();
+	const roomId = page.params.roomId;
 
-let isPaused = $derived(svManager.playState === "paused");
-let isBuffering = $derived(svManager.playState === "buffering");
+	let isPaused = $derived(svManager.playState === "paused");
+	let isBuffering = $derived(svManager.playState === "buffering");
 
-let artistName = $derived.by(() =>
-{
-	if (!song) return "-";
+	let artistName = $derived.by(() =>
+	{
+		if (!song) return "-";
 
-	if (song.type === "regular") return song.artist;
-	else if (song.type === "youtube") return "YouTube";
-	else return "-";
-});
-let artistLink = $derived.by(() =>
-{
-	if (!song) return "#";
+		if (song.type === "regular") return song.artist;
+		else if (song.type === "youtube") return "YouTube";
+		else return "-";
+	});
+	let artistLink = $derived.by(() =>
+	{
+		if (!song) return "#";
 
-	if (song.type === "regular") return `/${roomId}/artists/${song.artistId}`;
-	else if (song.type === "youtube") return `/${roomId}/yt`;
-	else return "#";
-});
-
+		if (song.type === "regular") return `/${roomId}/artists/${song.artistId}`;
+		else if (song.type === "youtube") return `/${roomId}/yt`;
+		else return "#";
+	});
 </script>
 
 <div class="flex justify-center">
@@ -68,13 +67,16 @@ let artistLink = $derived.by(() =>
 			{artistName}
 		</a>
 		•
-		<a class="hover:text-foreground transition-colors" href={`/${roomId}/albums/${song?.albumId ?? ""}`}>
+		<a
+			class="hover:text-foreground transition-colors"
+			href={`/${roomId}/albums/${song?.albumId ?? ""}`}
+		>
 			{song?.album ?? "-"}
 		</a>
 	</p>
 </div>
 
-<div class={["flex items-center gap-1 my-6"]}>
+<div class={["gap-1 my-6 flex items-center"]}>
 	<button
 		class="hover:bg-glass-bg-hover rounded-xl cursor-pointer transition-all duration-300 active:scale-95"
 		onclick={() => svManager.imanager.Prev()}
@@ -82,7 +84,7 @@ let artistLink = $derived.by(() =>
 		<SkipBack class="m-2.5" size={18} />
 	</button>
 	<button
-		class="hover:bg-glass-bg-hover rounded-full cursor-pointer transition-all duration-300 active:scale-95 border border-glass-border"
+		class="hover:bg-glass-bg-hover border-glass-border cursor-pointer rounded-full border transition-all duration-300 active:scale-95"
 		onclick={() => svManager.imanager.TogglePlayPause()}
 	>
 		{#if isBuffering}
@@ -99,18 +101,18 @@ let artistLink = $derived.by(() =>
 	>
 		<SkipForward class="m-2.5" size={18} />
 	</button>
-	<div class="flex-1 ml-4">
+	<div class="ml-4 flex-1">
 		<PositionSlider />
 	</div>
 </div>
-<div class={["grid grid-cols-[1.5rem_auto_2rem] items-center gap-2"]}>
-	<div class="text-center text-muted-foreground">
+<div class={["gap-2 grid grid-cols-[1.5rem_auto_2rem] items-center"]}>
+	<div class="text-muted-foreground text-center">
 		<Volume1 size={18} />
 	</div>
 	<div>
 		<VolumeSlider collapsed={false} />
 	</div>
-	<div class="text-center text-muted-foreground">
+	<div class="text-muted-foreground text-center">
 		<Volume2 size={18} />
 	</div>
 </div>

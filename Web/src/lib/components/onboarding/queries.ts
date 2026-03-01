@@ -23,7 +23,7 @@ export function useCreateRoom()
 
 	const mutation = createMutation({
 		mutationFn: (roomName?: string) => api.POST("/api/MusicRooms", {
-			body: {roomName: roomName || null},
+			body: { roomName: roomName || null },
 		}),
 		onSuccess: () =>
 		{

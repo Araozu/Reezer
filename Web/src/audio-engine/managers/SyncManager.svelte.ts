@@ -1,4 +1,8 @@
-import { MusicRoomHubClient, type ChatMessage, type ConnectedUser } from "~/api/MusicRoomHubClient.svelte";
+import {
+	MusicRoomHubClient,
+	type ChatMessage,
+	type ConnectedUser,
+} from "~/api/MusicRoomHubClient.svelte";
 import { type SyncResult, CalculateMAD } from "~/lib/sync-utils";
 import type { ISong } from "../types";
 
@@ -187,17 +191,21 @@ export class SyncManager
 	}
 
 	public onRoomState(handler: (state: {
-			queue: ISong[],
-			currentIndex: number,
-			isPlaying: boolean,
-			currentPosition: number,
-			lastUpdateServerTime: number
+			queue: ISong[];
+			currentIndex: number;
+			isPlaying: boolean;
+			currentPosition: number;
+			lastUpdateServerTime: number;
 		}) => void): () => void
 	{
 		return this.hubClient.OnRoomState(handler);
 	}
 
-	public getInterpolatedPosition(isPlaying: boolean, anchorPosition: number, lastUpdateServerTime: number): number
+	public getInterpolatedPosition(
+		isPlaying: boolean,
+		anchorPosition: number,
+		lastUpdateServerTime: number,
+	): number
 	{
 		return this.hubClient.getInterpolatedPosition(isPlaying, anchorPosition, lastUpdateServerTime);
 	}

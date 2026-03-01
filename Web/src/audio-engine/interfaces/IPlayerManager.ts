@@ -11,7 +11,7 @@ import type { PlayState } from "./IAudioBackend";
  */
 export interface IPlayerManager {
 	Init(): Promise<Result<void, unknown>>;
-	Deinit(): Promise<void>
+	Deinit(): Promise<void>;
 
 	/**
 	 * Checks if the current user has permission to perform the given action.
@@ -76,7 +76,7 @@ export interface IPlayerManager {
 	 *
 	 * Always allowed, the volume is local only.
 	 */
-	SetVolume(volume: number): void
+	SetVolume(volume: number): void;
 	/** Gets the current volume, as a value between 0 and 1. */
 	GetVolume(): number;
 
@@ -95,19 +95,19 @@ export interface IPlayerManager {
 	OnDurationChange(callback: (durationMs: number) => void): void;
 }
 
-export type Action = "PlaySong"
-                   | "PlaySongList"
-                   | "AddLastSong"
-                   | "AddLastSongList"
-                   | "AddNextSong"
-                   | "AddNextSongList"
-                   | "Next"
-                   | "Prev"
-                   | "PlayAt"
-                   | "ClearQueue"
-                   | "RemoveAt"
-                   | "SetQueue"
-                   | "SetLoopMode"
-                   | "TogglePlayPause"
-                   | "Seek"
-
+export type Action =
+	| "PlaySong"
+	| "PlaySongList"
+	| "AddLastSong"
+	| "AddLastSongList"
+	| "AddNextSong"
+	| "AddNextSongList"
+	| "Next"
+	| "Prev"
+	| "PlayAt"
+	| "ClearQueue"
+	| "RemoveAt"
+	| "SetQueue"
+	| "SetLoopMode"
+	| "TogglePlayPause"
+	| "Seek";

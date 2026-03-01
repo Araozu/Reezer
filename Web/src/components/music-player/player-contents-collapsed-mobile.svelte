@@ -1,25 +1,25 @@
 <script lang="ts">
-import { Play, Pause, LoaderCircle } from "lucide-svelte";
-import type { ISong } from "~/audio-engine/types";
-import { GetSvelteManagerContext } from "~/context/music-player-context";
+	import { Play, Pause, LoaderCircle } from "lucide-svelte";
+	import type { ISong } from "~/audio-engine/types";
+	import { GetSvelteManagerContext } from "~/context/music-player-context";
 
-let {
-	coverUrl = $bindable(),
-	song,
-	expand,
-}: {
-	coverUrl: string;
-	song: ISong | null;
-	expand: () => void;
-} = $props();
+	let {
+		coverUrl = $bindable(),
+		song,
+		expand,
+	}: {
+		coverUrl: string;
+		song: ISong | null;
+		expand: () => void;
+	} = $props();
 
-const svManager = GetSvelteManagerContext();
+	const svManager = GetSvelteManagerContext();
 
-let isPaused = $derived(svManager.playState === "paused");
-let isBuffering = $derived(svManager.playState === "buffering");
+	let isPaused = $derived(svManager.playState === "paused");
+	let isBuffering = $derived(svManager.playState === "buffering");
 </script>
 
-<div class="grid grid-cols-[3rem_auto_3rem] items-center gap-4">
+<div class="gap-4 grid grid-cols-[3rem_auto_3rem] items-center">
 	<div>
 		<img
 			class={["shadow-lg aspect-square object-cover", "rounded-xl"]}
@@ -33,14 +33,11 @@ let isBuffering = $derived(svManager.playState === "buffering");
 	</button>
 	<div>
 		<button
-			class="hover:bg-glass-bg-hover rounded-full cursor-pointer transition-all duration-300 active:scale-95"
+			class="hover:bg-glass-bg-hover cursor-pointer rounded-full transition-all duration-300 active:scale-95"
 			onclick={() => svManager.imanager.TogglePlayPause()}
 		>
 			{#if isBuffering}
-				<LoaderCircle
-					class="m-2 animate-spin"
-					size={32}
-				/>
+				<LoaderCircle class="m-2 animate-spin" size={32} />
 			{:else if isPaused}
 				<Play class="m-2" size={32} />
 			{:else}

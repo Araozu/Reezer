@@ -42,14 +42,14 @@ export class GeneralPurposeQueue implements IQueue
 		}
 	};
 
-	get queue():Readonly<Array<ISong>>
+	get queue(): Readonly<Array<ISong>>
 	{
 		return this._queueState;
 	}
 	get currentSong(): ISong | null
 	{
 		return this._currentIdx === -1 ? null : this._queueState[this._currentIdx];
-	};
+	}
 	get currentIdx(): number
 	{
 		return this._currentIdx;

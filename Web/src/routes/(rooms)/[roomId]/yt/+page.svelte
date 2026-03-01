@@ -1,53 +1,55 @@
 <script lang="ts">
-import { useYtSongs } from "./queries";
-import { toStore } from "svelte/store";
-import YtPagination from "./yt-pagination.svelte";
-import { page } from "$app/state";
-import YtSongRow from "./yt-song-row.svelte";
-import YtSongRowSkeleton from "./yt-song-row-skeleton.svelte";
-import BackButton from "$lib/components/back-button.svelte";
-import Button from "~/lib/components/ui/button/button.svelte";
-import { openYtQueue } from "../yt-queue.impl.svelte";
-    import type { ISong } from "~/audio-engine/types";
+	import { useYtSongs } from "./queries";
+	import { toStore } from "svelte/store";
+	import YtPagination from "./yt-pagination.svelte";
+	import { page } from "$app/state";
+	import YtSongRow from "./yt-song-row.svelte";
+	import YtSongRowSkeleton from "./yt-song-row-skeleton.svelte";
+	import BackButton from "$lib/components/back-button.svelte";
+	import Button from "~/lib/components/ui/button/button.svelte";
+	import { openYtQueue } from "../yt-queue.impl.svelte";
+	import type { ISong } from "~/audio-engine/types";
 
-const pageNumberQuery = Number.parseInt(page.url.searchParams.get("page") ?? "1", 10);
+	const pageNumberQuery = Number.parseInt(page.url.searchParams.get("page") ?? "1", 10);
 
-let requestPage = $state(pageNumberQuery);
-let requestPageSize = $state(20);
+	let requestPage = $state(pageNumberQuery);
+	let requestPageSize = $state(20);
 
-let cachedTotalCount = $state(1);
-let cachedPageSize = $state(20);
+	let cachedTotalCount = $state(1);
+	let cachedPageSize = $state(20);
 
-const ytSongsQuery = useYtSongs(
-	toStore(() => requestPage),
-	toStore(() => requestPageSize),
-);
-const annotatedYtSongsQuery = $derived($ytSongsQuery.data ? $ytSongsQuery.data.items.map((t): ISong => ({
-	...t,
-	id: t.ytId,
-	duration: Number(t.duration),
-	type: "youtube"
-})) : null);
+	const ytSongsQuery = useYtSongs(
+		toStore(() => requestPage),
+		toStore(() => requestPageSize),
+	);
+	const annotatedYtSongsQuery = $derived($ytSongsQuery.data
+		? $ytSongsQuery.data.items.map((t): ISong => ({
+			...t,
+			id: t.ytId,
+			duration: Number(t.duration),
+			type: "youtube",
+		}))
+		: null);
 
-$effect(() =>
-{
-	if ($ytSongsQuery.data)
+	$effect(() =>
 	{
-		cachedTotalCount = $ytSongsQuery.data.totalCount as number;
-		cachedPageSize = $ytSongsQuery.data.pageSize as number;
-	}
-});
+		if ($ytSongsQuery.data)
+		{
+			cachedTotalCount = $ytSongsQuery.data.totalCount as number;
+			cachedPageSize = $ytSongsQuery.data.pageSize as number;
+		}
+	});
 
-const totalCount = $derived(($ytSongsQuery.data?.totalCount as number | undefined) ?? cachedTotalCount);
-const pageSize = $derived(($ytSongsQuery.data?.pageSize as number | undefined) ?? cachedPageSize);
+	const totalCount = $derived(($ytSongsQuery.data?.totalCount as number | undefined) ?? cachedTotalCount);
+	const pageSize = $derived(($ytSongsQuery.data?.pageSize as number | undefined) ?? cachedPageSize);
 </script>
 
 <svelte:head>
 	<title>Reezer - YouTube Songs</title>
 </svelte:head>
 
-<div class="flex items-center justify-between py-8 px-4">
-	<h1 class="font-display text-4xl font-semibold flex items-center gap-3">
+<div class="py-8 px-4 flex items-center justify-between">
+	<h1 class="font-display text-4xl font-semibold gap-3 flex items-center">
 		<BackButton />
 		YouTube Songs
 	</h1>
@@ -64,7 +66,7 @@ const pageSize = $derived(($ytSongsQuery.data?.pageSize as number | undefined) ?
 <div class="px-4">
 	<YtPagination {totalCount} {pageSize} bind:requestPage />
 
-	<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+	<div class="md:grid-cols-4 gap-4 grid grid-cols-2">
 		{#if annotatedYtSongsQuery}
 			{#each annotatedYtSongsQuery as song (song.id)}
 				<YtSongRow {song} />

@@ -5,10 +5,7 @@ import { derived, type Readable } from "svelte/store";
 export type YtSongDto = components["schemas"]["YtSongDto"];
 export type PaginatedYtSongsResult = components["schemas"]["PaginatedResultOfYtSongDto"];
 
-export function useYtSongs(
-	$page: Readable<number>,
-	$pageSize: Readable<number>,
-)
+export function useYtSongs($page: Readable<number>, $pageSize: Readable<number>)
 {
 	return createQuery(derived([$page, $pageSize], ([page, pageSize]) => ({
 		queryKey: ["ytSongs", page, pageSize],

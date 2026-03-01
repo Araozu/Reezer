@@ -198,7 +198,9 @@ export class DualAudioBackend implements IAudioBackend
 			this.SwitchPlayers();
 			const currentPlayer = this.GetCurrentPlayer();
 			this.currentSongStartTime = Date.now();
-			currentPlayer.play().catch((e) => console.error("[DualAudioBackend] autoPlayNext play() failed:", e));
+			currentPlayer
+				.play()
+				.catch((e) => console.error("[DualAudioBackend] autoPlayNext play() failed:", e));
 			this.hasPrefetch = false;
 			this.startPositionTracking();
 		}

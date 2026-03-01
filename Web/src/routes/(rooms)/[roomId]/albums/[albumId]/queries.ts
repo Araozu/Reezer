@@ -3,7 +3,7 @@ import { api, sv, type components, type WithProblemDetails } from "~/api";
 import { derived, type Readable } from "svelte/store";
 import { type ISong, type SongType } from "~/audio-engine/types/song";
 
-type AlbumWithTracklistDto = components["schemas"]["AlbumWithTracklistDto"]
+type AlbumWithTracklistDto = components["schemas"]["AlbumWithTracklistDto"];
 
 export type SongDto = components["schemas"]["SongDto"];
 export type RegularSong = ISong & {
@@ -14,7 +14,7 @@ export type RegularSong = ISong & {
 	trackNumber: number | null | string;
 	discNumber: number | null | string;
 	duration: number;
-}
+};
 
 export function useAlbumByIdQuery(
 	$albumId: Readable<string>,
@@ -25,7 +25,7 @@ export function useAlbumByIdQuery(
 		queryKey: ["albums", albumId],
 		queryFn: sv(() => api.GET("/api/Albums/{albumId}", {
 			params: {
-				path: {albumId},
+				path: { albumId },
 			},
 		})),
 		staleTime: 5 * 60 * 1000,
@@ -34,4 +34,3 @@ export function useAlbumByIdQuery(
 	})));
 	return query as WithProblemDetails<typeof query>;
 }
-

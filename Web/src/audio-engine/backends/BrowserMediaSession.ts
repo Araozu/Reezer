@@ -105,9 +105,7 @@ export class BrowserMediaSession implements IMediaSession
 		}
 
 		const artworkArray = finalArtwork
-			? [
-				{ src: finalArtwork, sizes: "600x600", type: "image/jpeg" },
-			  ]
+			? [{ src: finalArtwork, sizes: "600x600", type: "image/jpeg" }]
 			: [];
 
 		navigator.mediaSession.metadata = new MediaMetadata({

@@ -32,4 +32,3 @@ export class SvPlayerManager
 		this.position = this.imanager.GetPosition();
 	}
 }
-

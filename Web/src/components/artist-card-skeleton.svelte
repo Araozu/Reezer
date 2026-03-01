@@ -5,8 +5,8 @@
 
 <Card.Root class="w-full">
 	<Card.Header>
-		<Card.Title class="font-display flex justify-center py-8">
-			<Skeleton class="inline-block w-32 h-6 rounded-lg" />
+		<Card.Title class="font-display py-8 flex justify-center">
+			<Skeleton class="w-32 h-6 rounded-lg inline-block" />
 		</Card.Title>
 	</Card.Header>
 </Card.Root>

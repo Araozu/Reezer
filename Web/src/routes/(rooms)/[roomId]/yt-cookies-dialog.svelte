@@ -1,45 +1,45 @@
 <script lang="ts">
-import { Button } from "$lib/components/ui/button";
-import { Label } from "$lib/components/ui/label";
-import * as Dialog from "$lib/components/ui/dialog";
-import { Textarea } from "$lib/components/ui/textarea";
-import { ytCookiesOpenState } from "./yt-cookies-dialog.impl.svelte";
-import { useSetYtCookies } from "./yt/queries";
+	import { Button } from "$lib/components/ui/button";
+	import { Label } from "$lib/components/ui/label";
+	import * as Dialog from "$lib/components/ui/dialog";
+	import { Textarea } from "$lib/components/ui/textarea";
+	import { ytCookiesOpenState } from "./yt-cookies-dialog.impl.svelte";
+	import { useSetYtCookies } from "./yt/queries";
 
-let cookiesText = $state("");
-let errorMessage = $state<string | null>(null);
+	let cookiesText = $state("");
+	let errorMessage = $state<string | null>(null);
 
-const setYtCookiesMutation = useSetYtCookies();
+	const setYtCookiesMutation = useSetYtCookies();
 
-async function handleSubmit(e: Event)
-{
-	e.preventDefault();
-	errorMessage = null;
-
-	if (!cookiesText.trim())
+	async function handleSubmit(e: Event)
 	{
-		errorMessage = "Please enter cookies content";
-		return;
-	}
+		e.preventDefault();
+		errorMessage = null;
 
-	try
-	{
-		await $setYtCookiesMutation.mutateAsync(cookiesText);
-		ytCookiesOpenState.open = false;
-		cookiesText = "";
-	}
-	catch (error: unknown)
-	{
-		if (error && typeof error === "object" && "detail" in error)
+		if (!cookiesText.trim())
 		{
-			errorMessage = String(error.detail);
+			errorMessage = "Please enter cookies content";
+			return;
 		}
-		else
+
+		try
 		{
-			errorMessage = "Failed to save cookies";
+			await $setYtCookiesMutation.mutateAsync(cookiesText);
+			ytCookiesOpenState.open = false;
+			cookiesText = "";
+		}
+		catch (error: unknown)
+		{
+			if (error && typeof error === "object" && "detail" in error)
+			{
+				errorMessage = String(error.detail);
+			}
+			else
+			{
+				errorMessage = "Failed to save cookies";
+			}
 		}
 	}
-}
 </script>
 
 <Dialog.Root bind:open={ytCookiesOpenState.open}>
@@ -48,8 +48,8 @@ async function handleSubmit(e: Event)
 			<Dialog.Title>Set YouTube Cookies</Dialog.Title>
 		</Dialog.Header>
 
-		<form onsubmit={handleSubmit} class="grid gap-4 py-4">
-			<div class="grid gap-2">
+		<form onsubmit={handleSubmit} class="gap-4 py-4 grid">
+			<div class="gap-2 grid">
 				<Label for="cookies">
 					Use extension "Get cookies.txt locally" for Chrome or "cookies.txt" for Firefox
 				</Label>
@@ -66,10 +66,7 @@ async function handleSubmit(e: Event)
 			</div>
 
 			<Dialog.Footer>
-				<Button
-					type="submit"
-					disabled={$setYtCookiesMutation.isPending}
-				>
+				<Button type="submit" disabled={$setYtCookiesMutation.isPending}>
 					{$setYtCookiesMutation.isPending ? "Saving..." : "Submit"}
 				</Button>
 			</Dialog.Footer>

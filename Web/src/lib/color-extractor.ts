@@ -20,12 +20,19 @@ function rgbToHex(r: number, g: number, b: number): string
 	return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
 }
 
-function colorDistanceSq(r1: number, g1: number, b1: number, r2: number, g2: number, b2: number): number
+function colorDistanceSq(
+	r1: number,
+	g1: number,
+	b1: number,
+	r2: number,
+	g2: number,
+	b2: number,
+): number
 {
 	const dr = r1 - r2;
 	const dg = g1 - g2;
 	const db = b1 - b2;
-	return (dr * dr * 2) + (dg * dg * 4) + (db * db * 3);
+	return dr * dr * 2 + dg * dg * 4 + db * db * 3;
 }
 
 function getSaturation(r: number, g: number, b: number): number
@@ -48,13 +55,16 @@ function scoreColor(r: number, g: number, b: number, count: number, totalPixels:
 	const lightness = getLightness(r, g, b);
 
 	const satBonus = saturation > 0.15 ? saturation * 2 : saturation * 0.5;
-	const lightnessScore = 1 - (Math.abs(lightness - 0.5) * 1.5);
+	const lightnessScore = 1 - Math.abs(lightness - 0.5) * 1.5;
 	const grayPenalty = saturation < 0.1 ? 0.3 : 1;
 
-	return (frequency * 0.3) + (satBonus * 0.4) + (lightnessScore * 0.3 * grayPenalty);
+	return frequency * 0.3 + satBonus * 0.4 + lightnessScore * 0.3 * grayPenalty;
 }
 
-export async function extractColorsFromImage(imageUrl: string, maxColors: number = 4): Promise<ExtractedColors>
+export async function extractColorsFromImage(
+	imageUrl: string,
+	maxColors: number = 4,
+): Promise<ExtractedColors>
 {
 	return new Promise((resolve) =>
 	{
@@ -89,7 +99,7 @@ export async function extractColorsFromImage(imageUrl: string, maxColors: number
 				const g = pixels[i + 1];
 				const b = pixels[i + 2];
 
-				totalLuminance += (0.299 * r) + (0.587 * g) + (0.114 * b);
+				totalLuminance += 0.299 * r + 0.587 * g + 0.114 * b;
 
 				const rq = r >> QUANT_SHIFT;
 				const gq = g >> QUANT_SHIFT;
@@ -157,13 +167,13 @@ export async function extractColorsFromImage(imageUrl: string, maxColors: number
 						}
 						if (distSq < diversityRadius)
 						{
-							diversityPenalty += 1 - (distSq / diversityRadius);
+							diversityPenalty += 1 - distSq / diversityRadius;
 						}
 					}
 
 					if (tooClose) continue;
 
-					const adjustedScore = bucket.score - (diversityPenalty * 0.3);
+					const adjustedScore = bucket.score - diversityPenalty * 0.3;
 					if (adjustedScore > bestScore)
 					{
 						bestScore = adjustedScore;
@@ -189,7 +199,7 @@ export async function extractColorsFromImage(imageUrl: string, maxColors: number
 				const saturation = getSaturation(c.r, c.g, c.b);
 				const lightness = getLightness(c.r, c.g, c.b);
 				const vividness = saturation * (1 - Math.abs(lightness - 0.5));
-				return (frequency * 0.6) + (vividness * 0.4);
+				return frequency * 0.6 + vividness * 0.4;
 			});
 
 			const maxWeight = Math.max(...weights);

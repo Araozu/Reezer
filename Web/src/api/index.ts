@@ -33,14 +33,12 @@ export type ProblemDetails = {
  * Utility type to transform Tanstack Query results to have ProblemDetails as the error type.
  * Works with UseQueryResult, UseMutationResult, and UseInfiniteQueryResult.
  */
-export type WithProblemDetails<T> = T extends CreateQueryResult<
-	infer ResultType,
-	any
->
-	? CreateQueryResult<ResultType, ProblemDetails>
-	: T extends CreateMutationResult<infer ResutType, any, infer FetchOptionsType, infer T3>
-		? CreateMutationResult<ResutType, ProblemDetails, FetchOptionsType, T3>
-		: T;
+export type WithProblemDetails<T> =
+	T extends CreateQueryResult<infer ResultType, any>
+		? CreateQueryResult<ResultType, ProblemDetails>
+		: T extends CreateMutationResult<infer ResutType, any, infer FetchOptionsType, infer T3>
+			? CreateMutationResult<ResutType, ProblemDetails, FetchOptionsType, T3>
+			: T;
 
 /**
  * Custom fetch implementation that includes credentials and handles errors.
@@ -60,10 +58,7 @@ export type WithProblemDetails<T> = T extends CreateQueryResult<
  * @returns The Response object if successful (2xx status)
  * @throws {ProblemDetails} Always throws ProblemDetails-shaped objects on error
  */
-const enhancedFetch = async(
-	input: RequestInfo | URL,
-	init?: RequestInit,
-): Promise<Response> =>
+const enhancedFetch = async(input: RequestInfo | URL, init?: RequestInit): Promise<Response> =>
 {
 	if (process.env.NODE_ENV === "development")
 	{

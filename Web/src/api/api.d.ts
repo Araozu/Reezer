@@ -4,1038 +4,1038 @@
  */
 
 export interface paths {
-    "/api/Yt": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get paginated YouTube songs */
-        get: {
-            parameters: {
-                query?: {
-                    page?: number | string;
-                    pageSize?: number | string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["PaginatedResultOfYtSongDto"];
-                        "application/json": components["schemas"]["PaginatedResultOfYtSongDto"];
-                        "text/json": components["schemas"]["PaginatedResultOfYtSongDto"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        /** Add a YouTube song by URL */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["AddYtSongRequest"];
-                    "text/json": components["schemas"]["AddYtSongRequest"];
-                    "application/*+json": components["schemas"]["AddYtSongRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["YtSongResponse"];
-                        "application/json": components["schemas"]["YtSongResponse"];
-                        "text/json": components["schemas"]["YtSongResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Yt/{ytId}/stream": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Stream a YouTube song by ID */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    ytId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Yt/{ytId}/thumbnail": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get YouTube video thumbnail by ID */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    ytId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Yt/{ytId}/regenerate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Regenerate a YouTube song from its ID */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    ytId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["YtSongResponse"];
-                        "application/json": components["schemas"]["YtSongResponse"];
-                        "text/json": components["schemas"]["YtSongResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Yt/{ytId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Delete a YouTube song by ID */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    ytId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Yt/cookies": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Set YouTube cookies from file */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "multipart/form-data": {
-                        file?: components["schemas"]["IFormFile"];
-                    };
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/User/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get current user information */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["UserDto"];
-                        "application/json": components["schemas"]["UserDto"];
-                        "text/json": components["schemas"]["UserDto"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/System/yt-cookies": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Store YouTube cookies file */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "multipart/form-data": {
-                        file?: components["schemas"]["IFormFile"];
-                    };
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Songs/{songId}/stream": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Stream a song by ID */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    songId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Songs/{songId}/prepare": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Prepare a song for streaming by transcoding it in the background */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    songId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Search": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Unified search across songs, YouTube songs, albums, and artists */
-        get: {
-            parameters: {
-                query?: {
-                    q?: string;
-                    limit?: number | string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["UnifiedSearchResultDto"];
-                        "application/json": components["schemas"]["UnifiedSearchResultDto"];
-                        "text/json": components["schemas"]["UnifiedSearchResultDto"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/MusicRooms": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get list of all active music rooms */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["MusicRoomDto"][];
-                        "application/json": components["schemas"]["MusicRoomDto"][];
-                        "text/json": components["schemas"]["MusicRoomDto"][];
-                    };
-                };
-            };
-        };
-        put?: never;
-        /** Create a new music room */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateMusicRoomDto"];
-                    "text/json": components["schemas"]["CreateMusicRoomDto"];
-                    "application/*+json": components["schemas"]["CreateMusicRoomDto"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["MusicRoomDto"];
-                        "application/json": components["schemas"]["MusicRoomDto"];
-                        "text/json": components["schemas"]["MusicRoomDto"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Auth/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Login with email and password */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["LoginCommand"];
-                    "text/json": components["schemas"]["LoginCommand"];
-                    "application/*+json": components["schemas"]["LoginCommand"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["LoginResult"];
-                        "application/json": components["schemas"]["LoginResult"];
-                        "text/json": components["schemas"]["LoginResult"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Auth/google": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Initiate Google OAuth login */
-        get: {
-            parameters: {
-                query?: {
-                    returnUrl?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Auth/google-internal-callback": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Handle Google OAuth callback */
-        get: {
-            parameters: {
-                query?: {
-                    returnUrl?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Auth/logout": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Logout current user */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Artists": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get paginated list of artists */
-        get: {
-            parameters: {
-                query?: {
-                    page?: number | string;
-                    pageSize?: number | string;
-                    search?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["PaginatedResultOfArtistDto"];
-                        "application/json": components["schemas"]["PaginatedResultOfArtistDto"];
-                        "text/json": components["schemas"]["PaginatedResultOfArtistDto"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Artists/{artistId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get artist by ID */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    artistId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ArtistDto"];
-                        "application/json": components["schemas"]["ArtistDto"];
-                        "text/json": components["schemas"]["ArtistDto"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Albums": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get paginated list of albums */
-        get: {
-            parameters: {
-                query?: {
-                    page?: number | string;
-                    pageSize?: number | string;
-                    search?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["PaginatedResultOfAlbumDto"];
-                        "application/json": components["schemas"]["PaginatedResultOfAlbumDto"];
-                        "text/json": components["schemas"]["PaginatedResultOfAlbumDto"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Albums/{albumId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get album with tracklist by album ID */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    albumId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["AlbumWithTracklistDto"];
-                        "application/json": components["schemas"]["AlbumWithTracklistDto"];
-                        "text/json": components["schemas"]["AlbumWithTracklistDto"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Albums/{albumId}/cover": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get album cover by album ID */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    albumId: string;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/Albums/random": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get random paginated list of albums */
-        get: {
-            parameters: {
-                query?: {
-                    page?: number | string;
-                    pageSize?: number | string;
-                    seed?: number | string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["PaginatedResultOfAlbumDto"];
-                        "application/json": components["schemas"]["PaginatedResultOfAlbumDto"];
-                        "text/json": components["schemas"]["PaginatedResultOfAlbumDto"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
+	"/api/Yt": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get paginated YouTube songs */
+		get: {
+			parameters: {
+				query?: {
+					page?: number | string;
+					pageSize?: number | string;
+				};
+				header?: never;
+				path?: never;
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content: {
+						"text/plain": components["schemas"]["PaginatedResultOfYtSongDto"];
+						"application/json": components["schemas"]["PaginatedResultOfYtSongDto"];
+						"text/json": components["schemas"]["PaginatedResultOfYtSongDto"];
+					};
+				};
+			};
+		};
+		put?: never;
+		/** Add a YouTube song by URL */
+		post: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path?: never;
+				cookie?: never;
+			};
+			requestBody: {
+				content: {
+					"application/json": components["schemas"]["AddYtSongRequest"];
+					"text/json": components["schemas"]["AddYtSongRequest"];
+					"application/*+json": components["schemas"]["AddYtSongRequest"];
+				};
+			};
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content: {
+						"text/plain": components["schemas"]["YtSongResponse"];
+						"application/json": components["schemas"]["YtSongResponse"];
+						"text/json": components["schemas"]["YtSongResponse"];
+					};
+				};
+			};
+		};
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Yt/{ytId}/stream": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Stream a YouTube song by ID */
+		get: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path: {
+					ytId: string;
+				};
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content?: never;
+				};
+			};
+		};
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Yt/{ytId}/thumbnail": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get YouTube video thumbnail by ID */
+		get: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path: {
+					ytId: string;
+				};
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content?: never;
+				};
+			};
+		};
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Yt/{ytId}/regenerate": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Regenerate a YouTube song from its ID */
+		post: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path: {
+					ytId: string;
+				};
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content: {
+						"text/plain": components["schemas"]["YtSongResponse"];
+						"application/json": components["schemas"]["YtSongResponse"];
+						"text/json": components["schemas"]["YtSongResponse"];
+					};
+				};
+			};
+		};
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Yt/{ytId}": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		post?: never;
+		/** Delete a YouTube song by ID */
+		delete: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path: {
+					ytId: string;
+				};
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content?: never;
+				};
+			};
+		};
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Yt/cookies": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Set YouTube cookies from file */
+		post: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path?: never;
+				cookie?: never;
+			};
+			requestBody: {
+				content: {
+					"multipart/form-data": {
+						file?: components["schemas"]["IFormFile"];
+					};
+				};
+			};
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content?: never;
+				};
+			};
+		};
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/User/me": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get current user information */
+		get: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path?: never;
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content: {
+						"text/plain": components["schemas"]["UserDto"];
+						"application/json": components["schemas"]["UserDto"];
+						"text/json": components["schemas"]["UserDto"];
+					};
+				};
+			};
+		};
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/System/yt-cookies": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Store YouTube cookies file */
+		post: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path?: never;
+				cookie?: never;
+			};
+			requestBody: {
+				content: {
+					"multipart/form-data": {
+						file?: components["schemas"]["IFormFile"];
+					};
+				};
+			};
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content?: never;
+				};
+			};
+		};
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Songs/{songId}/stream": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Stream a song by ID */
+		get: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path: {
+					songId: string;
+				};
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content?: never;
+				};
+			};
+		};
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Songs/{songId}/prepare": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Prepare a song for streaming by transcoding it in the background */
+		post: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path: {
+					songId: string;
+				};
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content?: never;
+				};
+			};
+		};
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Search": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Unified search across songs, YouTube songs, albums, and artists */
+		get: {
+			parameters: {
+				query?: {
+					q?: string;
+					limit?: number | string;
+				};
+				header?: never;
+				path?: never;
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content: {
+						"text/plain": components["schemas"]["UnifiedSearchResultDto"];
+						"application/json": components["schemas"]["UnifiedSearchResultDto"];
+						"text/json": components["schemas"]["UnifiedSearchResultDto"];
+					};
+				};
+			};
+		};
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/MusicRooms": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get list of all active music rooms */
+		get: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path?: never;
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content: {
+						"text/plain": components["schemas"]["MusicRoomDto"][];
+						"application/json": components["schemas"]["MusicRoomDto"][];
+						"text/json": components["schemas"]["MusicRoomDto"][];
+					};
+				};
+			};
+		};
+		put?: never;
+		/** Create a new music room */
+		post: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path?: never;
+				cookie?: never;
+			};
+			requestBody: {
+				content: {
+					"application/json": components["schemas"]["CreateMusicRoomDto"];
+					"text/json": components["schemas"]["CreateMusicRoomDto"];
+					"application/*+json": components["schemas"]["CreateMusicRoomDto"];
+				};
+			};
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content: {
+						"text/plain": components["schemas"]["MusicRoomDto"];
+						"application/json": components["schemas"]["MusicRoomDto"];
+						"text/json": components["schemas"]["MusicRoomDto"];
+					};
+				};
+			};
+		};
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Auth/login": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Login with email and password */
+		post: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path?: never;
+				cookie?: never;
+			};
+			requestBody: {
+				content: {
+					"application/json": components["schemas"]["LoginCommand"];
+					"text/json": components["schemas"]["LoginCommand"];
+					"application/*+json": components["schemas"]["LoginCommand"];
+				};
+			};
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content: {
+						"text/plain": components["schemas"]["LoginResult"];
+						"application/json": components["schemas"]["LoginResult"];
+						"text/json": components["schemas"]["LoginResult"];
+					};
+				};
+			};
+		};
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Auth/google": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Initiate Google OAuth login */
+		get: {
+			parameters: {
+				query?: {
+					returnUrl?: string;
+				};
+				header?: never;
+				path?: never;
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content?: never;
+				};
+			};
+		};
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Auth/google-internal-callback": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Handle Google OAuth callback */
+		get: {
+			parameters: {
+				query?: {
+					returnUrl?: string;
+				};
+				header?: never;
+				path?: never;
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content?: never;
+				};
+			};
+		};
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Auth/logout": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		get?: never;
+		put?: never;
+		/** Logout current user */
+		post: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path?: never;
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content?: never;
+				};
+			};
+		};
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Artists": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get paginated list of artists */
+		get: {
+			parameters: {
+				query?: {
+					page?: number | string;
+					pageSize?: number | string;
+					search?: string;
+				};
+				header?: never;
+				path?: never;
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content: {
+						"text/plain": components["schemas"]["PaginatedResultOfArtistDto"];
+						"application/json": components["schemas"]["PaginatedResultOfArtistDto"];
+						"text/json": components["schemas"]["PaginatedResultOfArtistDto"];
+					};
+				};
+			};
+		};
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Artists/{artistId}": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get artist by ID */
+		get: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path: {
+					artistId: string;
+				};
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content: {
+						"text/plain": components["schemas"]["ArtistDto"];
+						"application/json": components["schemas"]["ArtistDto"];
+						"text/json": components["schemas"]["ArtistDto"];
+					};
+				};
+			};
+		};
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Albums": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get paginated list of albums */
+		get: {
+			parameters: {
+				query?: {
+					page?: number | string;
+					pageSize?: number | string;
+					search?: string;
+				};
+				header?: never;
+				path?: never;
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content: {
+						"text/plain": components["schemas"]["PaginatedResultOfAlbumDto"];
+						"application/json": components["schemas"]["PaginatedResultOfAlbumDto"];
+						"text/json": components["schemas"]["PaginatedResultOfAlbumDto"];
+					};
+				};
+			};
+		};
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Albums/{albumId}": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get album with tracklist by album ID */
+		get: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path: {
+					albumId: string;
+				};
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content: {
+						"text/plain": components["schemas"]["AlbumWithTracklistDto"];
+						"application/json": components["schemas"]["AlbumWithTracklistDto"];
+						"text/json": components["schemas"]["AlbumWithTracklistDto"];
+					};
+				};
+			};
+		};
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Albums/{albumId}/cover": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get album cover by album ID */
+		get: {
+			parameters: {
+				query?: never;
+				header?: never;
+				path: {
+					albumId: string;
+				};
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content?: never;
+				};
+			};
+		};
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
+	"/api/Albums/random": {
+		parameters: {
+			query?: never;
+			header?: never;
+			path?: never;
+			cookie?: never;
+		};
+		/** Get random paginated list of albums */
+		get: {
+			parameters: {
+				query?: {
+					page?: number | string;
+					pageSize?: number | string;
+					seed?: number | string;
+				};
+				header?: never;
+				path?: never;
+				cookie?: never;
+			};
+			requestBody?: never;
+			responses: {
+				/** @description OK */
+				200: {
+					headers: {
+						[name: string]: unknown;
+					};
+					content: {
+						"text/plain": components["schemas"]["PaginatedResultOfAlbumDto"];
+						"application/json": components["schemas"]["PaginatedResultOfAlbumDto"];
+						"text/json": components["schemas"]["PaginatedResultOfAlbumDto"];
+					};
+				};
+			};
+		};
+		put?: never;
+		post?: never;
+		delete?: never;
+		options?: never;
+		head?: never;
+		patch?: never;
+		trace?: never;
+	};
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        AddYtSongRequest: {
-            url: string;
-        };
-        AlbumDto: {
-            /** Format: uuid */
-            id: string;
-            name: string;
-            /** Format: uuid */
-            artistId: string;
-            artistName: string;
-            coverPath: null | string;
-        };
-        AlbumWithTracklistDto: {
-            /** Format: uuid */
-            id: string;
-            name: string;
-            /** Format: uuid */
-            artistId: string;
-            artistName: string;
-            coverPath: null | string;
-            songs: components["schemas"]["SongDto"][];
-        };
-        ArtistDto: {
-            /** Format: uuid */
-            id: string;
-            name: string;
-            albums: components["schemas"]["AlbumDto"][];
-        };
-        CreateMusicRoomDto: {
-            roomName: null | string;
-        };
-        /** Format: binary */
-        IFormFile: string;
-        LoginCommand: {
-            email: string;
-            password: string;
-        };
-        LoginResult: {
-            success: boolean;
-            errorMessage?: null | string;
-        };
-        MusicRoomDto: {
-            /** Format: uuid */
-            id: string;
-            roomCode: string;
-            roomName: string;
-            /** Format: int32 */
-            connectedUsers: number | string;
-        };
-        PaginatedResultOfAlbumDto: {
-            items: components["schemas"]["AlbumDto"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalCount: number | string;
-        };
-        PaginatedResultOfArtistDto: {
-            items: components["schemas"]["ArtistDto"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalCount: number | string;
-        };
-        PaginatedResultOfYtSongDto: {
-            items: components["schemas"]["YtSongDto"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalCount: number | string;
-        };
-        SongDto: {
-            /** Format: uuid */
-            id: string;
-            name: string;
-            /** Format: int32 */
-            trackNumber: null | number | string;
-            /** Format: int32 */
-            discNumber: null | number | string;
-            artist: string;
-            album: string;
-            /** Format: uuid */
-            artistId: string;
-            /** Format: uuid */
-            albumId: string;
-            /** Format: int64 */
-            duration: number | string;
-        };
-        UnifiedSearchResultDto: {
-            songs: components["schemas"]["SongDto"][];
-            ytSongs: components["schemas"]["YtSongDto"][];
-            albums: components["schemas"]["AlbumDto"][];
-            artists: components["schemas"]["ArtistDto"][];
-        };
-        UserDto: {
-            id: string;
-            email: null | string;
-            name: null | string;
-            userName: null | string;
-        };
-        YtSongDto: {
-            ytId: string;
-            name: string;
-            cachedPath: null | string;
-            /** Format: int64 */
-            duration: number | string;
-        };
-        YtSongResponse: {
-            ytId: string;
-            name: string;
-        };
-    };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+	schemas: {
+		AddYtSongRequest: {
+			url: string;
+		};
+		AlbumDto: {
+			/** Format: uuid */
+			id: string;
+			name: string;
+			/** Format: uuid */
+			artistId: string;
+			artistName: string;
+			coverPath: null | string;
+		};
+		AlbumWithTracklistDto: {
+			/** Format: uuid */
+			id: string;
+			name: string;
+			/** Format: uuid */
+			artistId: string;
+			artistName: string;
+			coverPath: null | string;
+			songs: components["schemas"]["SongDto"][];
+		};
+		ArtistDto: {
+			/** Format: uuid */
+			id: string;
+			name: string;
+			albums: components["schemas"]["AlbumDto"][];
+		};
+		CreateMusicRoomDto: {
+			roomName: null | string;
+		};
+		/** Format: binary */
+		IFormFile: string;
+		LoginCommand: {
+			email: string;
+			password: string;
+		};
+		LoginResult: {
+			success: boolean;
+			errorMessage?: null | string;
+		};
+		MusicRoomDto: {
+			/** Format: uuid */
+			id: string;
+			roomCode: string;
+			roomName: string;
+			/** Format: int32 */
+			connectedUsers: number | string;
+		};
+		PaginatedResultOfAlbumDto: {
+			items: components["schemas"]["AlbumDto"][];
+			/** Format: int32 */
+			page: number | string;
+			/** Format: int32 */
+			pageSize: number | string;
+			/** Format: int32 */
+			totalCount: number | string;
+		};
+		PaginatedResultOfArtistDto: {
+			items: components["schemas"]["ArtistDto"][];
+			/** Format: int32 */
+			page: number | string;
+			/** Format: int32 */
+			pageSize: number | string;
+			/** Format: int32 */
+			totalCount: number | string;
+		};
+		PaginatedResultOfYtSongDto: {
+			items: components["schemas"]["YtSongDto"][];
+			/** Format: int32 */
+			page: number | string;
+			/** Format: int32 */
+			pageSize: number | string;
+			/** Format: int32 */
+			totalCount: number | string;
+		};
+		SongDto: {
+			/** Format: uuid */
+			id: string;
+			name: string;
+			/** Format: int32 */
+			trackNumber: null | number | string;
+			/** Format: int32 */
+			discNumber: null | number | string;
+			artist: string;
+			album: string;
+			/** Format: uuid */
+			artistId: string;
+			/** Format: uuid */
+			albumId: string;
+			/** Format: int64 */
+			duration: number | string;
+		};
+		UnifiedSearchResultDto: {
+			songs: components["schemas"]["SongDto"][];
+			ytSongs: components["schemas"]["YtSongDto"][];
+			albums: components["schemas"]["AlbumDto"][];
+			artists: components["schemas"]["ArtistDto"][];
+		};
+		UserDto: {
+			id: string;
+			email: null | string;
+			name: null | string;
+			userName: null | string;
+		};
+		YtSongDto: {
+			ytId: string;
+			name: string;
+			cachedPath: null | string;
+			/** Format: int64 */
+			duration: number | string;
+		};
+		YtSongResponse: {
+			ytId: string;
+			name: string;
+		};
+	};
+	responses: never;
+	parameters: never;
+	requestBodies: never;
+	headers: never;
+	pathItems: never;
 }
 export type $defs = Record<string, never>;
 export type operations = Record<string, never>;

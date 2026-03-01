@@ -1,70 +1,67 @@
 <script lang="ts">
-import { Button } from "$lib/components/ui/button";
-import { Input } from "$lib/components/ui/input";
-import { Send } from "lucide-svelte";
-import { GetSyncRoomManagerContext } from "~/context/music-player-context";
+	import { Button } from "$lib/components/ui/button";
+	import { Input } from "$lib/components/ui/input";
+	import { Send } from "lucide-svelte";
+	import { GetSyncRoomManagerContext } from "~/context/music-player-context";
 
-const playerManager = GetSyncRoomManagerContext();
+	const playerManager = GetSyncRoomManagerContext();
 
-let newMessage = $state("");
-let chatContainer: HTMLDivElement;
+	let newMessage = $state("");
+	let chatContainer: HTMLDivElement;
 
-const messages = $derived(playerManager.messages);
-const status = $derived(playerManager.status);
+	const messages = $derived(playerManager.messages);
+	const status = $derived(playerManager.status);
 
-$effect(() =>
-{
-	if (messages.length > 0)
+	$effect(() =>
 	{
-		scrollToBottom();
-	}
-});
-
-function scrollToBottom()
-{
-	if (chatContainer)
-	{
-		setTimeout(() =>
+		if (messages.length > 0)
 		{
-			chatContainer.scrollTop = chatContainer.scrollHeight;
-		}, 0);
-	}
-}
+			scrollToBottom();
+		}
+	});
 
-async function sendMessage()
-{
-	if (!newMessage.trim()) return;
+	function scrollToBottom()
+	{
+		if (chatContainer)
+		{
+			setTimeout(() =>
+			{
+				chatContainer.scrollTop = chatContainer.scrollHeight;
+			}, 0);
+		}
+	}
 
-	try
+	async function sendMessage()
 	{
-		await playerManager.sendChatMessage(newMessage);
-		newMessage = "";
-	}
-	catch (e)
-	{
-		console.error("Failed to send message", e);
-	}
-}
+		if (!newMessage.trim()) return;
 
-function handleKeydown(e: KeyboardEvent)
-{
-	if (e.key === "Enter" && !e.shiftKey)
-	{
-		e.preventDefault();
-		sendMessage();
+		try
+		{
+			await playerManager.sendChatMessage(newMessage);
+			newMessage = "";
+		}
+		catch (e)
+		{
+			console.error("Failed to send message", e);
+		}
 	}
-}
+
+	function handleKeydown(e: KeyboardEvent)
+	{
+		if (e.key === "Enter" && !e.shiftKey)
+		{
+			e.preventDefault();
+			sendMessage();
+		}
+	}
 </script>
 
-<div class="flex flex-col h-full w-full">
+<div class="flex h-full w-full flex-col">
 	<!-- Messages -->
-	<div
-		bind:this={chatContainer}
-		class="flex-1 overflow-y-auto p-4 space-y-4 min-h-0"
-	>
+	<div bind:this={chatContainer} class="p-4 space-y-4 min-h-0 flex-1 overflow-y-auto">
 		{#each messages as msg}
-			<div class="flex flex-col gap-1 animate-in fade-in slide-in-from-bottom-2 duration-300">
-				<div class="flex items-baseline gap-2">
+			<div class="gap-1 animate-in fade-in slide-in-from-bottom-2 flex flex-col duration-300">
+				<div class="gap-2 flex items-baseline">
 					<span class="font-medium text-sm text-primary">{msg.userName}</span>
 					<span class="text-xs text-muted-foreground opacity-70">
 						{new Date(msg.timestamp).toLocaleTimeString()}
@@ -76,15 +73,15 @@ function handleKeydown(e: KeyboardEvent)
 			</div>
 		{/each}
 		{#if messages.length === 0}
-			<div class="h-full flex items-center justify-center text-muted-foreground text-sm italic">
+			<div class="text-muted-foreground text-sm flex h-full items-center justify-center italic">
 				No messages yet. Say hello!
 			</div>
 		{/if}
 	</div>
 
 	<!-- Input -->
-	<div class="p-4 border-t border-glass-border bg-black/5">
-		<div class="flex gap-2">
+	<div class="p-4 border-glass-border bg-black/5 border-t">
+		<div class="gap-2 flex">
 			<Input
 				bind:value={newMessage}
 				onkeydown={handleKeydown}

@@ -60,14 +60,11 @@
 				query.delete("search");
 			}
 
-			goto(
-				`?${query.toString()}`,
-				{
-					replaceState: true,
-					noScroll: true,
-					keepFocus: true,
-				},
-			);
+			goto(`?${query.toString()}`, {
+				replaceState: true,
+				noScroll: true,
+				keepFocus: true,
+			});
 
 			debouncedSearchTerm = searchTerm;
 			requestPage = 1;
@@ -86,7 +83,7 @@
 		/>
 	</div>
 	<AlbumPagination {totalCount} {pageSize} bind:requestPage />
-	<div class="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-3 grid-cols-2 gap-2">
+	<div class="xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-3 gap-2 grid grid-cols-2">
 		{#if $albumsQuery.data}
 			{#each $albumsQuery.data.items as album (album.id)}
 				<AlbumCard {album} />

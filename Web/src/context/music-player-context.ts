@@ -36,4 +36,3 @@ export function GetSyncRoomManagerContext(): SyncManager
 {
 	return getContext<SyncManager>(SYNC_ROOM_MANAGER_KEY);
 }
-

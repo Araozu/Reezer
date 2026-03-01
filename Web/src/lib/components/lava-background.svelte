@@ -2,15 +2,15 @@
 	// Lava background effect
 </script>
 
-<div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none bg-background">
+<div class="inset-0 bg-background pointer-events-none fixed -z-10 overflow-hidden">
 	<div
-		class="absolute top-[-10%] left-[20%] w-[40vw] h-[40vw] bg-primary/40 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[80px] opacity-70 animate-blob"
+		class="bg-primary/40 animate-blob absolute top-[-10%] left-[20%] h-[40vw] w-[40vw] rounded-full opacity-70 mix-blend-multiply blur-[80px] filter dark:mix-blend-screen"
 	></div>
 	<div
-		class="absolute top-[-10%] right-[20%] w-[35vw] h-[35vw] bg-chart-1/40 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[80px] opacity-70 animate-blob animation-delay-2000"
+		class="bg-chart-1/40 animate-blob animation-delay-2000 absolute top-[-10%] right-[20%] h-[35vw] w-[35vw] rounded-full opacity-70 mix-blend-multiply blur-[80px] filter dark:mix-blend-screen"
 	></div>
 	<div
-		class="absolute bottom-[-20%] left-[30%] w-[45vw] h-[45vw] bg-chart-2/40 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[80px] opacity-70 animate-blob animation-delay-4000"
+		class="bg-chart-2/40 animate-blob animation-delay-4000 absolute bottom-[-20%] left-[30%] h-[45vw] w-[45vw] rounded-full opacity-70 mix-blend-multiply blur-[80px] filter dark:mix-blend-screen"
 	></div>
 </div>
 

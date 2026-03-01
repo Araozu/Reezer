@@ -17,13 +17,11 @@
 
 <LavaBackground />
 
-<div
-	class="flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10"
->
-	<div class="flex w-full flex-col justify-center items-center gap-6">
-		<div class="flex items-center gap-2 self-center font-medium">
+<div class="gap-6 p-6 md:p-10 flex min-h-svh flex-col items-center justify-center">
+	<div class="gap-6 flex w-full flex-col items-center justify-center">
+		<div class="gap-2 font-medium flex items-center self-center">
 			<div
-				class="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-lg"
+				class="bg-primary text-primary-foreground size-6 rounded-lg flex items-center justify-center"
 			>
 				<Disc3 class="size-4" />
 			</div>

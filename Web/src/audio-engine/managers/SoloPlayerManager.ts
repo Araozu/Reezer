@@ -26,7 +26,7 @@ export class SoloPlayerManager implements IPlayerManager
 		this.queueManager = new GeneralPurposeQueue(this.audioBackend);
 
 		// Setup music player
-		this.mediaSession = new BrowserMediaSession(this.queueManager , this.audioBackend);
+		this.mediaSession = new BrowserMediaSession(this.queueManager, this.audioBackend);
 		this.mediaSession.Init();
 	}
 

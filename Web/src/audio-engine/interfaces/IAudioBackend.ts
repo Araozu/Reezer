@@ -11,8 +11,8 @@ export interface IAudioBackend {
 	 * Raw volume between 0.0 and 1.0.
 	 * The caller is responsible for mapping this to a logarithmic scale if needed.
 	 */
-	get volume(): number ;
-	set volume(value: number)
+	get volume(): number;
+	set volume(value: number);
 
 	get duration(): number | null;
 	/** Current position in milliseconds */
@@ -22,23 +22,23 @@ export interface IAudioBackend {
 	/**
 	 * Plays the audio track with the given id.
 	 */
-	Play(track: ISong): Promise<void>
+	Play(track: ISong): Promise<void>;
 
 	/**
 	 * Pauses or resumes playback.
 	 */
-	TogglePlayPause(): void
-	Pause(): void
-	Resume(): void
+	TogglePlayPause(): void;
+	Pause(): void;
+	Resume(): void;
 	/** Seek to position in milliseconds */
-	Seek(position: number): void
+	Seek(position: number): void;
 
 	/**
 	 * Loads the given song into the current player,
 	 * without playing it.
 	 */
 	LoadCurrentSong(track: ISong): Promise<void>;
-	Prefetch(track: ISong): Promise<void>
+	Prefetch(track: ISong): Promise<void>;
 	ClearPrefetch(): void;
 
 	/**
@@ -82,4 +82,3 @@ export interface IAudioBackend {
 	 */
 	Deinit(): void;
 }
-

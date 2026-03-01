@@ -45,11 +45,7 @@ export class MultiplayerManager implements IPlayerManager
 
 			await this.queueManager.SetQueue(queue, currentIdx);
 
-			const projectedPosition = this.calculateProjectedPosition(
-				isPlaying,
-				position,
-				serverTime,
-			);
+			const projectedPosition = this.calculateProjectedPosition(isPlaying, position, serverTime);
 			console.log("[MultiplayerManager] Projected position (queue change):", projectedPosition);
 
 			this.audioBackend.Seek(projectedPosition);
@@ -87,7 +83,7 @@ export class MultiplayerManager implements IPlayerManager
 				"position:",
 				position,
 				"serverTime:",
-				serverTime
+				serverTime,
 			);
 
 			// Discard events that were issued before our last seek — they carry stale positions.
@@ -110,11 +106,14 @@ export class MultiplayerManager implements IPlayerManager
 			// to avoid stuttering on every state update
 			const currentPos = this.audioBackend.position;
 			const drift = Math.abs(currentPos - projectedPosition);
-			
-			if (drift > 1500 || !isPlaying) {
+
+			if (drift > 1500 || !isPlaying)
+			{
 				console.log(`[MultiplayerManager] Drift detected (${drift}ms). Seeking to ${projectedPosition}ms.`);
 				this.audioBackend.Seek(projectedPosition);
-			} else {
+			}
+			else
+			{
 				console.log(`[MultiplayerManager] Drift within tolerance (${drift}ms). Skipping seek.`);
 			}
 
@@ -161,43 +160,43 @@ export class MultiplayerManager implements IPlayerManager
 
 	async Next(): Promise<Result<void, unknown>>
 	{
-		throw new Error("Not migrated to server")
+		throw new Error("Not migrated to server");
 		return ok();
 	}
 
 	async Prev(): Promise<Result<void, unknown>>
 	{
-		throw new Error("Not migrated to server")
+		throw new Error("Not migrated to server");
 		return ok();
 	}
 
 	async PlayAt(idx: number): Promise<Result<void, unknown>>
 	{
-		throw new Error("Not migrated to server")
+		throw new Error("Not migrated to server");
 		return ok();
 	}
 
 	async ClearQueue(): Promise<Result<void, unknown>>
 	{
-		throw new Error("Not migrated to server")
+		throw new Error("Not migrated to server");
 		return ok();
 	}
 
 	async RemoveAt(idx: number): Promise<Result<void, unknown>>
 	{
-		throw new Error("Not migrated to server")
+		throw new Error("Not migrated to server");
 		return ok();
 	}
 
 	async SetQueue(newQueue: Array<ISong>, newCurrentIdx: number): Promise<Result<void, unknown>>
 	{
-		throw new Error("Not migrated to server")
+		throw new Error("Not migrated to server");
 		return ok();
 	}
 
 	async SetLoopMode(mode: LoopMode): Promise<Result<void, unknown>>
 	{
-		throw new Error("Not migrated to server")
+		throw new Error("Not migrated to server");
 		return ok();
 	}
 
@@ -224,7 +223,11 @@ export class MultiplayerManager implements IPlayerManager
 		lastUpdateServerTime: number,
 	): number
 	{
-		return this.syncManager.getInterpolatedPosition(isPlaying, serverPosition, lastUpdateServerTime);
+		return this.syncManager.getInterpolatedPosition(
+			isPlaying,
+			serverPosition,
+			lastUpdateServerTime,
+		);
 	}
 
 	HasPermission(action: Action): boolean
@@ -316,4 +319,3 @@ export class MultiplayerManager implements IPlayerManager
 		this.audioBackend.OnDurationChange(callback);
 	}
 }
-
