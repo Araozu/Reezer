@@ -65,10 +65,7 @@ ungrouped:
                         stage("Build & Push") {
                             steps {
                                 script {
-                                    withDockerRegistry(credentialsId: "${REGISTRY_CREDENTIALS}") {
-                                        def image = docker.build("${FULL_REGISTRY_URL}:${BUILD_REF}", "-f +devops/docker/Dockerfile .")
-                                        // image.push()
-                                    }
+                                    docker.build("${FULL_REGISTRY_URL}:${BUILD_REF}", "-f +devops/docker/Dockerfile .")
                                 }
                             }
                         }
