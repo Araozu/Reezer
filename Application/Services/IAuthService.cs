@@ -10,6 +10,10 @@ public interface IAuthService
         LoginCommand command,
         CancellationToken cancellationToken = default
     );
+    Task<OneOf<LoginResult, BadRequest>> RegisterAsync(
+        RegisterCommand command,
+        CancellationToken cancellationToken = default
+    );
     Task<LoginResult> GoogleLoginAsync(
         string returnUrl,
         CancellationToken cancellationToken = default

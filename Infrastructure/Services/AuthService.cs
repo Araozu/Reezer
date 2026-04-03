@@ -127,6 +127,37 @@ public class AuthService(
         return new LoginResult(true);
     }
 
+    public async Task<OneOf<LoginResult, BadRequest>> RegisterAsync(
+        RegisterCommand command,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var existingUser = await userManager.FindByEmailAsync(command.Email);
+        if (existingUser != null)
+        {
+            return new BadRequest("An account with this email already exists");
+        }
+
+        var user = new User
+        {
+            UserName = command.Email,
+            Email = command.Email,
+            EmailConfirmed = true,
+            Name = command.Name,
+        };
+
+        var createResult = await userManager.CreateAsync(user, command.Password);
+        if (!createResult.Succeeded)
+        {
+            var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+            return new BadRequest(errors);
+        }
+
+        await signInManager.SignInAsync(user, isPersistent: true);
+
+        return new LoginResult(true);
+    }
+
     public async Task LogoutAsync(CancellationToken cancellationToken = default)
     {
         await signInManager.SignOutAsync();

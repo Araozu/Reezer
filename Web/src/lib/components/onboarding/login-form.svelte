@@ -10,6 +10,8 @@
 	import { Input } from "$lib/components/ui/input/index.js";
 	import { CircleArrowRight, LoaderCircle } from "lucide-svelte";
 	import Disc_3 from "lucide-svelte/icons/disc-3";
+	import { api, type ProblemDetails } from "~/api";
+	import { useQueryClient } from "@tanstack/svelte-query";
 
 	let { loading, loggedIn }: { loading: boolean; loggedIn: boolean } =
 		$props();
@@ -17,12 +19,53 @@
 
 	let loadingLogin = $state(false);
 	let spinnerClass = $derived(loadingLogin ? "opacity-100" : "opacity-0");
+	let isRegisterMode = $state(false);
+	let errorMessage = $state("");
+	let email = $state("");
+	let password = $state("");
+	let name = $state("");
+
+	const queryClient = useQueryClient();
 
 	function handleGoogleLogin()
 	{
 		const returnUrl = encodeURIComponent(`${window.location.origin}/`);
 		loadingLogin = true;
 		window.location.href = `/api/auth/google?returnUrl=${returnUrl}`;
+	}
+
+	async function handleEmailSubmit(e: SubmitEvent)
+	{
+		e.preventDefault();
+		errorMessage = "";
+		loadingLogin = true;
+
+		try
+		{
+			if (isRegisterMode)
+			{
+				await api.POST("/api/Auth/register", {
+					body: { email, password, name },
+				});
+			}
+			else
+			{
+				await api.POST("/api/Auth/login", {
+					body: { email, password },
+				});
+			}
+
+			await queryClient.invalidateQueries({ queryKey: ["user", "me"] });
+		}
+		catch (err)
+		{
+			const problem = err as ProblemDetails;
+			errorMessage = problem.detail ?? "An error occurred";
+		}
+		finally
+		{
+			loadingLogin = false;
+		}
 	}
 </script>
 
@@ -50,16 +93,17 @@
 		</Card.Content>
 	{:else}
 		<Card.Header class="text-center">
-			<Card.Title class="text-xl">Welcome back</Card.Title>
+			<Card.Title class="text-xl">{isRegisterMode ? "Create an account" : "Welcome back"}</Card.Title>
 		</Card.Header>
 		<Card.Content>
-			<form>
+			<form onsubmit={handleEmailSubmit}>
 				<FieldGroup>
 					<Field>
 						<Button
 							variant="outline"
 							type="button"
 							onclick={handleGoogleLogin}
+							disabled={loadingLogin}
 						>
 							<Disc_3 class={`animate-spin transition-opacity ${spinnerClass}`} />
 							<svg
@@ -71,7 +115,7 @@
 									fill="currentColor"
 								/>
 							</svg>
-							Login with Google
+							{isRegisterMode ? "Sign up with Google" : "Login with Google"}
 						</Button>
 					</Field>
 					<FieldSeparator
@@ -79,6 +123,21 @@
 					>
 						Or continue with
 					</FieldSeparator>
+					{#if isRegisterMode}
+						<Field>
+							<FieldLabel for="name-{id}">
+								Name
+							</FieldLabel>
+							<Input
+								id="name-{id}"
+								type="text"
+								placeholder="Your name"
+								required
+								disabled={loadingLogin}
+								bind:value={name}
+							/>
+						</Field>
+					{/if}
 					<Field>
 						<FieldLabel for="email-{id}">
 							Email
@@ -88,7 +147,8 @@
 							type="email"
 							placeholder="m@example.com"
 							required
-							disabled
+							disabled={loadingLogin}
+							bind:value={email}
 						/>
 					</Field>
 					<Field>
@@ -103,14 +163,31 @@
 							id="password-{id}"
 							type="password"
 							required
-							disabled
+							disabled={loadingLogin}
+							bind:value={password}
 						/>
 					</Field>
+					{#if errorMessage}
+						<p class="text-sm text-destructive">{errorMessage}</p>
+					{/if}
 					<Field>
-						<Button type="submit" disabled
-							>Login</Button
-						>
+						<Button type="submit" disabled={loadingLogin}>
+							{#if loadingLogin}
+								<LoaderCircle class="animate-spin size-4" />
+							{/if}
+							{isRegisterMode ? "Create account" : "Login"}
+						</Button>
 					</Field>
+					<p class="text-center text-sm text-muted-foreground">
+						{isRegisterMode ? "Already have an account?" : "Don't have an account?"}
+						<button
+							type="button"
+							class="underline underline-offset-4 hover:text-primary"
+							onclick={() => { isRegisterMode = !isRegisterMode; errorMessage = ""; }}
+						>
+							{isRegisterMode ? "Login" : "Sign up"}
+						</button>
+					</p>
 				</FieldGroup>
 			</form>
 		</Card.Content>
