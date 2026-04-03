@@ -562,6 +562,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/Auth/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register with email and password */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RegisterCommand"];
+                    "text/json": components["schemas"]["RegisterCommand"];
+                    "application/*+json": components["schemas"]["RegisterCommand"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["LoginResult"];
+                        "application/json": components["schemas"]["LoginResult"];
+                        "text/json": components["schemas"]["LoginResult"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/Auth/google": {
         parameters: {
             query?: never;
@@ -954,6 +998,11 @@ export interface components {
         LoginResult: {
             success: boolean;
             errorMessage?: null | string;
+        };
+        RegisterCommand: {
+            email: string;
+            password: string;
+            name: string;
         };
         MusicRoomDto: {
             /** Format: uuid */

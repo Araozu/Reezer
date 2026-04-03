@@ -31,6 +31,28 @@ public class AuthController(IAuthService authService) : ControllerBase
         );
     }
 
+    [HttpPost("register")]
+    [EndpointSummary("Register with email and password")]
+    public async Task<ActionResult<LoginResult>> Register(
+        [FromBody] RegisterCommand command,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var result = await authService.RegisterAsync(command, cancellationToken);
+
+        return result.Match<ActionResult<LoginResult>>(
+            success => Ok(success),
+            badRequest =>
+                BadRequest(
+                    new ProblemDetails
+                    {
+                        Detail = badRequest.Reason,
+                        Status = StatusCodes.Status400BadRequest,
+                    }
+                )
+        );
+    }
+
     [HttpGet("google")]
     [EndpointSummary("Initiate Google OAuth login")]
     public async Task<ActionResult> GoogleLogin(
