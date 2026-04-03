@@ -59,8 +59,15 @@
 		}
 		catch (err)
 		{
-			const problem = err as ProblemDetails;
-			errorMessage = problem.detail ?? "An error occurred";
+			if (err && typeof err === "object" && "detail" in err)
+			{
+				const problem = err as ProblemDetails;
+				errorMessage = problem.detail ?? "An error occurred";
+			}
+			else
+			{
+				errorMessage = "A network error occurred. Please try again.";
+			}
 		}
 		finally
 		{
@@ -182,7 +189,7 @@
 						{isRegisterMode ? "Already have an account?" : "Don't have an account?"}
 						<button
 							type="button"
-							class="underline underline-offset-4 hover:text-primary"
+							class="underline underline-offset-4 hover:text-primary touch-action-manipulation [-webkit-tap-highlight-color:transparent]"
 							onclick={() => { isRegisterMode = !isRegisterMode; errorMessage = ""; }}
 						>
 							{isRegisterMode ? "Login" : "Sign up"}
