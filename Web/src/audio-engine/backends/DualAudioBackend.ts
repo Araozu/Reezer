@@ -34,13 +34,13 @@ export class DualAudioBackend implements IAudioBackend
 	get duration(): number | null
 	{
 		const player = this.GetCurrentPlayer();
-		return player && !isNaN(player.duration) ? player.duration : null;
+		return player && !isNaN(player.duration) ? player.duration * 1000 : null;
 	}
 
 	get position(): number
 	{
 		const player = this.GetCurrentPlayer();
-		return player ? player.currentTime : 0;
+		return player ? player.currentTime * 1000 : 0;
 	}
 
 	get playState(): PlayState
@@ -145,7 +145,7 @@ export class DualAudioBackend implements IAudioBackend
 	Seek(position: number): void
 	{
 		const player = this.GetCurrentPlayer();
-		player.currentTime = position;
+		player.currentTime = position / 1000;
 	}
 
 	async LoadCurrentSong(track: ISong): Promise<void>
@@ -198,7 +198,9 @@ export class DualAudioBackend implements IAudioBackend
 			this.SwitchPlayers();
 			const currentPlayer = this.GetCurrentPlayer();
 			this.currentSongStartTime = Date.now();
-			currentPlayer.play().catch((e) => console.error("[DualAudioBackend] autoPlayNext play() failed:", e));
+			currentPlayer
+				.play()
+				.catch((e) => console.error("[DualAudioBackend] autoPlayNext play() failed:", e));
 			this.hasPrefetch = false;
 			this.startPositionTracking();
 		}
@@ -266,8 +268,8 @@ export class DualAudioBackend implements IAudioBackend
 		setupBufferingEvents(this.player1);
 		setupBufferingEvents(this.player2);
 
-		this.player1.addEventListener("loadedmetadata", () => this.notifyDurationChange(this.player1.duration));
-		this.player2.addEventListener("loadedmetadata", () => this.notifyDurationChange(this.player2.duration));
+		this.player1.addEventListener("loadedmetadata", () => this.notifyDurationChange(this.player1.duration * 1000));
+		this.player2.addEventListener("loadedmetadata", () => this.notifyDurationChange(this.player2.duration * 1000));
 
 		this.readyCallbacks.forEach((callback) => callback());
 	}
@@ -282,12 +284,12 @@ export class DualAudioBackend implements IAudioBackend
 		this.songEndCallbacks.push(callback);
 	}
 
-	OnPositionUpdate(callback: (positionSeconds: number) => void): void
+	OnPositionUpdate(callback: (positionMs: number) => void): void
 	{
 		this.positionUpdateCallbacks.push(callback);
 	}
 
-	OnDurationChange(callback: (durationSeconds: number) => void): void
+	OnDurationChange(callback: (durationMs: number) => void): void
 	{
 		this.durationChangeCallbacks.push(callback);
 	}
@@ -362,11 +364,12 @@ export class DualAudioBackend implements IAudioBackend
 				return;
 			}
 
+			const currentPositionMs = player.currentTime * 1000;
 			const currentSecond = Math.floor(player.currentTime);
 			if (currentSecond !== this.lastReportedSecond)
 			{
 				this.lastReportedSecond = currentSecond;
-				this.positionUpdateCallbacks.forEach((cb) => cb(currentSecond));
+				this.positionUpdateCallbacks.forEach((cb) => cb(currentPositionMs));
 			}
 		}, 250);
 	}

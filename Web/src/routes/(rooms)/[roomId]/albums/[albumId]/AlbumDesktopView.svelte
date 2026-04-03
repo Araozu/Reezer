@@ -49,67 +49,75 @@
 	}
 </script>
 
-<div class="grid grid-cols-[20rem_auto] xl:grid-cols-[35rem_auto]">
+<div class="xl:grid-cols-[35rem_auto] grid grid-cols-[20rem_auto]">
 	<div>
-	<div class="h-screen w-[20rem] xl:w-140 flex flex-col items-center justify-center px-4 fixed top-0">
-		<AlbumCover {albumId} {albumName} skipFadeIn />
-		<div class="w-full px-4 py-2 transform -translate-y-8">
-			<div class="py-1 font-display text-4xl font-bold text-center backdrop-blur-xl bg-glass-bg border border-glass-border rounded-2xl
-				shadow-[0_4px_24px_-4px_var(--glass-shadow) inset_0_1px_1px_var(--glass-highlight)]
-				hover:bg-glass-bg-hover transition-colors
-				truncate px-4" title={albumName}>
-				{albumName}
+		<div
+			class="xl:w-140 px-4 top-0 fixed flex h-screen w-[20rem] flex-col items-center justify-center"
+		>
+			<AlbumCover {albumId} {albumName} skipFadeIn />
+			<div class="px-4 py-2 -translate-y-8 w-full transform">
+				<div
+					class="py-1 font-display text-4xl font-bold backdrop-blur-xl bg-glass-bg border-glass-border rounded-2xl shadow-[0_4px_24px_-4px_var(--glass-shadow) inset_0_1px_1px_var(--glass-highlight)]
+				hover:bg-glass-bg-hover px-4
+				truncate border
+				text-center transition-colors"
+					title={albumName}
+				>
+					{albumName}
+				</div>
 			</div>
-		</div>
-		<div class="w-full px-12 py-2 transform -translate-y-8">
-			<div class="font-display text-xl font-bold text-center backdrop-blur-xl bg-glass-bg border border-glass-border rounded-2xl
-				shadow-[0_4px_24px_-4px_var(--glass-shadow) inset_0_1px_1px_var(--glass-highlight)]
-				hover:bg-glass-bg-hover transition-colors
-				truncate px-4" title={artistName}>
-				<a href="/{roomId}/artists/{artistId}" class="block">{artistName}</a>
+			<div class="px-12 py-2 -translate-y-8 w-full transform">
+				<div
+					class="font-display text-xl font-bold backdrop-blur-xl bg-glass-bg border-glass-border rounded-2xl shadow-[0_4px_24px_-4px_var(--glass-shadow) inset_0_1px_1px_var(--glass-highlight)]
+				hover:bg-glass-bg-hover px-4
+				truncate border
+				text-center transition-colors"
+					title={artistName}
+				>
+					<a href="/{roomId}/artists/{artistId}" class="block">{artistName}</a>
+				</div>
 			</div>
-		</div>
-		<div class="md:text-left text-center flex items-center justify-center md:justify-start gap-2">
-			<Button onclick={onPlayAll}>
-				<Play />
-				Play All
-			</Button>
+			<div class="md:text-left md:justify-start gap-2 flex items-center justify-center text-center">
+				<Button onclick={onPlayAll}>
+					<Play />
+					Play All
+				</Button>
 
-			<Button onclick={onAddAllToQueue} variant="outline">
-				<ListEnd />
-				Add to queue
-			</Button>
+				<Button onclick={onAddAllToQueue} variant="outline">
+					<ListEnd />
+					Add to queue
+				</Button>
 
-			<DropdownMenu.Root>
-				<DropdownMenu.Trigger>
-					{#snippet child({ props })}
-						<Button variant="ghost" size="icon" {...props}>
-							<EllipsisVertical class="size-4" />
-						</Button>
-					{/snippet}
-				</DropdownMenu.Trigger>
-				<DropdownMenu.Content>
-					{#if uniqueDiscs.length === 1}
-						<DropdownMenu.Item onclick={() => copyTracklist(uniqueDiscs[0])}>
-							Copy Tracklist
-						</DropdownMenu.Item>
-					{:else}
-						{#each uniqueDiscs as disc (disc)}
-							<DropdownMenu.Item onclick={() => copyTracklist(disc)}>
-								Copy Disc {disc} Tracklist
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger>
+						{#snippet child({ props })}
+							<Button variant="ghost" size="icon" {...props}>
+								<EllipsisVertical class="size-4" />
+							</Button>
+						{/snippet}
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content>
+						{#if uniqueDiscs.length === 1}
+							<DropdownMenu.Item onclick={() => copyTracklist(uniqueDiscs[0])}>
+								Copy Tracklist
 							</DropdownMenu.Item>
-						{/each}
-					{/if}
-				</DropdownMenu.Content>
-			</DropdownMenu.Root>
+						{:else}
+							{#each uniqueDiscs as disc (disc)}
+								<DropdownMenu.Item onclick={() => copyTracklist(disc)}>
+									Copy Disc {disc} Tracklist
+								</DropdownMenu.Item>
+							{/each}
+						{/if}
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
+			</div>
 		</div>
 	</div>
-	</div>
 	<div>
-		<div class="min-h-screen flex flex-col justify-center px-4 py-16">
+		<div class="px-4 py-16 flex min-h-screen flex-col justify-center">
 			{#each uniqueDiscs as discNumber (discNumber)}
 				<div class="mb-6">
-					<div class="flex items-center gap-2 px-3 py-2 mb-2 text-muted-foreground">
+					<div class="gap-2 px-3 py-2 mb-2 text-muted-foreground flex items-center">
 						<Disc class="size-4" />
 						<span class="text-sm font-medium">Disc {discNumber}</span>
 					</div>

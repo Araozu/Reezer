@@ -32,12 +32,7 @@
 </script>
 
 <div class="py-4">
-	<Pagination.Root
-		bind:page={requestPage}
-		count={totalCount}
-		perPage={pageSize}
-		siblingCount={2}
-	>
+	<Pagination.Root bind:page={requestPage} count={totalCount} perPage={pageSize} siblingCount={2}>
 		{#snippet children({ pages, currentPage })}
 			<Pagination.Content>
 				<Pagination.Item>
@@ -50,11 +45,7 @@
 						</Pagination.Item>
 					{:else}
 						<Pagination.Item>
-							<Pagination.Link
-								{page}
-								isActive={currentPage ===
-									page.value}
-							>
+							<Pagination.Link {page} isActive={currentPage === page.value}>
 								{page.value}
 							</Pagination.Link>
 						</Pagination.Item>

@@ -1,76 +1,77 @@
 <script lang="ts">
-import * as Dialog from "$lib/components/ui/dialog";
-import { Activity, Clock, Gauge, Signal, Timer } from "lucide-svelte";
-import { GetSyncRoomManagerContext } from "~/context/music-player-context";
+	import * as Dialog from "$lib/components/ui/dialog";
+	import { Activity, Clock, Gauge, Signal, Timer } from "lucide-svelte";
+	import { GetSyncRoomManagerContext } from "~/context/music-player-context";
 
-let { open = $bindable(false) } = $props();
+	let { open = $bindable(false) } = $props();
 
-const playerManager = GetSyncRoomManagerContext();
-const syncResult = $derived(playerManager.syncResult);
-const status = $derived(playerManager.status);
+	const playerManager = GetSyncRoomManagerContext();
+	const syncResult = $derived(playerManager.syncResult);
+	const status = $derived(playerManager.status);
 
-let serverTime = $state(Date.now());
+	let serverTime = $state(Date.now());
 
-$effect(() =>
-{
-	if (!open) return;
-	const interval = setInterval(() =>
+	$effect(() =>
 	{
-		serverTime = Date.now() + (syncResult?.clockOffset ?? 0);
-	}, 100);
-	return () => clearInterval(interval);
-});
-
-function formatTime(timestamp: number): string
-{
-	return new Date(timestamp).toLocaleTimeString(undefined, {
-		hour: "2-digit",
-		minute: "2-digit",
-		second: "2-digit",
-		fractionalSecondDigits: 1,
+		if (!open) return;
+		const interval = setInterval(() =>
+		{
+			serverTime = Date.now() + (syncResult?.clockOffset ?? 0);
+		}, 100);
+		return () => clearInterval(interval);
 	});
-}
 
-function formatOffset(offset: number): string
-{
-	const sign = offset >= 0 ? "+" : "";
-	return `${sign}${offset.toFixed(1)}ms`;
-}
-
-function getAccuracyColor(accuracy: "high" | "medium" | "low"): string
-{
-	switch (accuracy)
+	function formatTime(timestamp: number): string
 	{
-	case "high": return "text-green-500";
-	case "medium": return "text-yellow-500";
-	case "low": return "text-red-500";
+		return new Date(timestamp).toLocaleTimeString(undefined, {
+			hour: "2-digit",
+			minute: "2-digit",
+			second: "2-digit",
+			fractionalSecondDigits: 1,
+		});
 	}
-}
+
+	function formatOffset(offset: number): string
+	{
+		const sign = offset >= 0 ? "+" : "";
+		return `${sign}${offset.toFixed(1)}ms`;
+	}
+
+	function getAccuracyColor(accuracy: "high" | "medium" | "low"): string
+	{
+		switch (accuracy)
+		{
+		case "high":
+			return "text-green-500";
+		case "medium":
+			return "text-yellow-500";
+		case "low":
+			return "text-red-500";
+		}
+	}
 </script>
 
 <Dialog.Root bind:open>
 	<Dialog.Content class="max-w-sm">
 		<Dialog.Header>
-			<Dialog.Title class="flex items-center gap-2">
+			<Dialog.Title class="gap-2 flex items-center">
 				<Signal class="size-5" />
 				Sync Status
 			</Dialog.Title>
-			<Dialog.Description>
-				Real-time synchronization stats
-			</Dialog.Description>
+			<Dialog.Description>Real-time synchronization stats</Dialog.Description>
 		</Dialog.Header>
 
-		<div class="grid gap-4 py-4">
-			<div class="flex items-center justify-between rounded-lg bg-glass-bg p-3">
-				<div class="flex items-center gap-2 text-muted-foreground">
+		<div class="gap-4 py-4 grid">
+			<div class="rounded-lg bg-glass-bg p-3 flex items-center justify-between">
+				<div class="gap-2 text-muted-foreground flex items-center">
 					<Activity class="size-4" />
 					<span>Status</span>
 				</div>
 				<span class="font-medium capitalize">{status}</span>
 			</div>
 
-			<div class="flex items-center justify-between rounded-lg bg-glass-bg p-3">
-				<div class="flex items-center gap-2 text-muted-foreground">
+			<div class="rounded-lg bg-glass-bg p-3 flex items-center justify-between">
+				<div class="gap-2 text-muted-foreground flex items-center">
 					<Timer class="size-4" />
 					<span>Server Time</span>
 				</div>
@@ -78,24 +79,24 @@ function getAccuracyColor(accuracy: "high" | "medium" | "low"): string
 			</div>
 
 			{#if syncResult}
-				<div class="flex items-center justify-between rounded-lg bg-glass-bg p-3">
-					<div class="flex items-center gap-2 text-muted-foreground">
+				<div class="rounded-lg bg-glass-bg p-3 flex items-center justify-between">
+					<div class="gap-2 text-muted-foreground flex items-center">
 						<Gauge class="size-4" />
 						<span>RTT</span>
 					</div>
 					<span class="font-mono font-medium">{syncResult.roundTripTime}ms</span>
 				</div>
 
-				<div class="flex items-center justify-between rounded-lg bg-glass-bg p-3">
-					<div class="flex items-center gap-2 text-muted-foreground">
+				<div class="rounded-lg bg-glass-bg p-3 flex items-center justify-between">
+					<div class="gap-2 text-muted-foreground flex items-center">
 						<Clock class="size-4" />
 						<span>Clock Offset</span>
 					</div>
 					<span class="font-mono font-medium">{formatOffset(syncResult.clockOffset)}</span>
 				</div>
 
-				<div class="flex items-center justify-between rounded-lg bg-glass-bg p-3">
-					<div class="flex items-center gap-2 text-muted-foreground">
+				<div class="rounded-lg bg-glass-bg p-3 flex items-center justify-between">
+					<div class="gap-2 text-muted-foreground flex items-center">
 						<Signal class="size-4" />
 						<span>Accuracy</span>
 					</div>
@@ -104,7 +105,7 @@ function getAccuracyColor(accuracy: "high" | "medium" | "low"): string
 					</span>
 				</div>
 			{:else}
-				<p class="text-center text-muted-foreground">No sync data available yet</p>
+				<p class="text-muted-foreground text-center">No sync data available yet</p>
 			{/if}
 		</div>
 	</Dialog.Content>

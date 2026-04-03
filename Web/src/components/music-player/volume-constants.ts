@@ -1,4 +1,3 @@
-
 /**
  * This array maps a number from 0-100 to a volume curve.
  *

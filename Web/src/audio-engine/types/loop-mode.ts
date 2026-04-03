@@ -1,6 +1,5 @@
-export enum LoopMode
-{
+export enum LoopMode {
 	None = 0,
 	One = 1,
-	All = 2,
+	All = 2
 }

@@ -5,10 +5,7 @@
 	import { browser } from "$app/environment";
 	import { beforeNavigate, afterNavigate } from "$app/navigation";
 	import posthog from "posthog-js";
-	import {
-		QueryClient,
-		QueryClientProvider,
-	} from "@tanstack/svelte-query";
+	import { QueryClient, QueryClientProvider } from "@tanstack/svelte-query";
 	import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
 	import { Toaster } from "$lib/components/ui/sonner/index.js";
 

@@ -1,4 +1,4 @@
-export const ytCookiesOpenState = $state({open: false});
+export const ytCookiesOpenState = $state({ open: false });
 
 export function openYtCookiesDialog()
 {

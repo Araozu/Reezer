@@ -6,7 +6,7 @@ using Reezer.Domain.Utils;
 
 namespace Reezer.Application.Commands;
 
-public record UpdatePlayStateCommand(string RoomCode, bool IsPlaying, double? Position = null)
+public record UpdatePlayStateCommand(string RoomCode, bool IsPlaying, long? Position = null)
     : IRequest<OneOf<Success, NotFound>>;
 
 public class UpdatePlayStateHandler(IMusicRoomRepository roomRepository, IPublisher publisher)
@@ -23,11 +23,15 @@ public class UpdatePlayStateHandler(IMusicRoomRepository roomRepository, IPublis
             async room =>
             {
                 room.SetPlayState(request.IsPlaying, request.Position);
+                
+                // Get the position AFTER setting it to ensure we send the clamped/calculated value
+                var currentPos = room.CurrentPosition;
+                
                 await publisher.Publish(
                     new PlayStateChangedNotification(
                         room.Code,
                         room.IsPlaying,
-                        room.CurrentPosition,
+                        currentPos,
                         room.LastUpdateServerTime
                     ),
                     cancellationToken

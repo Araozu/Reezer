@@ -9,12 +9,15 @@
 	const roomId = page.params.roomId;
 </script>
 
-<a class="inline-block touch-action-manipulation [-webkit-tap-highlight-color:transparent]" href={`/${roomId}/artists/${artist.id}`}>
+<a
+	class="touch-action-manipulation inline-block [-webkit-tap-highlight-color:transparent]"
+	href={`/${roomId}/artists/${artist.id}`}
+>
 	<Card.Root
-		class="w-full hover:bg-glass-bg-hover hover:border-glass-border-hover transition-all duration-300 relative overflow-hidden"
+		class="hover:bg-glass-bg-hover hover:border-glass-border-hover relative w-full overflow-hidden transition-all duration-300"
 	>
 		<Card.Header class="relative z-10">
-			<Card.Title class="font-display truncate text-center py-8">
+			<Card.Title class="font-display py-8 truncate text-center">
 				{artist.name}
 			</Card.Title>
 		</Card.Header>

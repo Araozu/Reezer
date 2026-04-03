@@ -1,4 +1,4 @@
-export const ytOpenState = $state({open: false});
+export const ytOpenState = $state({ open: false });
 
 export function openYtQueue()
 {

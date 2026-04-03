@@ -6,8 +6,7 @@ import type { ISong, LoopMode } from "../types";
  * The queue owns a IAudioBackend to play audio,
  * and manages the playback queue through this interface
  */
-export interface IQueue
-{
+export interface IQueue {
 	get queue(): Readonly<Array<ISong>>;
 	get currentSong(): ISong | null;
 	get currentIdx(): number;

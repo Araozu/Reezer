@@ -1,68 +1,76 @@
 <script lang="ts">
-import { page } from "$app/state";
-import type { PageProps } from "./$types";
-import type { components } from "~/api";
-import AlbumMobileView from "./AlbumMobileView.svelte";
-import AlbumDesktopView from "./AlbumDesktopView.svelte";
-import AlbumMobileSkeleton from "./AlbumMobileSkeleton.svelte";
-import AlbumDesktopSkeleton from "./AlbumDesktopSkeleton.svelte";
-import type { RegularSong } from "./queries";
-import { GetSvelteManagerContext } from "~/context/music-player-context";
+	import { page } from "$app/state";
+	import type { PageProps } from "./$types";
+	import type { components } from "~/api";
+	import AlbumMobileView from "./AlbumMobileView.svelte";
+	import AlbumDesktopView from "./AlbumDesktopView.svelte";
+	import AlbumMobileSkeleton from "./AlbumMobileSkeleton.svelte";
+	import AlbumDesktopSkeleton from "./AlbumDesktopSkeleton.svelte";
+	import type { RegularSong } from "./queries";
+	import { GetSvelteManagerContext } from "~/context/music-player-context";
 
-type AlbumWithTracklistDto = components["schemas"]["AlbumWithTracklistDto"];
+	type AlbumWithTracklistDto = components["schemas"]["AlbumWithTracklistDto"];
 
-let { data }: PageProps = $props();
+	let { data }: PageProps = $props();
 
-const svManager = GetSvelteManagerContext();
+	const svManager = GetSvelteManagerContext();
 
-const currentSongId = $derived(svManager.currentSong?.id ?? null);
+	const currentSongId = $derived(svManager.currentSong?.id ?? null);
 
-let albumId = $derived(page.params.albumId ?? "-");
-let roomId = $derived(page.params.roomId ?? "-");
+	let albumId = $derived(page.params.albumId ?? "-");
+	let roomId = $derived(page.params.roomId ?? "-");
 
-function getAlbumName(albumData: AlbumWithTracklistDto): string
-{
-	return albumData.name ?? "";
-}
+	function getAlbumName(albumData: AlbumWithTracklistDto): string
+	{
+		return albumData.name ?? "";
+	}
 
-function getSongs(albumData: AlbumWithTracklistDto): RegularSong[]
-{
-	return (albumData.songs ?? []).map((s) => ({
-		...s,
-		type: "regular",
-	}));
-}
+	function getSongs(albumData: AlbumWithTracklistDto): RegularSong[]
+	{
+		return (albumData.songs ?? []).map((s) => ({
+			...s,
+			id: s.id as string,
+			artist: s.artist ?? "",
+			album: s.album ?? "",
+			artistId: s.artistId ?? "",
+			albumId: s.albumId ?? "",
+			trackNumber: s.trackNumber ?? null,
+			discNumber: s.discNumber ?? null,
+			duration: Number(s.duration),
+			type: "regular" as const,
+		}));
+	}
 
-function getArtistId(songs: RegularSong[]): string
-{
-	return songs[0]?.artistId ?? "";
-}
+	function getArtistId(songs: RegularSong[]): string
+	{
+		return songs[0]?.artistId ?? "";
+	}
 
-function getArtistName(songs: RegularSong[]): string
-{
-	return songs[0]?.artist ?? "";
-}
+	function getArtistName(songs: RegularSong[]): string
+	{
+		return songs[0]?.artist ?? "";
+	}
 
-function getUniqueDiscs(songs: RegularSong[]): number[]
-{
-	const discs = new Set(songs.map((s) => Number(s.discNumber ?? 1)));
-	return Array.from(discs).sort((a, b) => a - b);
-}
+	function getUniqueDiscs(songs: RegularSong[]): number[]
+	{
+		const discs = new Set(songs.map((s) => Number(s.discNumber ?? 1)));
+		return Array.from(discs).sort((a, b) => a - b);
+	}
 
-function getSongsForDisc(songs: RegularSong[], discNumber: number): RegularSong[]
-{
-	return songs.filter((s) => Number(s.discNumber ?? 1) === discNumber);
-}
+	function getSongsForDisc(songs: RegularSong[], discNumber: number): RegularSong[]
+	{
+		return songs.filter((s) => Number(s.discNumber ?? 1) === discNumber);
+	}
 
-function getSongIndex(songs: RegularSong[], song: RegularSong): number
-{
-	return songs.findIndex((s) => s.id === song.id);
-}
+	function getSongIndex(songs: RegularSong[], song: RegularSong): number
+	{
+		return songs.findIndex((s) => s.id === song.id);
+	}
 
-function playFromSong(songs: RegularSong[], index: number)
-{
-	svManager.imanager.PlaySongList(songs.slice(index));
-}
+	function playFromSong(songs: RegularSong[], index: number)
+	{
+		svManager.imanager.PlaySongList(songs.slice(index));
+	}
 </script>
 
 <svelte:head>
@@ -70,20 +78,20 @@ function playFromSong(songs: RegularSong[], index: number)
 </svelte:head>
 
 {#await data.albumDataPromise}
-	<div class="block md:hidden">
+	<div class="md:hidden block">
 		<AlbumMobileSkeleton {albumId} />
 	</div>
-	<div class="hidden md:block">
+	<div class="md:block hidden">
 		<AlbumDesktopSkeleton {albumId} />
 	</div>
-	{:then albumData}
+{:then albumData}
 	{@const songs = getSongs(albumData)}
 	{@const albumName = getAlbumName(albumData)}
 	{@const artistId = getArtistId(songs)}
 	{@const artistName = getArtistName(songs)}
 	{@const uniqueDiscs = getUniqueDiscs(songs)}
 
-	<div class="block md:hidden">
+	<div class="md:hidden block">
 		<AlbumMobileView
 			{albumId}
 			{albumName}
@@ -102,7 +110,7 @@ function playFromSong(songs: RegularSong[], index: number)
 			{artistName}
 		/>
 	</div>
-	<div class="hidden md:block">
+	<div class="md:block hidden">
 		<AlbumDesktopView
 			{albumId}
 			{albumName}
@@ -121,8 +129,8 @@ function playFromSong(songs: RegularSong[], index: number)
 			{artistName}
 		/>
 	</div>
-	{:catch error}
-	<div class="flex flex-col items-center justify-center h-64 gap-4">
+{:catch error}
+	<div class="h-64 gap-4 flex flex-col items-center justify-center">
 		<p class="text-destructive">Error loading album</p>
 		<p class="text-muted-foreground text-sm">{error?.message ?? "Unknown error"}</p>
 	</div>

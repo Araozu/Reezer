@@ -65,7 +65,7 @@ export class WebAudioBackend implements IAudioBackend
 
 	get duration(): number | null
 	{
-		return this.currentBuffer ? this.currentBuffer.duration : null;
+		return this.currentBuffer ? this.currentBuffer.duration * 1000 : null;
 	}
 
 	get playState(): PlayState
@@ -76,8 +76,8 @@ export class WebAudioBackend implements IAudioBackend
 	get position(): number
 	{
 		if (!this.audioContext) return 0;
-		if (this.isPaused) return this.pausedAt;
-		return Math.max(0, this.audioContext.currentTime - this.startedAt);
+		if (this.isPaused) return this.pausedAt * 1000;
+		return Math.max(0, (this.audioContext.currentTime - this.startedAt) * 1000);
 	}
 
 	async Play(track: ISong): Promise<void>
@@ -116,7 +116,7 @@ export class WebAudioBackend implements IAudioBackend
 			this.isPaused = false;
 			this.playBuffer(this.prefetchedBuffer, 0);
 			this.ClearPrefetch();
-			this.notifyDurationChange(this.currentBuffer.duration);
+			this.notifyDurationChange(this.currentBuffer.duration * 1000);
 			this.notifyPlayStateChange("playing");
 			this.startPositionTracking();
 			return;
@@ -143,7 +143,7 @@ export class WebAudioBackend implements IAudioBackend
 						this.pausedAt = 0;
 						this.isPaused = false;
 						this.playBuffer(buffer, 0);
-						this.notifyDurationChange(buffer.duration);
+						this.notifyDurationChange(buffer.duration * 1000);
 						this.notifyPlayStateChange("playing");
 						this.startPositionTracking();
 					}
@@ -214,7 +214,8 @@ export class WebAudioBackend implements IAudioBackend
 			return;
 		}
 
-		const clampedPosition = Math.max(0, Math.min(position, this.currentBuffer.duration));
+		const positionSeconds = position / 1000;
+		const clampedPosition = Math.max(0, Math.min(positionSeconds, this.currentBuffer.duration));
 
 		this.stopCurrentSource();
 		this.pausedAt = clampedPosition;
@@ -252,7 +253,7 @@ export class WebAudioBackend implements IAudioBackend
 						this.currentSongId = id;
 						this.pausedAt = 0;
 						this.isPaused = true;
-						this.notifyDurationChange(buffer.duration);
+						this.notifyDurationChange(buffer.duration * 1000);
 						this.notifyPlayStateChange("paused");
 					}
 					else
@@ -328,12 +329,12 @@ export class WebAudioBackend implements IAudioBackend
 		this.songEndCallbacks.push(callback);
 	}
 
-	OnPositionUpdate(callback: (positionSeconds: number) => void): void
+	OnPositionUpdate(callback: (positionMs: number) => void): void
 	{
 		this.positionUpdateCallbacks.push(callback);
 	}
 
-	OnDurationChange(callback: (durationSeconds: number) => void): void
+	OnDurationChange(callback: (durationMs: number) => void): void
 	{
 		this.durationChangeCallbacks.push(callback);
 	}
@@ -468,7 +469,7 @@ export class WebAudioBackend implements IAudioBackend
 			this.currentSongStartTime = Date.now();
 			this.pausedAt = 0;
 			this.playBuffer(this.prefetchedBuffer, 0);
-			this.notifyDurationChange(this.currentBuffer.duration);
+			this.notifyDurationChange(this.currentBuffer.duration * 1000);
 			this.notifyPlayStateChange("playing");
 			this.startPositionTracking();
 
@@ -501,13 +502,13 @@ export class WebAudioBackend implements IAudioBackend
 				return;
 			}
 
-			const currentPosition = this.audioContext.currentTime - this.startedAt;
-			const currentSecond = Math.floor(currentPosition);
+			const currentPosition = (this.audioContext.currentTime - this.startedAt) * 1000;
+			const currentSecond = Math.floor(currentPosition / 1000);
 
 			if (currentSecond !== this.lastReportedSecond)
 			{
 				this.lastReportedSecond = currentSecond;
-				this.positionUpdateCallbacks.forEach((cb) => cb(currentSecond));
+				this.positionUpdateCallbacks.forEach((cb) => cb(currentPosition));
 			}
 		}, 250);
 	}

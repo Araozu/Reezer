@@ -14,13 +14,13 @@ export default defineConfig(
 	js.configs.recommended,
 	{
 		rules: {
-			"indent": ["error", "tab"],
+			indent: ["error", "tab"],
 			"brace-style": ["error", "allman"],
 			"no-tabs": "off",
-			"quotes": ["error", "double"],
-			"semi": ["error", "always"],
-			"semi-spacing": ["error", { "before": false, "after": true }],
-			"no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 1 }],
+			quotes: ["error", "double"],
+			semi: ["error", "always"],
+			"semi-spacing": ["error", { before: false, after: true }],
+			"no-multiple-empty-lines": ["error", { max: 1, maxEOF: 1 }],
 			// migrated
 			"no-const-assign": "error",
 			"no-var": "error",
@@ -48,7 +48,7 @@ export default defineConfig(
 			"no-multi-assign": "error",
 			"no-plusplus": "error",
 			"operator-linebreak": "error",
-			"eqeqeq": "error",
+			eqeqeq: "error",
 			"no-case-declarations": "error",
 			"no-nested-ternary": "error",
 			"no-unneeded-ternary": "error",
@@ -64,7 +64,7 @@ export default defineConfig(
 			"key-spacing": "error",
 			"no-trailing-spaces": "error",
 			"comma-style": "error",
-			"radix": "error",
+			radix: "error",
 			"no-new-wrappers": "error",
 		},
 	},
@@ -81,11 +81,7 @@ export default defineConfig(
 		},
 	},
 	{
-		files: [
-			"**/*.svelte",
-			"**/*.svelte.ts",
-			"**/*.svelte.js",
-		],
+		files: ["**/*.svelte", "**/*.svelte.ts", "**/*.svelte.js"],
 		languageOptions: {
 			parserOptions: {
 				projectService: true,

@@ -12,28 +12,28 @@
 </svelte:head>
 
 {#await data.artistDataPromise}
-	<h1 class="font-display text-4xl font-semibold py-8 px-4 flex items-center gap-3">
+	<h1 class="font-display text-4xl font-semibold py-8 px-4 gap-3 flex items-center">
 		<BackButton />
 		<span class="font-medium">&nbsp;</span>
 	</h1>
 
 	<div class="px-4">
 		<h2 class="text-2xl font-semibold mb-4">Albums</h2>
-		<div class="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-3 grid-cols-2 gap-2">
+		<div class="xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-3 gap-2 grid grid-cols-2">
 			{#each new Array(5).fill(null) as _, idx (idx)}
 				<AlbumCardSkeleton />
 			{/each}
 		</div>
 	</div>
 {:then artistData}
-	<h1 class="font-display text-4xl font-semibold py-8 px-4 flex items-center gap-3">
+	<h1 class="font-display text-4xl font-semibold py-8 px-4 gap-3 flex items-center">
 		<BackButton />
 		<span class="font-medium">{artistData.name}</span>
 	</h1>
 
 	<div class="px-4">
 		<h2 class="text-2xl font-semibold mb-4">Albums</h2>
-		<div class="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-3 grid-cols-2 gap-2">
+		<div class="xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-3 gap-2 grid grid-cols-2">
 			{#each artistData.albums ?? [] as album (album.id)}
 				<AlbumCard {album} />
 			{/each}

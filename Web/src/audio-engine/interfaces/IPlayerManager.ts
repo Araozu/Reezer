@@ -11,7 +11,7 @@ import type { PlayState } from "./IAudioBackend";
  */
 export interface IPlayerManager {
 	Init(): Promise<Result<void, unknown>>;
-	Deinit(): Promise<void>
+	Deinit(): Promise<void>;
 
 	/**
 	 * Checks if the current user has permission to perform the given action.
@@ -68,7 +68,7 @@ export interface IPlayerManager {
 	/** Toggles between play and pause. May fail if no permission. */
 	TogglePlayPause(): Promise<Result<void, unknown>>;
 
-	/** Seeks to a position in seconds. May fail if no permission. */
+	/** Seeks to a position in milliseconds. May fail if no permission. */
 	Seek(position: number): Promise<Result<void, unknown>>;
 
 	/**
@@ -76,7 +76,7 @@ export interface IPlayerManager {
 	 *
 	 * Always allowed, the volume is local only.
 	 */
-	SetVolume(volume: number): void
+	SetVolume(volume: number): void;
 	/** Gets the current volume, as a value between 0 and 1. */
 	GetVolume(): number;
 
@@ -91,23 +91,23 @@ export interface IPlayerManager {
 
 	OnQueueChanged(callback: () => void): void;
 	OnPlayStateChanged(callback: (state: PlayState) => void): void;
-	OnPositionUpdate(callback: (positionSeconds: number) => void): void;
-	OnDurationChange(callback: (durationSeconds: number) => void): void;
+	OnPositionUpdate(callback: (positionMs: number) => void): void;
+	OnDurationChange(callback: (durationMs: number) => void): void;
 }
 
-export type Action = "PlaySong"
-                   | "PlaySongList"
-                   | "AddLastSong"
-                   | "AddLastSongList"
-                   | "AddNextSong"
-                   | "AddNextSongList"
-                   | "Next"
-                   | "Prev"
-                   | "PlayAt"
-                   | "ClearQueue"
-                   | "RemoveAt"
-                   | "SetQueue"
-                   | "SetLoopMode"
-                   | "TogglePlayPause"
-                   | "Seek"
-
+export type Action =
+	| "PlaySong"
+	| "PlaySongList"
+	| "AddLastSong"
+	| "AddLastSongList"
+	| "AddNextSong"
+	| "AddNextSongList"
+	| "Next"
+	| "Prev"
+	| "PlayAt"
+	| "ClearQueue"
+	| "RemoveAt"
+	| "SetQueue"
+	| "SetLoopMode"
+	| "TogglePlayPause"
+	| "Seek";

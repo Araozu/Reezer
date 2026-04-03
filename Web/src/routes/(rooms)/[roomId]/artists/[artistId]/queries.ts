@@ -15,4 +15,3 @@ export function useArtistByIdQuery($artistId: Readable<string>)
 		refetchOnWindowFocus: false,
 	})));
 }
-

@@ -26,7 +26,7 @@ export class SoloPlayerManager implements IPlayerManager
 		this.queueManager = new GeneralPurposeQueue(this.audioBackend);
 
 		// Setup music player
-		this.mediaSession = new BrowserMediaSession(this.queueManager , this.audioBackend);
+		this.mediaSession = new BrowserMediaSession(this.queueManager, this.audioBackend);
 		this.mediaSession.Init();
 	}
 
@@ -194,12 +194,12 @@ export class SoloPlayerManager implements IPlayerManager
 		this.audioBackend.OnPlayStateChange(callback);
 	}
 
-	OnPositionUpdate(callback: (positionSeconds: number) => void): void
+	OnPositionUpdate(callback: (positionMs: number) => void): void
 	{
 		this.audioBackend.OnPositionUpdate(callback);
 	}
 
-	OnDurationChange(callback: (durationSeconds: number) => void): void
+	OnDurationChange(callback: (durationMs: number) => void): void
 	{
 		this.audioBackend.OnDurationChange(callback);
 	}

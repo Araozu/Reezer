@@ -1,66 +1,69 @@
 <script lang="ts">
-import type { components } from "~/api";
-import * as Card from "~/lib/components/ui/card-plain";
-import AlbumCover from "./album-cover.svelte";
-import { page } from "$app/state";
-import { extractColorsFromImage } from "$lib/color-extractor";
+	import type { components } from "~/api";
+	import * as Card from "~/lib/components/ui/card-plain";
+	import AlbumCover from "./album-cover.svelte";
+	import { page } from "$app/state";
+	import { extractColorsFromImage } from "$lib/color-extractor";
 
-type Album = components["schemas"]["AlbumDto"];
+	type Album = components["schemas"]["AlbumDto"];
 
-let { album }: { album: Album } = $props();
-const roomId = page.params.roomId;
+	let { album }: { album: Album } = $props();
+	const roomId = page.params.roomId;
 
-let isHovered = $state(false);
-let extractedColors = $state<string[]>([]);
-let hasTriedExtraction = $state(false);
+	let isHovered = $state(false);
+	let extractedColors = $state<string[]>([]);
+	let hasTriedExtraction = $state(false);
 
-let showGlow = $derived(isHovered && extractedColors.length > 0);
+	let showGlow = $derived(isHovered && extractedColors.length > 0);
 
-const coverUrl = `/api/Albums/${album.id}/cover`;
+	const coverUrl = `/api/Albums/${album.id}/cover`;
 
-$effect(() =>
-{
-	if (isHovered && extractedColors.length === 0 && !hasTriedExtraction)
+	$effect(() =>
 	{
-		hasTriedExtraction = true;
-		extractColorsFromImage(coverUrl, 4).then((result) =>
+		if (isHovered && extractedColors.length === 0 && !hasTriedExtraction)
 		{
-			extractedColors = result.colors;
-		});
-	}
-});
+			hasTriedExtraction = true;
+			extractColorsFromImage(coverUrl, 4).then((result) =>
+			{
+				extractedColors = result.colors;
+			});
+		}
+	});
 </script>
 
-<a class="inline-block touch-action-manipulation [-webkit-tap-highlight-color:transparent]" href={`/${roomId}/albums/${album.id}`}>
+<a
+	class="touch-action-manipulation inline-block [-webkit-tap-highlight-color:transparent]"
+	href={`/${roomId}/albums/${album.id}`}
+>
 	<Card.Root
-		class="w-full transition-all duration-300 relative overflow-hidden"
+		class="relative w-full overflow-hidden transition-all duration-300"
 		onmouseenter={() => (isHovered = true)}
 		onmouseleave={() => (isHovered = false)}
 	>
 		<div
-			class="absolute inset-0 transition-opacity {showGlow ? "duration-500" : "duration-250"}"
+			class="inset-0 absolute transition-opacity {showGlow ? "duration-500" : "duration-250"}"
 			style:opacity={showGlow ? 1 : 0}
 		>
 			{#if extractedColors.length > 0}
 				<div
-					class="absolute -top-[20%] -left-[20%] w-[70%] h-[70%] rounded-full blur-3xl opacity-50"
+					class="blur-3xl absolute -top-[20%] -left-[20%] h-[70%] w-[70%] rounded-full opacity-50"
 					style:background-color={extractedColors[0]}
 				></div>
 				{#if extractedColors[1]}
 					<div
-						class="absolute -bottom-[20%] -right-[20%] w-[70%] h-[70%] rounded-full blur-3xl opacity-50"
+						class="blur-3xl absolute -right-[20%] -bottom-[20%] h-[70%] w-[70%] rounded-full opacity-50"
 						style:background-color={extractedColors[1]}
 					></div>
 				{/if}
 				{#if extractedColors[2]}
 					<div
-						class="absolute -top-[20%] -right-[20%] w-[50%] h-[50%] rounded-full blur-3xl opacity-50"
+						class="blur-3xl absolute -top-[20%] -right-[20%] h-[50%] w-[50%] rounded-full opacity-50"
 						style:background-color={extractedColors[2]}
 					></div>
 				{/if}
 				{#if extractedColors[3]}
 					<div
-						class="absolute -bottom-[20%] -left-[10%] w-[50%] h-[50%] rounded-full blur-3xl opacity-50"
+						class="blur-3xl absolute -bottom-[20%] -left-[10%] h-[50%] w-[50%] rounded-full opacity-50"
 						style:background-color={extractedColors[3]}
 					></div>
 				{/if}
@@ -77,7 +80,7 @@ $effect(() =>
 				href={`/${roomId}/artists/${album.artistId}`}
 				class="touch-action-manipulation [-webkit-tap-highlight-color:transparent]"
 			>
-				<Card.Description class="truncate hover:text-foreground transition-colors">
+				<Card.Description class="hover:text-foreground truncate transition-colors">
 					<span>{album.artistName}</span>
 				</Card.Description>
 			</a>

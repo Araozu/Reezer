@@ -1,8 +1,8 @@
-import {ok,type  Result} from "neverthrow";
+import { ok, type Result } from "neverthrow";
 import type { IAudioSource } from "../interfaces/IAudioSource";
 import type { ISong } from "../types";
 
-type UrlAudioError = "NotFound" | "Other"
+type UrlAudioError = "NotFound" | "Other";
 
 /**
  * Gets audio tracks from the default streaming backend,

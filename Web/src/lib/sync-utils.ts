@@ -1,8 +1,8 @@
 export interface SyncResult {
-  roundTripTime: number; // in milliseconds
-  clockOffset: number; // in milliseconds (positive = server is ahead, negative = client is ahead)
-  serverTime: number; // synchronized server time in milliseconds
-  accuracy: "high" | "medium" | "low";
+	roundTripTime: number; // in milliseconds
+	clockOffset: number; // in milliseconds (positive = server is ahead, negative = client is ahead)
+	serverTime: number; // synchronized server time in milliseconds
+	accuracy: "high" | "medium" | "low";
 }
 
 export function CalculateMAD(values: number[]): number
@@ -15,10 +15,10 @@ export function CalculateMAD(values: number[]): number
 }
 
 /**
-   * Gets the current synchronized server time
-   * @param syncResult Previous sync result to base calculation on
-   * @returns Current synchronized server time in milliseconds
-   */
+ * Gets the current synchronized server time
+ * @param syncResult Previous sync result to base calculation on
+ * @returns Current synchronized server time in milliseconds
+ */
 export function GetSynchronizedTime(syncResult?: SyncResult): number
 {
 	if (syncResult)
@@ -32,10 +32,10 @@ export function GetSynchronizedTime(syncResult?: SyncResult): number
 }
 
 /**
-   * Checks if synchronization is still valid
-   * @param lastSyncTime When the last sync was performed
-   * @param maxAge Maximum age in milliseconds (default: 5 minutes)
-   */
+ * Checks if synchronization is still valid
+ * @param lastSyncTime When the last sync was performed
+ * @param maxAge Maximum age in milliseconds (default: 5 minutes)
+ */
 export function IsSyncValid(lastSyncTime: number, maxAge = 5 * 60 * 1000): boolean
 {
 	return Date.now() - lastSyncTime < maxAge;

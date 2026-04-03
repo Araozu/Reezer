@@ -49,7 +49,7 @@ export class BrowserMediaSession implements IMediaSession
 		{
 			if (details.seekTime !== undefined)
 			{
-				this.backend.Seek(details.seekTime);
+				this.backend.Seek(details.seekTime * 1000);
 			}
 		});
 
@@ -105,9 +105,7 @@ export class BrowserMediaSession implements IMediaSession
 		}
 
 		const artworkArray = finalArtwork
-			? [
-				{ src: finalArtwork, sizes: "600x600", type: "image/jpeg" },
-			  ]
+			? [{ src: finalArtwork, sizes: "600x600", type: "image/jpeg" }]
 			: [];
 
 		navigator.mediaSession.metadata = new MediaMetadata({
@@ -136,7 +134,7 @@ export class BrowserMediaSession implements IMediaSession
 		}
 	}
 
-	UpdatePosition(position: number, duration: number): void
+	UpdatePosition(positionMs: number, durationMs: number): void
 	{
 		if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
 		if (!("setPositionState" in navigator.mediaSession)) return;
@@ -144,9 +142,9 @@ export class BrowserMediaSession implements IMediaSession
 		try
 		{
 			navigator.mediaSession.setPositionState({
-				duration: duration,
+				duration: durationMs / 1000,
 				playbackRate: 1.0,
-				position: position,
+				position: positionMs / 1000,
 			});
 		}
 		catch (e)

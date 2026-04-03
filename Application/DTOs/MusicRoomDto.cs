@@ -8,6 +8,6 @@ public record MusicRoomStateDto(
     IEnumerable<Domain.Entities.Room.RoomSong> Queue,
     int CurrentIndex,
     bool IsPlaying,
-    double CurrentPosition,
+    long CurrentPosition,
     long LastUpdateServerTime
 );

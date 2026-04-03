@@ -46,7 +46,7 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class="max-w-4xl max-h-[90vh] flex flex-col">
+	<Dialog.Content class="max-w-4xl flex max-h-[90vh] flex-col">
 		<Dialog.Header>
 			<Dialog.Title>Search on YouTube</Dialog.Title>
 			<Dialog.Description>
@@ -54,23 +54,25 @@
 			</Dialog.Description>
 		</Dialog.Header>
 
-		<div class="flex-1 min-h-0 space-y-4 overflow-hidden">
-			<div class="aspect-video w-full rounded-xl overflow-hidden bg-glass-bg border border-glass-border">
+		<div class="min-h-0 space-y-4 flex-1 overflow-hidden">
+			<div
+				class="aspect-video rounded-xl bg-glass-bg border-glass-border w-full overflow-hidden border"
+			>
 				<iframe
 					src={youtubeSearchUrl}
 					title="YouTube Search"
-					class="w-full h-full"
+					class="h-full w-full"
 					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 					allowfullscreen
 				></iframe>
 			</div>
 
 			<div class="space-y-3">
-				<div class="flex items-start gap-2 p-3 rounded-xl bg-glass-bg border border-glass-border">
-					<HelpCircle class="size-5 text-muted-foreground shrink-0 mt-0.5" />
+				<div class="gap-2 p-3 rounded-xl bg-glass-bg border-glass-border flex items-start border">
+					<HelpCircle class="size-5 text-muted-foreground mt-0.5 shrink-0" />
 					<div class="text-sm text-muted-foreground">
 						<p class="font-medium text-foreground mb-1">How to add a YouTube song:</p>
-						<ol class="list-decimal list-inside space-y-1">
+						<ol class="space-y-1 list-inside list-decimal">
 							<li>Search for the song in the YouTube player above</li>
 							<li>Click on the video you want</li>
 							<li>Copy the URL from your browser's address bar</li>
@@ -79,7 +81,7 @@
 					</div>
 				</div>
 
-				<div class="flex gap-3">
+				<div class="gap-3 flex">
 					<Input
 						type="url"
 						placeholder="Paste YouTube URL here (e.g., https://youtube.com/watch?v=...)"
@@ -87,10 +89,7 @@
 						onkeydown={handleKeydown}
 						class="flex-1"
 					/>
-					<Button
-						onclick={handleAddSong}
-						disabled={!ytUrl.trim() || $addYtSongMutation.isPending}
-					>
+					<Button onclick={handleAddSong} disabled={!ytUrl.trim() || $addYtSongMutation.isPending}>
 						{#if $addYtSongMutation.isPending}
 							<Loader2 class="size-4 animate-spin" />
 						{:else}
@@ -104,7 +103,7 @@
 						href={youtubeSearchUrl}
 						target="_blank"
 						rel="noopener noreferrer"
-						class="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+						class="text-sm text-muted-foreground hover:text-foreground gap-1 flex items-center transition-colors"
 					>
 						Open in new tab
 						<ExternalLink class="size-3" />
@@ -114,9 +113,7 @@
 		</div>
 
 		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (open = false)}>
-				Close
-			</Button>
+			<Button variant="outline" onclick={() => (open = false)}>Close</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

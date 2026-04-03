@@ -24,10 +24,11 @@ public class UnifiedSearchUseCase(IUnifiedSearchRepository repository)
             s.Album.Artist.Name,
             s.Album.Name,
             s.Album.ArtistId,
-            s.Album.Id
+            s.Album.Id,
+            (long)(s.Duration * 1000)
         ));
 
-        var ytSongDtos = ytSongs.Select(y => new YtSongDto(y.YtId, y.Name, y.CachedPath));
+        var ytSongDtos = ytSongs.Select(y => new YtSongDto(y.YtId, y.Name, y.CachedPath, (long)(y.Duration * 1000)));
 
         var albumDtos = albums.Select(a => new AlbumDto(
             a.Id,
